@@ -216,7 +216,84 @@
       }
     }
   },
-  "about": {},
+  "about": {
+    "hero": {
+      "badge": "Empowering Food Businesses",
+      "titleLineOne": "Our Mission: To",
+      "titleLineTwo": "Revolutionize",
+      "titleLineThree": "How the World Eats.",
+      "description": "We're building the infrastructure that allows restaurants of all sizes to thrive in a digital-first world. From small cafes to global franchises, we provide the tools to manage every detail seamlessly.",
+      "partnersLabel": "Global Partners Trust Us",
+      "imageOverlayEyebrow": "Innovation in every dish",
+      "imageOverlayTitle": "The Core of Our Operations",
+      "growthFactor": "Growth Factor"
+    },
+    "journey": {
+      "title": "Our Journey",
+      "description": "From a small startup in a garage to a global leader in restaurant technology. Here’s how we got here."
+    },
+    "timeline": {
+      "founded": {
+        "title": "Founded with Vision",
+        "description": "Our founders identified the friction between kitchen operations and digital ordering systems."
+      },
+      "pivot": {
+        "title": "The Great Pivot",
+        "description": "During the global pandemic, we helped over 10,000 restaurants transition to digital-only formats overnight."
+      },
+      "globalExpansion": {
+        "title": "Global Expansion",
+        "description": "Opened offices in London, Singapore, and New York to better serve our growing international client base."
+      }
+    },
+    "teamSection": {
+      "title": "Meet the Visionaries",
+      "description": "Leading the charge in redefining the food industry landscape."
+    },
+    "team": {
+      "marcus": {
+        "role": "CEO & Co-Founder",
+        "description": "Ex-Google engineer with a passion for streamlining complex logistics."
+      },
+      "sarah": {
+        "role": "CTO",
+        "description": "Leading our architecture to support 1M+ transactions per second."
+      },
+      "david": {
+        "role": "COO",
+        "description": "Focused on expanding our global footprint and operational excellence."
+      },
+      "elena": {
+        "role": "Head of Product",
+        "description": "Designing intuitive experiences for both chefs and customers."
+      }
+    },
+    "valuesSection": {
+      "title": "Values That Drive Us",
+      "description": "The core principles behind every line of code we write."
+    },
+    "values": {
+      "speed": {
+        "title": "Speed & Agility",
+        "description": "The food industry moves fast. Our platform moves faster to keep you ahead of the curve."
+      },
+      "restaurantFirst": {
+        "title": "Restaurant First",
+        "description": "Every feature we build starts with a conversation with a chef or restaurant owner."
+      },
+      "trust": {
+        "title": "Ironclad Trust",
+        "description": "Your data and your revenue are safe with our enterprise-grade security protocols."
+      }
+    },
+    "cta": {
+      "title": "Ready to Transform Your Business?",
+      "descriptionLineOne": "Join over 120,000+ restaurant owners who have taken their operations",
+      "descriptionLineTwo": "to the next level.",
+      "primaryButton": "Get Started Now",
+      "secondaryButton": "Request a Demo"
+    }
+  },
   "services": {},
   "categories": {},
   "pricing": {},

@@ -9,7 +9,7 @@ interface TeamCardProps {
   image: string;
 }
 
-const TeamCard: React.FC<TeamCardProps> = ({ name, role, description, image }) => {
+export function TeamCard({ name, role, description, image }: TeamCardProps) {
   return (
     <div className="flex flex-col items-center text-center group">
       {/* Image Wrapper */}
@@ -33,6 +33,4 @@ const TeamCard: React.FC<TeamCardProps> = ({ name, role, description, image }) =
       <p className="text-slate-600 text-sm mt-3 max-w-xs leading-5">{description}</p>
     </div>
   );
-};
-
-export default TeamCard;
+}

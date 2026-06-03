@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Accordion,
   AccordionContent,
@@ -7,9 +5,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { pricingFaqData } from "@/constants/faq";
-import SectionHeader from "../about/SectionHeader";
+import { SectionHeader } from "../about/SectionHeader";
 
-const Faq = () => {
+export function Faq() {
   return (
     <section className="w-full bg-slate-50 py-24 px-6">
       <div className="max-w-4xl mx-auto flex flex-col gap-16">
@@ -43,6 +41,4 @@ const Faq = () => {
       </div>
     </section>
   );
-};
-
-export default Faq;
+}

@@ -7,11 +7,11 @@ interface SectionHeaderProps {
   maxWidth?: string; // optional custom max width
 }
 
-const SectionHeader: React.FC<SectionHeaderProps> = ({
+export function SectionHeader({
   title,
   description,
   align = "center",
-}) => {
+}: SectionHeaderProps) {
   const textAlignClass =
     align === "center" ? "text-center" : align === "left" ? "text-left" : "text-right";
 
@@ -21,6 +21,4 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
       <p className="text-slate-600 text-sm sm:text-base leading-6">{description}</p>
     </div>
   );
-};
-
-export default SectionHeader;
+}

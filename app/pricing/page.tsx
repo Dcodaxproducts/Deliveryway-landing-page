@@ -1,6 +1,6 @@
-import Cta from '@/components/about/Cta'
-import Comparison from '@/components/pricing/Comparison'
-import Faq from '@/components/pricing/Faq'
+import { Cta } from '@/components/about/Cta'
+import { Comparison } from '@/components/pricing/Comparison'
+import { Faq } from '@/components/pricing/Faq'
 import Plans from '@/components/pricing/Plans'
 import Hero from '@/components/shared/Hero'
 

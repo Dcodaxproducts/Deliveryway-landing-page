@@ -1,12 +1,14 @@
 "use client";
 
+import type { ElementType } from "react";
+
 interface ValueCardProps {
   title: string;
   description: string;
-  Icon: React.ElementType;
+  Icon: ElementType;
 }
 
-const ValueCard: React.FC<ValueCardProps> = ({ title, description, Icon }) => {
+export function ValueCard({ title, description, Icon }: ValueCardProps) {
   return (
     <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 group">
       {/* Icon */}
@@ -21,6 +23,4 @@ const ValueCard: React.FC<ValueCardProps> = ({ title, description, Icon }) => {
       <p className="text-slate-600 text-sm leading-6 mt-3">{description}</p>
     </div>
   );
-};
-
-export default ValueCard;
+}

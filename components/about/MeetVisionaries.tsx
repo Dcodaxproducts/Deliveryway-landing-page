@@ -2,18 +2,21 @@
 
 import { team } from "@/constants/about";
 
-import SectionHeader from "./SectionHeader";
-import TeamCard from "../cards/TeamCard";
+import { SectionHeader } from "./SectionHeader";
+import { TeamCard } from "../cards/TeamCard";
+import { useTranslations } from "next-intl";
 
-const MeetVisionaries = () => {
+export function MeetVisionaries() {
+  const t = useTranslations();
+
   return (
     <section className="w-full py-16 lg:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-20 flex flex-col gap-14">
 
         {/* Header */}
         <SectionHeader
-          title="Meet the Visionaries"
-          description="Leading the charge in redefining the food industry landscape."
+          title={t("about.teamSection.title")}
+          description={t("about.teamSection.description")}
         />
 
         {/* Team Grid */}
@@ -22,8 +25,8 @@ const MeetVisionaries = () => {
             <TeamCard
               key={index}
               name={member.name}
-              role={member.role}
-              description={member.description}
+              role={t(member.roleKey)}
+              description={t(member.descriptionKey)}
               image={member.image}
             />
           ))}
@@ -32,6 +35,4 @@ const MeetVisionaries = () => {
       </div>
     </section>
   );
-};
-
-export default MeetVisionaries;
+}

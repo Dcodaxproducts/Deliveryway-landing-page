@@ -1,16 +1,19 @@
 "use client";
 
 import { timelineData } from "@/constants/about";
-import SectionHeader from "./SectionHeader";
+import { SectionHeader } from "./SectionHeader";
+import { useTranslations } from "next-intl";
 
-const OurJourney = () => {
+export function OurJourney() {
+  const t = useTranslations();
+
   return (
     <section className="w-full bg-slate-50 py-14 lg:py-20 px-5 lg:px-20 flex flex-col items-center gap-12 lg:gap-14">
       
       {/* Header */}
     <SectionHeader
-        title="Our Journey"
-        description="From a small startup in a garage to a global leader in restaurant technology. Here’s how we got here."
+        title={t("about.journey.title")}
+        description={t("about.journey.description")}
       />
 
       {/* Timeline Wrapper */}
@@ -40,10 +43,10 @@ const OurJourney = () => {
                 {item.align === "left" && (
                   <>
                     <h3 className="text-slate-900 text-xl sm:text-2xl font-bold">
-                      {item.title}
+                      {t(item.titleKey)}
                     </h3>
                     <p className="text-slate-600 text-base leading-6 mt-2 max-w-md ml-auto">
-                      {item.description}
+                      {t(item.descriptionKey)}
                     </p>
                   </>
                 )}
@@ -83,10 +86,10 @@ const OurJourney = () => {
                 {/* Mobile always shows content here */}
                 <div className="lg:hidden">
                   <h3 className="text-slate-900 text-lg font-bold">
-                    {item.title}
+                    {t(item.titleKey)}
                   </h3>
                   <p className="text-slate-600 text-sm leading-6 mt-2">
-                    {item.description}
+                    {t(item.descriptionKey)}
                   </p>
                 </div>
 
@@ -94,10 +97,10 @@ const OurJourney = () => {
                 {item.align === "right" && (
                   <div className="hidden lg:block">
                     <h3 className="text-slate-900 text-xl sm:text-2xl font-bold">
-                      {item.title}
+                      {t(item.titleKey)}
                     </h3>
                     <p className="text-slate-600 text-base leading-6 mt-2 max-w-md">
-                      {item.description}
+                      {t(item.descriptionKey)}
                     </p>
                   </div>
                 )}
@@ -109,6 +112,4 @@ const OurJourney = () => {
       </div>
     </section>
   );
-};
-
-export default OurJourney;
+}

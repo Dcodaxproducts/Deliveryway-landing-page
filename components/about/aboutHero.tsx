@@ -2,8 +2,11 @@
 
 import Image from "next/image";
 import { BadgeCheck, TrendingUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-const AboutHero = () => {
+export function AboutHero() {
+  const t = useTranslations("about.hero");
+
   return (
     <section className="w-full bg-[#CE181B] flex justify-center items-center px-6 lg:px-0 pt-12 lg:pt-7 pb-14 lg:pb-8 relative">
       
@@ -25,26 +28,26 @@ const AboutHero = () => {
           <div className="px-4 py-2 bg-neutral-50/10 rounded-full inline-flex items-center gap-3 justify-center lg:justify-start">
             <BadgeCheck className="w-4 h-4 text-white" />
             <span className="text-neutral-50 text-sm font-semibold mt-[2px]">
-              Empowering Food Businesses
+              {t("badge")}
             </span>
           </div>
 
           {/* Heading */}
           <div className="flex flex-col gap-1">
             <h1 className="text-white text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight lg:leading-[72px]">
-              Our Mission: To
+              {t("titleLineOne")}
             </h1>
             <h1 className="text-zinc-900 text-4xl sm:text-5xl lg:text-6xl font-extrabold">
-              Revolutionize
+              {t("titleLineTwo")}
             </h1>
             <h1 className="text-white text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight lg:leading-[72px]">
-              How the World Eats.
+              {t("titleLineThree")}
             </h1>
           </div>
 
           {/* Description */}
           <p className="text-gray-200 text-base sm:text-lg leading-7 max-w-xl mt-4">
-            We&apos;re building the infrastructure that allows restaurants of all sizes to thrive in a digital-first world. From small cafes to global franchises, we provide the tools to manage every detail seamlessly.
+            {t("description")}
           </p>
 
           {/* Social Proof */}
@@ -75,7 +78,7 @@ const AboutHero = () => {
 
             <div className="text-center sm:text-left">
               <div className="text-neutral-50 text-lg font-bold leading-7">120K+</div>
-              <div className="text-gray-200 text-sm">Global Partners Trust Us</div>
+              <div className="text-gray-200 text-sm">{t("partnersLabel")}</div>
             </div>
           </div>
         </div>
@@ -96,10 +99,10 @@ const AboutHero = () => {
             {/* Text Overlay */}
             <div className="absolute bottom-6 right-6 text-right">
               <p className="text-white text-sm font-medium opacity-80 rotate-1">
-                Innovation in every dish
+                {t("imageOverlayEyebrow")}
               </p>
               <p className="text-white text-lg sm:text-xl font-bold rotate-1">
-                The Core of Our Operations
+                {t("imageOverlayTitle")}
               </p>
             </div>
           </div>
@@ -112,7 +115,7 @@ const AboutHero = () => {
               </div>
               <div>
                 <p className="text-slate-800 text-xs font-bold uppercase tracking-wide">
-                  Growth Factor
+                  {t("growthFactor")}
                 </p>
                 <p className="text-red-600 text-2xl font-black">
                   +240%
@@ -125,6 +128,4 @@ const AboutHero = () => {
       </div>
     </section>
   );
-};
-
-export default AboutHero;
+}

@@ -216,7 +216,84 @@
       }
     }
   },
-  "about": {},
+  "about": {
+    "hero": {
+      "badge": "Food-Unternehmen stärken",
+      "titleLineOne": "Unsere Mission:",
+      "titleLineTwo": "Revolutionieren",
+      "titleLineThree": "wie die Welt isst.",
+      "description": "Wir bauen die Infrastruktur, mit der Restaurants jeder Größe in einer digital geprägten Welt erfolgreich sein können. Von kleinen Cafes bis zu globalen Franchise-Unternehmen liefern wir die Werkzeuge, um jedes Detail nahtlos zu verwalten.",
+      "partnersLabel": "Globale Partner vertrauen uns",
+      "imageOverlayEyebrow": "Innovation in jedem Gericht",
+      "imageOverlayTitle": "Der Kern unserer Abläufe",
+      "growthFactor": "Wachstumsfaktor"
+    },
+    "journey": {
+      "title": "Unsere Reise",
+      "description": "Von einem kleinen Startup in einer Garage zu einem globalen Marktführer für Restauranttechnologie. So sind wir hierher gekommen."
+    },
+    "timeline": {
+      "founded": {
+        "title": "Mit Vision gegründet",
+        "description": "Unsere Gründer erkannten die Reibung zwischen Küchenabläufen und digitalen Bestellsystemen."
+      },
+      "pivot": {
+        "title": "Der große Wandel",
+        "description": "Während der globalen Pandemie halfen wir über 10.000 Restaurants, über Nacht auf digitale Formate umzusteigen."
+      },
+      "globalExpansion": {
+        "title": "Globale Expansion",
+        "description": "Wir eröffneten Büros in London, Singapur und New York, um unseren wachsenden internationalen Kundenstamm besser zu betreuen."
+      }
+    },
+    "teamSection": {
+      "title": "Lernen Sie die Visionäre kennen",
+      "description": "Sie treiben die Neudefinition der Food-Branche voran."
+    },
+    "team": {
+      "marcus": {
+        "role": "CEO & Mitgründer",
+        "description": "Ehemaliger Google-Ingenieur mit Leidenschaft für die Vereinfachung komplexer Logistik."
+      },
+      "sarah": {
+        "role": "CTO",
+        "description": "Leitet unsere Architektur, um über 1 Mio. Transaktionen pro Sekunde zu unterstützen."
+      },
+      "david": {
+        "role": "COO",
+        "description": "Fokussiert auf den Ausbau unserer globalen Präsenz und operative Exzellenz."
+      },
+      "elena": {
+        "role": "Head of Product",
+        "description": "Gestaltet intuitive Erlebnisse für Köche und Kunden."
+      }
+    },
+    "valuesSection": {
+      "title": "Werte, die uns antreiben",
+      "description": "Die Grundprinzipien hinter jeder Codezeile, die wir schreiben."
+    },
+    "values": {
+      "speed": {
+        "title": "Tempo und Agilität",
+        "description": "Die Food-Branche bewegt sich schnell. Unsere Plattform bewegt sich schneller, damit Sie voraus bleiben."
+      },
+      "restaurantFirst": {
+        "title": "Restaurant zuerst",
+        "description": "Jede Funktion, die wir entwickeln, beginnt mit einem Gespräch mit einem Koch oder Restaurantbesitzer."
+      },
+      "trust": {
+        "title": "Unerschütterliches Vertrauen",
+        "description": "Ihre Daten und Ihr Umsatz sind mit unseren Sicherheitsprotokollen auf Unternehmensniveau geschützt."
+      }
+    },
+    "cta": {
+      "title": "Bereit, Ihr Geschäft zu transformieren?",
+      "descriptionLineOne": "Schließen Sie sich über 120.000+ Restaurantbesitzern an, die ihre Abläufe",
+      "descriptionLineTwo": "auf die nächste Stufe gebracht haben.",
+      "primaryButton": "Jetzt loslegen",
+      "secondaryButton": "Demo anfordern"
+    }
+  },
   "services": {},
   "categories": {},
   "pricing": {},
