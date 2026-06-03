@@ -47,7 +47,175 @@
     "termsOfService": "Nutzungsbedingungen",
     "copyright": "Copyright © 2025 Investo. Alle Rechte vorbehalten"
   },
-  "home": {},
+  "home": {
+    "hero": {
+      "badge": "Für Food-Unternehmen entwickelt",
+      "titleLineOne": "Das komplette Restaurant-Management",
+      "titleLineTwo": "System, das alles übernimmt.",
+      "descriptionLineOne": "Stärken Sie Ihre Marke und kontrollieren Sie Ihren Umsatz.",
+      "descriptionLineTwo": "Starten Sie Ihre eigene Food-Bestell-App in Tagen, nicht Monaten.",
+      "primaryCta": "Loslegen",
+      "secondaryCta": "Demo anfordern",
+      "totalIncome": "Gesamteinnahmen",
+      "foodLabels": {
+        "hotDog": "Hot Dog",
+        "pasta": "Pasta",
+        "donuts": "Donuts",
+        "burger": "Burger"
+      }
+    },
+    "sectionTwo": {
+      "stats": {
+        "operatingSystem": {
+          "title": "Ein komplettes Betriebssystem, das Restaurants hilft, Umsatz zu steigern und tägliche Abläufe mühelos zu führen."
+        },
+        "trustedOwners": {
+          "title": "Vertraut von Restaurantbesitzern wegen Zuverlässigkeit, intuitivem Design und Echtzeit-Kontrolle von Bestellungen."
+        },
+        "regionalGrowth": {
+          "title": "Wir helfen Restaurants mit starker Präsenz in mehreren Regionen und Liefernetzwerken zu wachsen."
+        }
+      }
+    },
+    "sectionThree": {
+      "title": "Beliebte Kategorien entdecken",
+      "descriptionLineOne": "Entdecken Sie die passende Auswahl aus unseren beliebtesten Optionen,",
+      "descriptionLineTwo": "damit Sie lernen, wachsen und erfolgreich sein können",
+      "viewAll": "Alle ansehen",
+      "categories": {
+        "menuManagement": {
+          "title": "Menüverwaltung",
+          "description": "Aktualisieren Sie Gerichte, Varianten, Preise und Lagerbestände ganz einfach."
+        },
+        "orderDelivery": {
+          "title": "Bestell- und Lieferablauf",
+          "description": "Aktualisieren Sie Gerichte, Varianten, Preise und Lagerbestände ganz einfach."
+        },
+        "salesAnalytics": {
+          "title": "Umsatz und Analysen",
+          "description": "Überwachen Sie Umsatz, beliebte Artikel, Stoßzeiten und Performance-Einblicke."
+        },
+        "customerFeedback": {
+          "title": "Kundenfeedback",
+          "description": "Sehen Sie Bewertungen, antworten Sie auf Reviews und stärken Sie Ihren Ruf."
+        },
+        "promotions": {
+          "title": "Aktionen und Rabatte",
+          "description": "Erstellen Sie Angebote, Promo-Codes und heben Sie Bestseller hervor."
+        },
+        "staffRoles": {
+          "title": "Personal- und Rollensteuerung",
+          "description": "Verwalten Sie Mitarbeiterkonten, Zugriffsstufen und Aktivitätsprotokolle."
+        }
+      }
+    },
+    "sectionFour": {
+      "trustedBy": "Vertraut von über",
+      "industryLeaders": "Branchenführern"
+    },
+    "sectionFive": {
+      "titleLineOne": "Lassen Sie Ihr Restaurant wachsen mit",
+      "titleLineTwo": "einer smarteren Lieferplattform",
+      "descriptionLineOne": "Unsere Technologie hilft Restaurants, Umsätze zu steigern,",
+      "descriptionLineTwo": "Abläufe zu optimieren und Kunden schneller zu erreichen - ganz ohne",
+      "descriptionLineThree": "Aufwand.",
+      "features": {
+        "createAccount": {
+          "title": "Restaurantkonto erstellen",
+          "description": "Richten Sie Ihren digitalen Store in Minuten ein. Laden Sie Ihr Menü hoch, definieren Sie Preise, fügen Sie Bilder hinzu und empfangen Sie sofort Bestellungen über unseren automatisierten Onboarding-Ablauf."
+        },
+        "realTimeOrders": {
+          "title": "Bestellungen in Echtzeit verwalten",
+          "description": "Verfolgen Sie neue Bestellungen, angenommene Bestellungen, Fahrerzuweisungen und Lieferfortschritt - alles live aktualisiert und auf allen Geräten synchron."
+        },
+        "support": {
+          "title": "24/7 Support für Restaurants",
+          "description": "Erhalten Sie jederzeit priorisierte Hilfe. Von technischem Support bis Menüoptimierung sorgt unser Team dafür, dass Ihre Abläufe reibungslos laufen."
+        }
+      }
+    },
+    "sectionSix": {
+      "titleLineOne": "Restaurantwachstum",
+      "titleLineTwo": "transformieren,",
+      "titleLineThree": "Bestellung für Bestellung.",
+      "description": "Unsere Plattform hilft Restaurants, smarter zu arbeiten, schneller zu bedienen und mühelos zu skalieren. Mit fortschrittlicher Automatisierung und Echtzeit-Einblicken bleiben Food-Unternehmen im Liefermarkt voraus.",
+      "checklist": {
+        "manageOrders": "Alle eingehenden Bestellungen sofort verwalten",
+        "performanceTools": "Smarte Tools zur Steigerung der Restaurantleistung",
+        "fasterDeliveries": "Schnellere Lieferungen, zufriedenere Kunden"
+      },
+      "features": {
+        "multiChannelSync": {
+          "title": "Multi-Channel-Synchronisierung",
+          "description": "Gebündelte Bestellungen von UberEats, DoorDash und Ihrer Website."
+        },
+        "kitchenDisplay": {
+          "title": "Kitchen Display System (KDS)",
+          "description": "Direkte papierlose Kommunikation zwischen Servicebereich und Küche."
+        },
+        "realTimeDispatch": {
+          "title": "Echtzeit-Disposition",
+          "description": "Koordinieren Sie lokale Fahrer oder 3PL-Lieferpartner sofort."
+        }
+      }
+    },
+    "sectionSeven": {
+      "titleLineOne": "Reibungslose und einfache",
+      "titleLineTwo": "Restaurant-Bestell",
+      "titleLineThree": "Verwaltung",
+      "description": "Mit benutzerfreundlichen Funktionen, wettbewerbsfähigen Wechselkursen und robusten Sicherheitsmaßnahmen vereinfacht unsere Plattform internationale Transaktionen.",
+      "checklist": {
+        "orderFlow": "Nahtloser Bestellfluss vom Kunden bis in Ihre Küche",
+        "menuControls": "Smarte Menü-, Preis- und Bestandskontrollen"
+      }
+    },
+    "sectionEight": {
+      "eyebrow": "FAQ",
+      "titleLineOne": "Häufig",
+      "titleLineTwo": "gestellte",
+      "titleLineThree": "Fragen",
+      "description": "Stellen Sie Ihre Fragen"
+    },
+    "faq": {
+      "allOrderTypes": {
+        "question": "Kann ich die Plattform für Vor-Ort- und Lieferbestellungen nutzen?",
+        "answer": "Ja, unser System unterstützt alle Bestellarten - Lieferung, Abholung und Vor-Ort-Bestellungen. Restaurants können alles über ein einziges Dashboard verwalten, das auf Geschwindigkeit und Effizienz ausgelegt ist."
+      },
+      "updateMenu": {
+        "question": "Wie aktualisiere ich mein Restaurantmenü?",
+        "answer": "Sie können Ihr Menü direkt im Restaurant-Dashboard aktualisieren. Fügen Sie Artikel hinzu oder entfernen Sie sie, ändern Sie Preise, verwalten Sie Varianten und steuern Sie Verfügbarkeit in Echtzeit ohne technische Hilfe."
+      },
+      "deliveryRiders": {
+        "question": "Stellen Sie Lieferfahrer bereit?",
+        "answer": "Wir unterstützen sowohl interne als auch externe Liefermodelle. Restaurants können eigene Fahrer nutzen oder je nach Geschäftsbedarf unterstützte Lieferpartner integrieren."
+      },
+      "joiningFees": {
+        "question": "Gibt es Gebühren für den Beitritt zur Plattform?",
+        "answer": "Es gibt keine Einrichtungsgebühren im Voraus. Die Preise hängen vom gewählten Plan und Bestellvolumen ab. Alle Details erhalten Sie beim Onboarding oder über unser Sales-Team."
+      },
+      "multipleDevices": {
+        "question": "Kann ich Bestellungen von mehreren Geräten verwalten?",
+        "answer": "Ja. Ihr Konto bleibt auf allen Geräten synchronisiert, sodass Sie Bestellungen, Menüs und Analysen gleichzeitig von Tablets, Smartphones oder Desktops verwalten können."
+      }
+    },
+    "sectionNine": {
+      "titleLineOne": "Laden Sie unsere Restaurant-App herunter",
+      "titleLineTwo": "und verwalten Sie Bestellungen mühelos!",
+      "descriptionLineOne": "Übernehmen Sie von überall die volle Kontrolle über Ihre Restaurantabläufe.",
+      "descriptionLineTwo": "Nehmen Sie Bestellungen an, aktualisieren Sie Menüs, verfolgen Sie Lieferungen und überwachen Sie die Leistung - alles",
+      "descriptionLineThree": "über unsere leistungsstarke, einfach zu nutzende mobile App.",
+      "descriptionLineFour": "Profitieren Sie von Echtzeit-Benachrichtigungen, schnelleren Workflows und einem nahtlosen",
+      "descriptionLineFive": "Management-Erlebnis für vielbeschäftigte Restaurantteams.",
+      "store": {
+        "googlePlayAlt": "Google Play",
+        "googlePlayEyebrow": "Jetzt bei",
+        "googlePlay": "Google Play",
+        "appStoreAlt": "App Store",
+        "appStoreEyebrow": "Laden im",
+        "appStore": "App Store"
+      }
+    }
+  },
   "about": {},
   "services": {},
   "categories": {},

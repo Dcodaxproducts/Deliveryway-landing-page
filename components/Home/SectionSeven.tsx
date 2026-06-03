@@ -1,22 +1,26 @@
+"use client";
+
 import { ContentWithChecklistSection } from "../shared/ContentWithChecklistSection";
+import { homeChecklistSections } from "@/constants/home";
+import { useTranslations } from "next-intl";
 
 export function SectionSeven() {
+  const t = useTranslations();
+  const section = homeChecklistSections.orderManagement;
+
   return (
     <ContentWithChecklistSection
       imagePosition="right" 
        reverseOnMobile
       title={
         <>
-          Smooth and Easy <br className="hidden sm:block" />
-          Restaurant Order <br className="hidden sm:block" />
-          Management
+          {t("home.sectionSeven.titleLineOne")} <br className="hidden sm:block" />
+          {t("home.sectionSeven.titleLineTwo")} <br className="hidden sm:block" />
+          {t("home.sectionSeven.titleLineThree")}
         </>
       }
-      description="With user-friendly features, competitive exchange rates, and robust security measures, our platform simplifies international transactions."
-      checklist={[
-        "Seamless order flow from customers to your kitchen",
-        "Smart menu, pricing, and inventory controls",
-      ]}
+      description={t(section.descriptionKey)}
+      checklist={section.checklistKeys.map((key) => t(key))}
       imageSrc="/assets/sectionSeven/map.png"
       imageAlt="Global restaurant order management map"
       imageWidth={560}

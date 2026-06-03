@@ -1,5 +1,7 @@
+"use client";
+
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 const topLogos = [
   { name: "Brand One", src: "/assets/sectionFour/brand1.png" },
@@ -14,14 +16,15 @@ const bottomLogos = [
   { name: "The Backside", src: "/assets/sectionFour/brand7.png" },
 ];
 
-export default function SectionFour() {
+export function SectionFour() {
+  const t = useTranslations("home.sectionFour");
+
   return (
     <section className="w-full bg-white py-12 md:py-15">
       <div className="mx-auto max-w-7xl px-4 text-center">
         {/* Heading */}
         <h2 className="text-xl font-medium text-gray-900 font-heading">
-          Trusted by Over <span className="font-bold">5,500+</span> Industry
-          Leaders
+          {t("trustedBy")} <span className="font-bold">5,500+</span> {t("industryLeaders")}
         </h2>
 
         {/* ================= MOBILE GRID (2 logos per row) ================= */}

@@ -1,7 +1,7 @@
 import OptimizedFeatures from '@/components/categories/DigitalFirstBlock'
 import OperationalExcellenceBlock from '@/components/categories/OperationalExcellenceBlock'
 import SalesAnalyticsBlock from '@/components/categories/SalesAnalyticsBlock'
-import SectionNine from '@/components/Home/SectionNine'
+import { SectionNine } from '@/components/Home/SectionNine'
 import Hero from '@/components/shared/Hero'
 
 const page = () => {

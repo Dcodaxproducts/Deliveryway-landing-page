@@ -1,23 +1,26 @@
+"use client";
+
 import { ContentWithChecklistSection } from "../shared/ContentWithChecklistSection";
+import { homeChecklistSections } from "@/constants/home";
+import { useTranslations } from "next-intl";
 
 export function SectionSix() {
+  const t = useTranslations();
+  const section = homeChecklistSections.growth;
+
   return (
     <ContentWithChecklistSection
       reverseOnMobile
       imagePosition="left"
       title={
         <>
-          Transforming <br className="hidden sm:block" />
-          Restaurant Growth, <br className="hidden sm:block" />
-          One Order at a Time.
+          {t("home.sectionSix.titleLineOne")} <br className="hidden sm:block" />
+          {t("home.sectionSix.titleLineTwo")} <br className="hidden sm:block" />
+          {t("home.sectionSix.titleLineThree")}
         </>
       }
-      description="Our platform empowers restaurants to operate smarter, serve faster, and scale effortlessly. Designed with advanced automation and real-time insights, we help food businesses stay ahead in a competitive delivery market."
-      checklist={[
-        "Manage all incoming orders instantly",
-        "Smart tools to boost restaurant performance",
-        "Faster deliveries, happier customers",
-      ]}
+      description={t(section.descriptionKey)}
+      checklist={section.checklistKeys.map((key) => t(key))}
       imageSrc="/assets/sectionSix/dining.png"
       imageAlt="Restaurant dining experience"
       imageWidth={520}

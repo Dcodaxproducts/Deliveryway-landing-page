@@ -1,7 +1,12 @@
+"use client";
+
 import { sectionTwoStats } from "@/constants/stats";
 import StatsCard from "../cards/StatsCard";
+import { useTranslations } from "next-intl";
 
-export default function SectionTwo() {
+export function SectionTwo() {
+  const t = useTranslations();
+
   return (
     <section className="w-full bg-white py-8 pt-20 md:py-10 md:pt-35">
       <div className="mx-auto max-w-7xl px-4">
@@ -11,7 +16,7 @@ export default function SectionTwo() {
               key={index}
               icon={item.icon}
               value={item.value}
-              title={item.title}
+              title={t(item.titleKey)}
               iconSize={item.iconSize}
             />
           ))}

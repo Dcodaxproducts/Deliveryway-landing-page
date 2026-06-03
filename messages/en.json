@@ -47,7 +47,175 @@
     "termsOfService": "Terms of Service",
     "copyright": "Copyright © 2025 Investo. All Rights Reserved"
   },
-  "home": {},
+  "home": {
+    "hero": {
+      "badge": "Powering Food Businesses",
+      "titleLineOne": "The Complete Restaurant Management",
+      "titleLineTwo": "System That Handles Everything.",
+      "descriptionLineOne": "Empower Your Brand, Control Your Revenue.",
+      "descriptionLineTwo": "Launch Your Own Branded Food Ordering App in Days, Not Months.",
+      "primaryCta": "Get Started",
+      "secondaryCta": "Request a demo",
+      "totalIncome": "Total Income",
+      "foodLabels": {
+        "hotDog": "Hot Dog",
+        "pasta": "Pasta",
+        "donuts": "Donuts",
+        "burger": "Burger"
+      }
+    },
+    "sectionTwo": {
+      "stats": {
+        "operatingSystem": {
+          "title": "A complete operating system designed to help restaurants increase revenue and run daily operations effortlessly."
+        },
+        "trustedOwners": {
+          "title": "Trusted by restaurant owners for its unmatched reliability, intuitive design, and real-time order control."
+        },
+        "regionalGrowth": {
+          "title": "We help restaurants grow with a strong presence across multiple regions and delivery networks."
+        }
+      }
+    },
+    "sectionThree": {
+      "title": "Browse Popular Categories",
+      "descriptionLineOne": "Discover the perfect course from our top-loved selections,",
+      "descriptionLineTwo": "designed to help you learn, grow, and succeed",
+      "viewAll": "View all",
+      "categories": {
+        "menuManagement": {
+          "title": "Menu Management",
+          "description": "Easily update dishes, variations, prices & stock levels."
+        },
+        "orderDelivery": {
+          "title": "Order & Delivery Flow",
+          "description": "Easily update dishes, variations, prices & stock levels."
+        },
+        "salesAnalytics": {
+          "title": "Sales & Analytics",
+          "description": "Monitor revenue, popular items, peak hours & performance insights."
+        },
+        "customerFeedback": {
+          "title": "Customer Feedback",
+          "description": "View ratings, respond to reviews & boost your reputation."
+        },
+        "promotions": {
+          "title": "Promotions & Discounts",
+          "description": "Create offers, promo codes & highlight best-selling meals."
+        },
+        "staffRoles": {
+          "title": "Staff & Role Control",
+          "description": "Manage staff accounts, access levels & activity logs."
+        }
+      }
+    },
+    "sectionFour": {
+      "trustedBy": "Trusted by Over",
+      "industryLeaders": "Industry Leaders"
+    },
+    "sectionFive": {
+      "titleLineOne": "Grow Your Restaurant with",
+      "titleLineTwo": "a Smarter Delivery Platform",
+      "descriptionLineOne": "Our technology helps restaurants increase sales, streamline",
+      "descriptionLineTwo": "operations, and reach customers faster than ever—without the",
+      "descriptionLineThree": "hassle.",
+      "features": {
+        "createAccount": {
+          "title": "Create Your Restaurant Account",
+          "description": "Set up your digital storefront in minutes. Upload your menu, define pricing, add food images, and start receiving orders instantly through our fully automated onboarding flow."
+        },
+        "realTimeOrders": {
+          "title": "Manage Orders in Real-Time",
+          "description": "Track new orders, accepted orders, rider assignments, and delivery progress — all updated live. Everything stays synchronized across devices."
+        },
+        "support": {
+          "title": "24/7 Support for Restaurants",
+          "description": "Get priority assistance at any time. From technical help to menu optimization, our support team ensures your operations run smoothly."
+        }
+      }
+    },
+    "sectionSix": {
+      "titleLineOne": "Transforming",
+      "titleLineTwo": "Restaurant Growth,",
+      "titleLineThree": "One Order at a Time.",
+      "description": "Our platform empowers restaurants to operate smarter, serve faster, and scale effortlessly. Designed with advanced automation and real-time insights, we help food businesses stay ahead in a competitive delivery market.",
+      "checklist": {
+        "manageOrders": "Manage all incoming orders instantly",
+        "performanceTools": "Smart tools to boost restaurant performance",
+        "fasterDeliveries": "Faster deliveries, happier customers"
+      },
+      "features": {
+        "multiChannelSync": {
+          "title": "Multi-Channel Sync",
+          "description": "Aggregated orders from UberEats, DoorDash, and your website."
+        },
+        "kitchenDisplay": {
+          "title": "Kitchen Display System (KDS)",
+          "description": "Direct paperless communication between FOH and kitchen."
+        },
+        "realTimeDispatch": {
+          "title": "Real-time Dispatch",
+          "description": "Coordinate with local drivers or 3PL delivery partners instantly."
+        }
+      }
+    },
+    "sectionSeven": {
+      "titleLineOne": "Smooth and Easy",
+      "titleLineTwo": "Restaurant Order",
+      "titleLineThree": "Management",
+      "description": "With user-friendly features, competitive exchange rates, and robust security measures, our platform simplifies international transactions.",
+      "checklist": {
+        "orderFlow": "Seamless order flow from customers to your kitchen",
+        "menuControls": "Smart menu, pricing, and inventory controls"
+      }
+    },
+    "sectionEight": {
+      "eyebrow": "FAQ’S",
+      "titleLineOne": "Frequently",
+      "titleLineTwo": "Asked",
+      "titleLineThree": "Questions",
+      "description": "Ask any questions"
+    },
+    "faq": {
+      "allOrderTypes": {
+        "question": "Can I use the platform for both dine-in and delivery orders?",
+        "answer": "Yes, our system supports all order types — delivery, takeaway, and dine-in. Restaurants can easily manage them through a single dashboard designed for speed and efficiency."
+      },
+      "updateMenu": {
+        "question": "How do I update my restaurant menu?",
+        "answer": "You can update your menu directly from the restaurant dashboard. Add or remove items, update prices, manage variations, and control availability in real time without any technical assistance."
+      },
+      "deliveryRiders": {
+        "question": "Do you provide delivery riders?",
+        "answer": "We support both in-house and third-party delivery models. Restaurants can use their own riders or integrate with supported delivery partners depending on their business needs."
+      },
+      "joiningFees": {
+        "question": "Are there any fees for joining the platform?",
+        "answer": "There are no upfront setup fees. Pricing depends on your selected plan and order volume. Full details are available during onboarding or by contacting our sales team."
+      },
+      "multipleDevices": {
+        "question": "Can I manage orders from multiple devices?",
+        "answer": "Yes. Your account stays synchronized across all devices, allowing you to manage orders, menus, and analytics from multiple tablets, phones, or desktops simultaneously."
+      }
+    },
+    "sectionNine": {
+      "titleLineOne": "Download Our Restaurant App",
+      "titleLineTwo": "and Manage Orders Effortlessly!",
+      "descriptionLineOne": "Take full control of your restaurant operations from anywhere.",
+      "descriptionLineTwo": "Accept orders, update menus, track deliveries, and monitor performance — all",
+      "descriptionLineThree": "through our powerful, easy-to-use mobile app.",
+      "descriptionLineFour": "Enjoy real-time notifications, faster workflows, and a seamless",
+      "descriptionLineFive": "management experience designed for busy restaurant teams.",
+      "store": {
+        "googlePlayAlt": "Google Play",
+        "googlePlayEyebrow": "Get it on",
+        "googlePlay": "Google Play",
+        "appStoreAlt": "App Store",
+        "appStoreEyebrow": "Download on the",
+        "appStore": "App Store"
+      }
+    }
+  },
   "about": {},
   "services": {},
   "categories": {},

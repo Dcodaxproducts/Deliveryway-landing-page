@@ -1,13 +1,13 @@
-import SectionTwo from "@/components/Home/SectionTwo";
+import { SectionTwo } from "@/components/Home/SectionTwo";
 import Container from "../components/container";
-import SectionThree from "@/components/Home/SectionThree";
-import SectionFour from "@/components/Home/SectionFour";
-import SectionFive from "@/components/Home/SectionFive";
+import { SectionThree } from "@/components/Home/SectionThree";
+import { SectionFour } from "@/components/Home/SectionFour";
+import { SectionFive } from "@/components/Home/SectionFive";
 import { SectionSix } from "@/components/Home/SectionSix";
 import { SectionSeven } from "@/components/Home/SectionSeven";
-import SectionEight from "@/components/Home/SectionEight";
-import Hero from "@/components/Home/Hero";
-import SectionNine from "@/components/Home/SectionNine";
+import { SectionEight } from "@/components/Home/SectionEight";
+import { Hero } from "@/components/Home/Hero";
+import { SectionNine } from "@/components/Home/SectionNine";
 
 export default function Home() {
     return (

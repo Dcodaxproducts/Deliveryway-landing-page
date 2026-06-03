@@ -1,8 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import { sectionFiveFeatures } from "@/constants/features";
 import FeatureCard from "../cards/FeatureCard";
+import { useTranslations } from "next-intl";
 
-export default function SectionFive() {
+export function SectionFive() {
+  const t = useTranslations();
+
   return (
     <section className="w-full bg-white py-12 md:py-15">
       <div className="mx-auto max-w-7xl px-4">
@@ -10,14 +15,14 @@ export default function SectionFive() {
           {/* LEFT CONTENT */}
           <div className="text-center lg:text-left">
             <h2 className="leading-tight text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 font-heading">
-              Grow Your Restaurant with <br className="hidden sm:block" />
-              a Smarter Delivery Platform
+              {t("home.sectionFive.titleLineOne")} <br className="hidden sm:block" />
+              {t("home.sectionFive.titleLineTwo")}
             </h2>
 
             <p className="mt-4 max-w-xl mx-auto lg:mx-0 text-sm sm:text-base leading-relaxed text-gray-600">
-              Our technology helps restaurants increase sales, streamline
-              operations, and reach customers faster than ever—without the
-              hassle.
+              {t("home.sectionFive.descriptionLineOne")}{" "}
+              {t("home.sectionFive.descriptionLineTwo")}{" "}
+              {t("home.sectionFive.descriptionLineThree")}
             </p>
 
             {/* FEATURES */}
@@ -25,8 +30,8 @@ export default function SectionFive() {
               {sectionFiveFeatures.map((feature) => (
                 <FeatureCard
                   key={feature.id}
-                  title={feature.title}
-                  description={feature.description}
+                  title={t(feature.titleKey)}
+                  description={t(feature.descriptionKey)}
                   icon={feature.icon}
                 />
               ))}
