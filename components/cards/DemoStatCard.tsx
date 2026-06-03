@@ -1,11 +1,9 @@
-"use client";
-
 interface StatCardProps {
   value: string | number;
   label: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ value, label }) => {
+export const DemoStatCard = ({ value, label }: StatCardProps) => {
   return (
     <div className="flex-1 p-4 bg-white/5 rounded-lg outline outline-1 outline-white/10 flex flex-col items-start">
       <div className="text-red-600 text-2xl font-bold">{value}</div>
@@ -15,5 +13,3 @@ const StatCard: React.FC<StatCardProps> = ({ value, label }) => {
     </div>
   );
 };
-
-export default StatCard;

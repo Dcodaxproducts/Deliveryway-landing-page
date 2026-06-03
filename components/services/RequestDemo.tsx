@@ -2,8 +2,8 @@
 
 import { requestDemoConfig, stats } from "@/constants/services";
 import { useTranslations } from "next-intl";
-import DemoForm from "../forms/DemoForm";
-import StatCard from "../cards/DemoStatCard";
+import { DemoForm } from "../forms/DemoForm";
+import { DemoStatCard } from "../cards/DemoStatCard";
 
 export const RequestDemo = () => {
   const t = useTranslations();
@@ -24,7 +24,7 @@ export const RequestDemo = () => {
           {/* Stats */}
           <div className="flex flex-col sm:flex-row gap-4 mt-6">
             {stats.map((stat) => (
-              <StatCard key={stat.labelKey} value={stat.value} label={t(stat.labelKey)} />
+              <DemoStatCard key={stat.labelKey} value={stat.value} label={t(stat.labelKey)} />
             ))}
           </div>
         </div>

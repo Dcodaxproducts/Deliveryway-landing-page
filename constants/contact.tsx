@@ -7,6 +7,20 @@ interface ContactStatConfig {
   labelKey: TranslatedTextKey;
 }
 
+export const contactHero = {
+  badgeKey: "contact.hero.badge",
+  titleLineOneKey: "contact.hero.titleLineOne",
+  titleLineTwoKey: "contact.hero.titleLineTwo",
+  descriptionKey: "contact.hero.description",
+} as const;
+
+export const contactSectionLabels = {
+  contactInformationKey: "contact.sections.contactInformation",
+  officeLocationsKey: "contact.sections.officeLocations",
+  infrastructureTitleKey: "contact.infrastructure.title",
+  infrastructureDescriptionKey: "contact.infrastructure.description",
+} as const;
+
 // Stats
 export const statsData: ContactStatConfig[] = [
   { value: "10k+", label: "Active Restaurants", labelKey: "contact.stats.activeRestaurants.label" },

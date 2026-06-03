@@ -575,9 +575,107 @@
       }
     }
   },
-  "contact": {},
+  "contact": {
+    "hero": {
+      "badge": "Contact Support",
+      "titleLineOne": "Get in Touch with",
+      "titleLineTwo": "Our Experts",
+      "description": "Need help managing your restaurant or interested in our enterprise solutions? Our team is available 24/7 to assist you."
+    },
+    "sections": {
+      "contactInformation": "Contact Information",
+      "officeLocations": "Office Locations"
+    },
+    "info": {
+      "supportPhone": {
+        "title": "Support Phone",
+        "note": "Available 24/7 for Professional & Enterprise plans"
+      },
+      "salesEmail": {
+        "title": "Sales Email",
+        "note": "Response time within 2 business hours"
+      }
+    },
+    "officeLocations": {
+      "newYork": {
+        "city": "New York"
+      },
+      "london": {
+        "city": "London"
+      }
+    },
+    "infrastructure": {
+      "title": "Global Support Infrastructure",
+      "description": "Providing seamless restaurant management solutions across 50+ countries with localized support teams."
+    },
+    "stats": {
+      "activeRestaurants": {
+        "label": "Active Restaurants"
+      },
+      "liveAssistance": {
+        "label": "Live Assistance"
+      },
+      "expertsGlobally": {
+        "label": "Experts Globally"
+      },
+      "avgResponseTime": {
+        "label": "Avg Response Time"
+      }
+    }
+  },
   "register": {},
-  "forms": {},
+  "forms": {
+    "fields": {
+      "fullName": {
+        "label": "Full Name",
+        "placeholder": "John Doe"
+      },
+      "firstName": {
+        "label": "First Name",
+        "placeholder": "First Name"
+      },
+      "lastName": {
+        "label": "Last Name",
+        "placeholder": "Last Name"
+      },
+      "workEmail": {
+        "label": "Work Email",
+        "placeholder": "john@restaurant.com",
+        "shortPlaceholder": "Work Email"
+      },
+      "restaurantName": {
+        "label": "Restaurant Name",
+        "placeholder": "The Gusto Kitchen"
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "How can we help your business today?"
+      },
+      "companySize": {
+        "label": "Company Size",
+        "placeholder": "Select company size"
+      }
+    },
+    "companySizeOptions": {
+      "tenToFifty": "10-50 Employees",
+      "fiftyOneToTwoHundred": "51-200 Employees",
+      "twoHundredOneToFiveHundred": "201-500 Employees",
+      "fiveHundredPlus": "500+ Employees"
+    },
+    "actions": {
+      "sendMessage": "Send Message",
+      "bookDemo": "Book Your Demo",
+      "submitting": "Submitting..."
+    },
+    "contact": {
+      "needInstantAnswers": "Need instant answers?",
+      "checkFaq": "Check our FAQ"
+    },
+    "status": {
+      "submitSuccess": "Message sent successfully.",
+      "submitError": "Something went wrong. Please try again."
+    }
+  },
   "validation": {},
   "errors": {
     "uploadUrlFailed": "Failed to get upload URL",

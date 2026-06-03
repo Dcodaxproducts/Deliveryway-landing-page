@@ -10,8 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
-const DemoForm = () => {
+export const DemoForm = () => {
+  const t = useTranslations();
+
   return (
     <form className="flex flex-col gap-4 w-full">
 
@@ -19,21 +22,21 @@ const DemoForm = () => {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 flex flex-col gap-1">
           <Label htmlFor="firstName" className="text-slate-900 text-sm font-semibold">
-            First Name
+            {t("forms.fields.firstName.label")}
           </Label>
           <Input
             id="firstName"
-            placeholder="First Name"
+            placeholder={t("forms.fields.firstName.placeholder")}
             className="h-10 bg-white border border-slate-200 rounded-lg"
           />
         </div>
         <div className="flex-1 flex flex-col gap-1">
           <Label htmlFor="lastName" className="text-slate-900 text-sm font-semibold">
-            Last Name
+            {t("forms.fields.lastName.label")}
           </Label>
           <Input
             id="lastName"
-            placeholder="Last Name"
+            placeholder={t("forms.fields.lastName.placeholder")}
             className="h-10 bg-white border border-slate-200 rounded-lg"
           />
         </div>
@@ -42,12 +45,12 @@ const DemoForm = () => {
       {/* Work Email */}
       <div className="flex flex-col gap-1">
         <Label htmlFor="email" className="text-slate-900 text-sm font-semibold">
-          Work Email
+          {t("forms.fields.workEmail.label")}
         </Label>
         <Input
           id="email"
           type="email"
-          placeholder="Work Email"
+          placeholder={t("forms.fields.workEmail.shortPlaceholder")}
           className="h-10 bg-white border border-slate-200 rounded-lg"
         />
       </div>
@@ -55,27 +58,25 @@ const DemoForm = () => {
       {/* Company Size */}
       <div className="flex flex-col gap-1">
         <Label htmlFor="companySize" className="text-slate-900 text-sm font-semibold">
-          Company Size
+          {t("forms.fields.companySize.label")}
         </Label>
         <Select>
           <SelectTrigger className="h-10 bg-white border border-slate-200 rounded-lg w-full">
-            <SelectValue placeholder="Select company size" />
+            <SelectValue placeholder={t("forms.fields.companySize.placeholder")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="10-50">10-50 Employees</SelectItem>
-            <SelectItem value="51-200">51-200 Employees</SelectItem>
-            <SelectItem value="201-500">201-500 Employees</SelectItem>
-            <SelectItem value="500+">500+ Employees</SelectItem>
+            <SelectItem value="10-50">{t("forms.companySizeOptions.tenToFifty")}</SelectItem>
+            <SelectItem value="51-200">{t("forms.companySizeOptions.fiftyOneToTwoHundred")}</SelectItem>
+            <SelectItem value="201-500">{t("forms.companySizeOptions.twoHundredOneToFiveHundred")}</SelectItem>
+            <SelectItem value="500+">{t("forms.companySizeOptions.fiveHundredPlus")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* Submit Button */}
       <Button className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-4">
-        Book Your Demo
+        {t("forms.actions.bookDemo")}
       </Button>
     </form>
   );
 };
-
-export default DemoForm;
