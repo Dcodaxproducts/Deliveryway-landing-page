@@ -1,12 +1,15 @@
-'use client';
-import { Plan } from "@/constants/pricing";
+"use client";
+import { Plan, pricingHeaders } from "@/constants/pricing";
 import { Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface PlanCardProps {
   plan: Plan;
 }
 
 const PlanCard = ({ plan }: PlanCardProps) => {
+  const t = useTranslations();
+
   return (
     <div
       className={`relative w-full max-w-sm self-stretch px-8 py-12 bg-white rounded-2xl flex flex-col justify-start items-start ${
@@ -18,14 +21,14 @@ const PlanCard = ({ plan }: PlanCardProps) => {
       {/* Most Popular Badge */}
       {plan.highlighted && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-red-600 rounded-full">
-          <span className="text-white text-xs font-bold uppercase tracking-wider">Most Popular</span>
+          <span className="text-white text-xs font-bold uppercase tracking-wider">{t(pricingHeaders.mostPopularKey)}</span>
         </div>
       )}
 
       {/* Header */}
       <div className="w-full pb-8 flex flex-col gap-2">
-        <h3 className="text-slate-900 text-xl font-bold leading-7">{plan.name}</h3>
-        <p className="text-slate-500 text-sm leading-5">{plan.description}</p>
+        <h3 className="text-slate-900 text-xl font-bold leading-7">{t(plan.nameKey)}</h3>
+        <p className="text-slate-500 text-sm leading-5">{t(plan.descriptionKey)}</p>
       </div>
 
       {/* Price */}
@@ -39,10 +42,10 @@ const PlanCard = ({ plan }: PlanCardProps) => {
       {/* Features */}
       <div className="flex-1 pb-10 w-full">
         <div className="flex flex-col gap-4">
-          {plan.features.map((feature, i) => (
-            <div key={i} className="flex items-center gap-3">
+          {plan.featureKeys.map((featureKey) => (
+            <div key={featureKey} className="flex items-center gap-3">
               <Check className="w-4 h-4 text-red-600" />
-              <span className="text-slate-900 text-sm leading-5">{feature}</span>
+              <span className="text-slate-900 text-sm leading-5">{t(featureKey)}</span>
             </div>
           ))}
         </div>
@@ -56,10 +59,10 @@ const PlanCard = ({ plan }: PlanCardProps) => {
             : "outline outline-2 outline-slate-200 text-slate-900"
         }`}
       >
-        <span className="text-base font-bold leading-6">{plan.buttonText}</span>
+        <span className="text-base font-bold leading-6">{t(plan.buttonTextKey)}</span>
       </div>
     </div>
   );
 };
 
-export default PlanCard;
+export { PlanCard };

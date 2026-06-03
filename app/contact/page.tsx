@@ -1,6 +1,6 @@
 import Contact from '@/components/contact/Contact'
 import Infrastructure from '@/components/contact/Infrastructure'
-import Hero from '@/components/shared/Hero'
+import { Hero } from '@/components/shared/Hero'
 import React from 'react'
 
 const page = () => {

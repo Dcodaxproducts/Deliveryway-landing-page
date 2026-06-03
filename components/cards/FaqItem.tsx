@@ -10,7 +10,7 @@ interface FaqItemProps {
   answer: string;
 }
 
-const FaqItem = ({ id, question, answer }: FaqItemProps) => {
+export const FaqItem = ({ id, question, answer }: FaqItemProps) => {
   return (
     <AccordionItem value={id}>
       <AccordionTrigger className="text-base sm:text-[18px] font-heading font-[600] text-[#171717]">
@@ -22,5 +22,3 @@ const FaqItem = ({ id, question, answer }: FaqItemProps) => {
     </AccordionItem>
   );
 };
-
-export default FaqItem;

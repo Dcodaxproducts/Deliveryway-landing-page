@@ -2,7 +2,7 @@
 
 import { categoriesHero } from "@/constants/categories";
 import { useTranslations } from "next-intl";
-import Hero from "../shared/Hero";
+import { Hero } from "../shared/Hero";
 
 export const CategoriesHero = () => {
   const t = useTranslations();

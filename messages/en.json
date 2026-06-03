@@ -463,7 +463,118 @@
       }
     }
   },
-  "pricing": {},
+  "pricing": {
+    "hero": {
+      "titleLineOne": "Transparent",
+      "titleLineTwo": "Pricing Plans",
+      "description": "Simple, predictable pricing designed to scale with your restaurant. Choose the plan that fits your kitchen's needs."
+    },
+    "billing": {
+      "monthly": "Monthly Billing",
+      "annual": "Annual Billing",
+      "saveBadge": "Save 20%"
+    },
+    "plans": {
+      "mostPopular": "Most Popular",
+      "starter": {
+        "name": "Starter",
+        "description": "Perfect for single locations and small cafes.",
+        "buttonText": "Choose Starter",
+        "features": {
+          "singleLocation": "Single Location",
+          "corePosFeatures": "Core POS Features",
+          "basicInventoryTracking": "Basic Inventory Tracking",
+          "emailSupport": "Email Support"
+        }
+      },
+      "professional": {
+        "name": "Professional",
+        "description": "Optimized for growing full-service restaurants.",
+        "buttonText": "Start Free Trial",
+        "features": {
+          "upToThreeLocations": "Up to 3 Locations",
+          "advancedLaborManagement": "Advanced Labor Management",
+          "realTimeCostAnalytics": "Real-time Cost Analytics",
+          "smartInventoryForecasts": "Smart Inventory Forecasts",
+          "prioritySupport": "24/7 Priority Support"
+        }
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Custom solutions for large chains and franchises.",
+        "buttonText": "Contact Sales",
+        "features": {
+          "unlimitedLocations": "Unlimited Locations",
+          "customApiAccess": "Custom API Access",
+          "dedicatedAccountManager": "Dedicated Account Manager",
+          "onsiteImplementation": "On-site Implementation"
+        }
+      }
+    },
+    "comparison": {
+      "title": "Detailed Feature Comparison",
+      "description": "Everything you need to know about our capabilities.",
+      "columns": {
+        "feature": "Feature"
+      },
+      "sections": {
+        "coreOperations": {
+          "title": "Core Operations"
+        },
+        "managementTools": {
+          "title": "Management Tools"
+        }
+      },
+      "features": {
+        "cloudPosIntegration": {
+          "name": "Cloud POS Integration"
+        },
+        "inventoryTracking": {
+          "name": "Inventory Tracking"
+        },
+        "kitchenDisplaySystem": {
+          "name": "Kitchen Display System"
+        },
+        "staffScheduling": {
+          "name": "Staff Scheduling"
+        },
+        "mobileManagementApp": {
+          "name": "Mobile Management App"
+        },
+        "financialReporting": {
+          "name": "Financial Reporting"
+        }
+      },
+      "values": {
+        "basic": "Basic",
+        "advanced": "Advanced",
+        "advancedApi": "Advanced + API",
+        "weekly": "Weekly",
+        "realTime": "Real-time",
+        "realTimeCustom": "Real-time + Custom"
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Got questions? We've got answers.",
+      "switchPlans": {
+        "question": "Can I switch plans later?",
+        "answer": "Yes, you can upgrade or downgrade your plan at any time. When upgrading, new features become available immediately. Downgrades take effect at the end of your current billing cycle."
+      },
+      "existingHardware": {
+        "question": "Does Gusto work with my existing hardware?",
+        "answer": "Gusto is hardware-agnostic. We support most modern POS terminals, iPads, and Android tablets. Contact our team to verify your specific setup."
+      },
+      "supportIncluded": {
+        "question": "What kind of support is included?",
+        "answer": "Starter plans include email support. Professional and Enterprise plans include 24/7 priority phone and chat support with guaranteed response times under 30 minutes."
+      },
+      "hiddenFees": {
+        "question": "Are there any hidden setup fees?",
+        "answer": "No. We believe in transparent pricing. There are no mandatory implementation fees. Custom onboarding is available for Enterprise teams if needed."
+      }
+    }
+  },
   "contact": {},
   "register": {},
   "forms": {},

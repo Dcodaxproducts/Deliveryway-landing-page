@@ -9,6 +9,26 @@ export type FeatureValue = ComparisonValue;
 
 export type FeatureRow = ComparisonFeatureConfig;
 
+export const pricingHero = {
+  titleLineOneKey: "pricing.hero.titleLineOne",
+  titleLineTwoKey: "pricing.hero.titleLineTwo",
+  descriptionKey: "pricing.hero.description",
+} as const;
+
+export const billingToggleLabels = {
+  monthlyKey: "pricing.billing.monthly",
+  annualKey: "pricing.billing.annual",
+  saveBadgeKey: "pricing.billing.saveBadge",
+} as const;
+
+export const pricingHeaders = {
+  comparisonTitleKey: "pricing.comparison.title",
+  comparisonDescriptionKey: "pricing.comparison.description",
+  faqTitleKey: "pricing.faq.title",
+  faqDescriptionKey: "pricing.faq.description",
+  mostPopularKey: "pricing.plans.mostPopular",
+} as const;
+
 export interface FeatureSection {
   title: string;
   titleKey: TranslatedTextKey;

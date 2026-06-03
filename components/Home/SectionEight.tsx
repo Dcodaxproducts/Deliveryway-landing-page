@@ -1,7 +1,7 @@
 "use client";
 
 import { Accordion } from "@/components/ui/accordion";
-import FaqItem from "../cards/FaqItem";
+import { FaqItem } from "../cards/FaqItem";
 import { faqs } from "@/constants/faq";
 import { useTranslations } from "next-intl";
 

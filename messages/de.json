@@ -463,7 +463,118 @@
       }
     }
   },
-  "pricing": {},
+  "pricing": {
+    "hero": {
+      "titleLineOne": "Transparente",
+      "titleLineTwo": "Preispläne",
+      "description": "Einfache, planbare Preise, die mit Ihrem Restaurant skalieren. Wählen Sie den Plan, der zu den Anforderungen Ihrer Küche passt."
+    },
+    "billing": {
+      "monthly": "Monatliche Abrechnung",
+      "annual": "Jährliche Abrechnung",
+      "saveBadge": "20% sparen"
+    },
+    "plans": {
+      "mostPopular": "Am beliebtesten",
+      "starter": {
+        "name": "Starter",
+        "description": "Perfekt für einzelne Standorte und kleine Cafes.",
+        "buttonText": "Starter wählen",
+        "features": {
+          "singleLocation": "Ein Standort",
+          "corePosFeatures": "Kernfunktionen für POS",
+          "basicInventoryTracking": "Einfache Bestandsverfolgung",
+          "emailSupport": "E-Mail-Support"
+        }
+      },
+      "professional": {
+        "name": "Professional",
+        "description": "Optimiert für wachsende Full-Service-Restaurants.",
+        "buttonText": "Kostenlose Testversion starten",
+        "features": {
+          "upToThreeLocations": "Bis zu 3 Standorte",
+          "advancedLaborManagement": "Erweitertes Personalmanagement",
+          "realTimeCostAnalytics": "Kostenanalysen in Echtzeit",
+          "smartInventoryForecasts": "Smarte Bestandsprognosen",
+          "prioritySupport": "24/7 Prioritäts-Support"
+        }
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Individuelle Lösungen für große Ketten und Franchise-Unternehmen.",
+        "buttonText": "Sales kontaktieren",
+        "features": {
+          "unlimitedLocations": "Unbegrenzte Standorte",
+          "customApiAccess": "Individueller API-Zugriff",
+          "dedicatedAccountManager": "Dedizierter Account Manager",
+          "onsiteImplementation": "Implementierung vor Ort"
+        }
+      }
+    },
+    "comparison": {
+      "title": "Detaillierter Funktionsvergleich",
+      "description": "Alles, was Sie über unsere Möglichkeiten wissen müssen.",
+      "columns": {
+        "feature": "Funktion"
+      },
+      "sections": {
+        "coreOperations": {
+          "title": "Kernabläufe"
+        },
+        "managementTools": {
+          "title": "Management-Tools"
+        }
+      },
+      "features": {
+        "cloudPosIntegration": {
+          "name": "Cloud-POS-Integration"
+        },
+        "inventoryTracking": {
+          "name": "Bestandsverfolgung"
+        },
+        "kitchenDisplaySystem": {
+          "name": "Kitchen Display System"
+        },
+        "staffScheduling": {
+          "name": "Mitarbeiterplanung"
+        },
+        "mobileManagementApp": {
+          "name": "Mobile Management App"
+        },
+        "financialReporting": {
+          "name": "Finanzberichte"
+        }
+      },
+      "values": {
+        "basic": "Basic",
+        "advanced": "Advanced",
+        "advancedApi": "Advanced + API",
+        "weekly": "Wöchentlich",
+        "realTime": "Echtzeit",
+        "realTimeCustom": "Echtzeit + individuell"
+      }
+    },
+    "faq": {
+      "title": "Häufig gestellte Fragen",
+      "description": "Sie haben Fragen? Wir haben Antworten.",
+      "switchPlans": {
+        "question": "Kann ich später den Plan wechseln?",
+        "answer": "Ja, Sie können Ihren Plan jederzeit upgraden oder downgraden. Beim Upgrade sind neue Funktionen sofort verfügbar. Downgrades werden am Ende des aktuellen Abrechnungszeitraums wirksam."
+      },
+      "existingHardware": {
+        "question": "Funktioniert Gusto mit meiner bestehenden Hardware?",
+        "answer": "Gusto ist hardwareunabhängig. Wir unterstützen die meisten modernen POS-Terminals, iPads und Android-Tablets. Kontaktieren Sie unser Team, um Ihr spezifisches Setup zu prüfen."
+      },
+      "supportIncluded": {
+        "question": "Welche Art von Support ist enthalten?",
+        "answer": "Starter-Pläne enthalten E-Mail-Support. Professional- und Enterprise-Pläne enthalten 24/7 priorisierten Telefon- und Chat-Support mit garantierten Antwortzeiten unter 30 Minuten."
+      },
+      "hiddenFees": {
+        "question": "Gibt es versteckte Einrichtungsgebühren?",
+        "answer": "Nein. Wir glauben an transparente Preise. Es gibt keine verpflichtenden Implementierungsgebühren. Individuelles Onboarding ist für Enterprise-Teams bei Bedarf verfügbar."
+      }
+    }
+  },
   "contact": {},
   "register": {},
   "forms": {},

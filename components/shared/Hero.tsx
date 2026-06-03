@@ -1,12 +1,12 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import React from "react";
-import BillingToggle from "../pricing/BillingToggle";
+import type { ReactNode } from "react";
+import { BillingToggle } from "../pricing/BillingToggle";
 
 interface HeroProps {
   badgeText?: string; // Top badge, optional
-  heading: React.ReactNode; // Can be spans, colors, etc.
+  heading: ReactNode; // Can be spans, colors, etc.
   description: string;
   primaryButton?: {
     label: string;
@@ -22,7 +22,7 @@ interface HeroProps {
 
 }
 
-const Hero: React.FC<HeroProps> = ({
+export const Hero = ({
   badgeText,
   heading,
   description,
@@ -31,7 +31,7 @@ const Hero: React.FC<HeroProps> = ({
   showBackground = true,
   showToggle = false,
   className = "",
-}) => {
+}: HeroProps) => {
   return (
     <section
       className={`w-full relative bg-[#CE181B] flex flex-col items-center overflow-hidden pt-20 pb-24 px-6 lg:px-0 ${className}`}
@@ -99,5 +99,3 @@ const Hero: React.FC<HeroProps> = ({
     </section>
   );
 };
-
-export default Hero;

@@ -1,8 +1,11 @@
-'use client';
+"use client";
+import { billingToggleLabels } from "@/constants/pricing";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-const BillingToggle = () => {
+export const BillingToggle = () => {
   const [isAnnual, setIsAnnual] = useState(false);
+  const t = useTranslations();
 
   return (
     <div className="w-full flex flex-col sm:flex-row justify-center items-center gap-4 pt-6 text-center">
@@ -13,7 +16,7 @@ const BillingToggle = () => {
           !isAnnual ? "text-white" : "text-white/60"
         }`}
       >
-        Monthly Billing
+        {t(billingToggleLabels.monthlyKey)}
       </span>
 
       {/* Toggle */}
@@ -39,15 +42,13 @@ const BillingToggle = () => {
             isAnnual ? "text-white" : "text-white/60"
           }`}
         >
-          Annual Billing
+          {t(billingToggleLabels.annualKey)}
         </span>
 
         <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white bg-white/10 rounded-full border border-white/20 whitespace-nowrap">
-          Save 20%
+          {t(billingToggleLabels.saveBadgeKey)}
         </span>
       </div>
     </div>
   );
 };
-
-export default BillingToggle;
