@@ -6,8 +6,9 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { LanguageSelector } from "@/components/navbar/LanguageSelector";
 
-export default function Navbar() {
+export function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
   return (
@@ -48,6 +49,10 @@ export default function Navbar() {
 
             {/* RIGHT: CTA + MOBILE MENU */}
             <div className="flex items-center gap-3">
+              <div className="hidden md:block">
+                <LanguageSelector />
+              </div>
+
               <Button
                 className="hidden md:inline-flex rounded-full bg-white px-7 py-3 text-[15px] font-sans font-medium text-[#CE181B] hover:bg-white/90"
               onClick={()=>router.push("/register")}
@@ -95,6 +100,10 @@ export default function Navbar() {
               <Link href="#">Services</Link>
               <Link href="#">Pricing</Link>
               <Link href="#">Contact</Link>
+
+              <div className="w-fit rounded-full bg-[#CE181B]">
+                <LanguageSelector />
+              </div>
 
               <Button className="mt-4 py-3 rounded-full bg-[#CE181B] text-white hover:bg-[#b51619]" onClick={()=>router.push("/register")}>
                 Registration / Sign In

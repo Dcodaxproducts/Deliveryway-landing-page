@@ -1,0 +1,17 @@
+{
+  "common": {},
+  "navigation": {
+    "changeLanguage": "Change language"
+  },
+  "footer": {},
+  "home": {},
+  "about": {},
+  "services": {},
+  "categories": {},
+  "pricing": {},
+  "contact": {},
+  "register": {},
+  "forms": {},
+  "validation": {},
+  "errors": {}
+}
