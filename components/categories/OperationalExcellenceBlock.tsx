@@ -1,10 +1,12 @@
 "use client";
 
-import { features } from "@/constants/home";
+import { operationalExcellenceBlock } from "@/constants/categories";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { FiCheck } from "react-icons/fi";
 
-export default function OperationalExcellenceBlock() {
+export function OperationalExcellenceBlock() {
+  const t = useTranslations();
 
   return (
     <div className="w-full flex flex-col-reverse lg:flex-row items-center justify-center gap-12 lg:gap-16 px-4 lg:px-0">
@@ -15,7 +17,7 @@ export default function OperationalExcellenceBlock() {
         <div className="hidden lg:block absolute -top-5 left-5 w-[570px] h-full bg-red-600/5 rounded-2xl z-0" />
         <Image
           src="/assets/categories/two.png"
-          alt="Order & Delivery Flow"
+          alt={t(operationalExcellenceBlock.imageAltKey)}
           className="rounded-xl relative z-10 w-full h-full object-cover"
           width={584}
           height={400}
@@ -27,31 +29,31 @@ export default function OperationalExcellenceBlock() {
         {/* Badge */}
         <div className="px-3 py-1 bg-red-600/10 rounded-full inline-flex items-center w-fit">
           <span className="text-red-600 text-xs font-bold uppercase tracking-wider">
-            Operational Excellence
+            {t(operationalExcellenceBlock.badgeKey)}
           </span>
         </div>
 
         {/* Title */}
         <h2 className="text-3xl sm:text-4xl font-bold text-neutral-900 leading-snug sm:leading-10">
-          Order & Delivery Flow
+          {t(operationalExcellenceBlock.titleKey)}
         </h2>
 
         {/* Description */}
         <p className="text-base sm:text-lg text-stone-700 leading-6 sm:leading-7">
-          Consolidate all your orders into one intuitive interface. Manage in-house dining and third-party delivery apps without the multi-tablet headache.
+          {t(operationalExcellenceBlock.descriptionKey)}
         </p>
 
         {/* Features List */}
         <div className="flex flex-col gap-3 sm:gap-4">
-          {features.map((feature, idx) => (
-            <div key={idx} className="flex items-start gap-2 sm:gap-3">
+          {operationalExcellenceBlock.features.map((feature) => (
+            <div key={feature.id} className="flex items-start gap-2 sm:gap-3">
               {/* Tick Icon */}
               <div className="p-1 bg-red-600/10 rounded-full flex items-center justify-center">
                 <FiCheck className="text-red-600 w-4 h-4" />
               </div>
               <div className="flex flex-col gap-0.5">
-                <span className="text-sm sm:text-base font-bold text-neutral-900">{feature.title}</span>
-                <span className="text-xs sm:text-sm text-stone-700">{feature.desc}</span>
+                <span className="text-sm sm:text-base font-bold text-neutral-900">{t(feature.titleKey)}</span>
+                <span className="text-xs sm:text-sm text-stone-700">{t(feature.descKey)}</span>
               </div>
             </div>
           ))}
@@ -59,7 +61,7 @@ export default function OperationalExcellenceBlock() {
 
         {/* Button */}
         <button className="mt-4 px-6 py-3 bg-neutral-900 text-white font-bold rounded-lg w-fit">
-          Explore Flow
+          {t(operationalExcellenceBlock.buttonKey)}
         </button>
       </div>
     </div>

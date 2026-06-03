@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from "next/navigation";
-import CategoriesCard from "../cards/CategoriesCard";
+import { CategoriesCard } from "../cards/CategoriesCard";
 import { Button } from "../ui/button";
 import { sectionThreeCategories } from "@/constants/categories";
 import { homeSectionThreeCategoryCopy } from "@/constants/home";

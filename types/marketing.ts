@@ -16,7 +16,7 @@ export interface IconCardConfig {
   description?: string;
   descriptionKey?: TranslatedTextKey;
   desc?: string;
-  descKey?: TranslatedTextKey;
+  descKey: TranslatedTextKey;
   icon?: MarketingIconValue;
   href?: string;
   image?: string;

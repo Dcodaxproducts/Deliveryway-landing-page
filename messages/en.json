@@ -294,8 +294,175 @@
       "secondaryButton": "Request a Demo"
     }
   },
-  "services": {},
-  "categories": {},
+  "services": {
+    "hero": {
+      "badge": "The Complete Platform",
+      "titleLineOne": "Solutions for",
+      "titleLineTwo": "Every Kitchen",
+      "description": "Streamline your operations, from back-of-house inventory to front-of-house service. Our unified platform empowers your team to deliver excellence in every dish and every interaction.",
+      "secondaryCta": "Watch Video"
+    },
+    "items": {
+      "inventoryManagement": {
+        "title": "Inventory Management",
+        "description": "Real-time tracking of ingredients, waste monitoring, and automated reordering to keep your costs down and kitchen running smoothly."
+      },
+      "staffScheduling": {
+        "title": "Staff Scheduling",
+        "description": "Easily manage shifts, monitor labor costs, and streamline employee communication with our intuitive drag-and-drop scheduling tool."
+      },
+      "posIntegration": {
+        "title": "POS Integration",
+        "description": "Connect your existing hardware seamlessly. Sync orders, payments, and kitchen displays in real-time for zero friction service."
+      }
+    },
+    "actions": {
+      "learnMore": "Learn More"
+    },
+    "builtForChefs": {
+      "title": "Built by Chefs, for Chefs.",
+      "description": "We understand the heat of the kitchen. That's why we've designed our interface to be lightning-fast, highly visible, and incredibly simple to use—even during the busiest dinner rushes.",
+      "features": {
+        "uptime": "99.9% Uptime reliability",
+        "prioritySupport": "24/7 Priority support line",
+        "mobileFirst": "Mobile-first design for on-the-go management"
+      }
+    },
+    "stats": {
+      "locationsSupported": {
+        "label": "Locations Supported"
+      },
+      "customerSatisfaction": {
+        "label": "Customer Satisfaction"
+      }
+    },
+    "requestDemo": {
+      "title": "Custom Enterprise Solutions",
+      "description": "Running a restaurant group or a national chain? We provide tailored workflows, multi-location consolidation, and advanced reporting tools designed to scale with your business growth.",
+      "formTitle": "Request a Custom Demo"
+    },
+    "operationalExcellence": {
+      "features": {
+        "multiChannelSync": {
+          "title": "Multi-Channel Sync",
+          "description": "Aggregated orders from UberEats, DoorDash, and your website."
+        },
+        "kitchenDisplay": {
+          "title": "Kitchen Display System (KDS)",
+          "description": "Direct paperless communication between FOH and kitchen."
+        },
+        "realTimeDispatch": {
+          "title": "Real-time Dispatch",
+          "description": "Coordinate with local drivers or 3PL delivery partners instantly."
+        }
+      }
+    }
+  },
+  "categories": {
+    "hero": {
+      "badge": "The Complete Platform",
+      "titleLineOne": "Full Suite of",
+      "titleLineTwo": "Restaurant Solutions",
+      "description": "Streamline your operations, boost your sales, and delight your customers with our all-in-one management platform built for modern dining.",
+      "secondaryCta": "Watch Video"
+    },
+    "sectionThree": {
+      "menuManagement": {
+        "title": "Menu Management",
+        "description": "Easily update dishes, variations, prices & stock levels."
+      },
+      "orderDelivery": {
+        "title": "Order & Delivery Flow",
+        "description": "Easily update dishes, variations, prices & stock levels."
+      },
+      "salesAnalytics": {
+        "title": "Sales & Analytics",
+        "description": "Monitor revenue, popular items, peak hours & performance insights."
+      },
+      "customerFeedback": {
+        "title": "Customer Feedback",
+        "description": "View ratings, respond to reviews & boost your reputation."
+      },
+      "promotions": {
+        "title": "Promotions & Discounts",
+        "description": "Create offers, promo codes & highlight best-selling meals."
+      },
+      "staffRoles": {
+        "title": "Staff & Role Control",
+        "description": "Manage staff accounts, access levels & activity logs."
+      }
+    },
+    "digitalFirst": {
+      "badge": "Digital First",
+      "title": "Menu Management",
+      "description": "Take full control of your digital and physical menus with real-time updates and seamless integration across all channels. Reduce printing costs and adapt instantly.",
+      "button": "Learn More",
+      "imageAlt": "Menu Management",
+      "features": {
+        "qrCode": {
+          "title": "QR Code Integration",
+          "description": "Instant QR generation for contact-less tableside ordering."
+        },
+        "inventorySync": {
+          "title": "Inventory Sync",
+          "description": "Automatically hide out-of-stock items across all platforms."
+        },
+        "dietaryTagging": {
+          "title": "Dietary Tagging",
+          "description": "Easily mark allergens and special diet options (GF, Vegan, etc)."
+        }
+      }
+    },
+    "operationalExcellence": {
+      "badge": "Operational Excellence",
+      "title": "Order & Delivery Flow",
+      "description": "Consolidate all your orders into one intuitive interface. Manage in-house dining and third-party delivery apps without the multi-tablet headache.",
+      "button": "Explore Flow",
+      "imageAlt": "Order & Delivery Flow",
+      "features": {
+        "multiChannelSync": {
+          "title": "Multi-Channel Sync",
+          "description": "Aggregated orders from UberEats, DoorDash, and your website."
+        },
+        "kitchenDisplay": {
+          "title": "Kitchen Display System (KDS)",
+          "description": "Direct paperless communication between FOH and kitchen."
+        },
+        "realTimeDispatch": {
+          "title": "Real-time Dispatch",
+          "description": "Coordinate with local drivers or 3PL delivery partners instantly."
+        }
+      }
+    },
+    "salesAnalytics": {
+      "badge": "Data Insights",
+      "title": "Sales & Analytics",
+      "description": "Make data-driven decisions. Understand your peak hours, most\nprofitable dishes, and customer behavior with detailed visual\nreports.",
+      "button": "View Samples",
+      "stats": {
+        "revenueGrowth": {
+          "label": "Revenue Growth"
+        },
+        "avgOrderSpeed": {
+          "label": "Avg Order Speed"
+        }
+      },
+      "features": {
+        "profitHeatmaps": {
+          "title": "Profit Heatmaps",
+          "description": "Identify high-margin items vs volume sellers."
+        },
+        "laborCostAnalysis": {
+          "title": "Labor Cost Analysis",
+          "description": "Optimize staffing based on historical sales trends."
+        }
+      },
+      "chart": {
+        "title": "Weekly Performance",
+        "subtitle": "Real-time revenue tracking"
+      }
+    }
+  },
   "pricing": {},
   "contact": {},
   "register": {},

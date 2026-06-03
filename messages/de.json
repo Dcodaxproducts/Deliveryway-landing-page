@@ -294,8 +294,175 @@
       "secondaryButton": "Demo anfordern"
     }
   },
-  "services": {},
-  "categories": {},
+  "services": {
+    "hero": {
+      "badge": "Die komplette Plattform",
+      "titleLineOne": "Lösungen für",
+      "titleLineTwo": "jede Küche",
+      "description": "Optimieren Sie Ihre Abläufe vom Warenbestand im Hintergrund bis zum Service im Gastraum. Unsere einheitliche Plattform unterstützt Ihr Team dabei, in jedem Gericht und jeder Interaktion Exzellenz zu liefern.",
+      "secondaryCta": "Video ansehen"
+    },
+    "items": {
+      "inventoryManagement": {
+        "title": "Bestandsverwaltung",
+        "description": "Echtzeit-Tracking von Zutaten, Abfallüberwachung und automatisierte Nachbestellung, damit Kosten sinken und die Küche reibungslos läuft."
+      },
+      "staffScheduling": {
+        "title": "Mitarbeiterplanung",
+        "description": "Verwalten Sie Schichten, überwachen Sie Personalkosten und vereinfachen Sie die Teamkommunikation mit unserem intuitiven Drag-and-drop-Planungstool."
+      },
+      "posIntegration": {
+        "title": "POS-Integration",
+        "description": "Verbinden Sie bestehende Hardware nahtlos. Synchronisieren Sie Bestellungen, Zahlungen und Küchenanzeigen in Echtzeit für reibungslosen Service."
+      }
+    },
+    "actions": {
+      "learnMore": "Mehr erfahren"
+    },
+    "builtForChefs": {
+      "title": "Von Köchen entwickelt, für Köche.",
+      "description": "Wir kennen die Hitze der Küche. Deshalb haben wir unsere Oberfläche blitzschnell, gut sichtbar und unglaublich einfach gestaltet - selbst während der hektischsten Abendservices.",
+      "features": {
+        "uptime": "99,9% Uptime-Zuverlässigkeit",
+        "prioritySupport": "24/7 Prioritäts-Supportline",
+        "mobileFirst": "Mobile-first Design für Verwaltung unterwegs"
+      }
+    },
+    "stats": {
+      "locationsSupported": {
+        "label": "Unterstützte Standorte"
+      },
+      "customerSatisfaction": {
+        "label": "Kundenzufriedenheit"
+      }
+    },
+    "requestDemo": {
+      "title": "Individuelle Enterprise-Lösungen",
+      "description": "Betreiben Sie eine Restaurantgruppe oder nationale Kette? Wir bieten maßgeschneiderte Workflows, Konsolidierung für mehrere Standorte und erweiterte Reporting-Tools, die mit Ihrem Wachstum skalieren.",
+      "formTitle": "Individuelle Demo anfordern"
+    },
+    "operationalExcellence": {
+      "features": {
+        "multiChannelSync": {
+          "title": "Multi-Channel-Synchronisierung",
+          "description": "Gebündelte Bestellungen von UberEats, DoorDash und Ihrer Website."
+        },
+        "kitchenDisplay": {
+          "title": "Kitchen Display System (KDS)",
+          "description": "Direkte papierlose Kommunikation zwischen Servicebereich und Küche."
+        },
+        "realTimeDispatch": {
+          "title": "Echtzeit-Disposition",
+          "description": "Koordinieren Sie lokale Fahrer oder 3PL-Lieferpartner sofort."
+        }
+      }
+    }
+  },
+  "categories": {
+    "hero": {
+      "badge": "Die komplette Plattform",
+      "titleLineOne": "Vollständige Suite an",
+      "titleLineTwo": "Restaurantlösungen",
+      "description": "Optimieren Sie Abläufe, steigern Sie Verkäufe und begeistern Sie Kunden mit unserer All-in-one-Managementplattform für moderne Gastronomie.",
+      "secondaryCta": "Video ansehen"
+    },
+    "sectionThree": {
+      "menuManagement": {
+        "title": "Menüverwaltung",
+        "description": "Aktualisieren Sie Gerichte, Varianten, Preise und Lagerbestände ganz einfach."
+      },
+      "orderDelivery": {
+        "title": "Bestell- und Lieferablauf",
+        "description": "Aktualisieren Sie Gerichte, Varianten, Preise und Lagerbestände ganz einfach."
+      },
+      "salesAnalytics": {
+        "title": "Umsatz und Analysen",
+        "description": "Überwachen Sie Umsatz, beliebte Artikel, Stoßzeiten und Performance-Einblicke."
+      },
+      "customerFeedback": {
+        "title": "Kundenfeedback",
+        "description": "Sehen Sie Bewertungen, antworten Sie auf Reviews und stärken Sie Ihren Ruf."
+      },
+      "promotions": {
+        "title": "Aktionen und Rabatte",
+        "description": "Erstellen Sie Angebote, Promo-Codes und heben Sie Bestseller hervor."
+      },
+      "staffRoles": {
+        "title": "Personal- und Rollensteuerung",
+        "description": "Verwalten Sie Mitarbeiterkonten, Zugriffsstufen und Aktivitätsprotokolle."
+      }
+    },
+    "digitalFirst": {
+      "badge": "Digital zuerst",
+      "title": "Menüverwaltung",
+      "description": "Übernehmen Sie die volle Kontrolle über digitale und physische Menüs mit Echtzeit-Updates und nahtloser Integration über alle Kanäle. Reduzieren Sie Druckkosten und passen Sie sich sofort an.",
+      "button": "Mehr erfahren",
+      "imageAlt": "Menüverwaltung",
+      "features": {
+        "qrCode": {
+          "title": "QR-Code-Integration",
+          "description": "Sofortige QR-Erstellung für kontaktlose Tischbestellungen."
+        },
+        "inventorySync": {
+          "title": "Bestandssynchronisierung",
+          "description": "Blenden Sie ausverkaufte Artikel automatisch auf allen Plattformen aus."
+        },
+        "dietaryTagging": {
+          "title": "Ernährungskennzeichnung",
+          "description": "Markieren Sie Allergene und spezielle Ernährungsoptionen einfach (GF, Vegan usw.)."
+        }
+      }
+    },
+    "operationalExcellence": {
+      "badge": "Operative Exzellenz",
+      "title": "Bestell- und Lieferablauf",
+      "description": "Bündeln Sie alle Bestellungen in einer intuitiven Oberfläche. Verwalten Sie In-house Dining und Drittanbieter-Lieferapps ohne Tablet-Chaos.",
+      "button": "Ablauf entdecken",
+      "imageAlt": "Bestell- und Lieferablauf",
+      "features": {
+        "multiChannelSync": {
+          "title": "Multi-Channel-Synchronisierung",
+          "description": "Gebündelte Bestellungen von UberEats, DoorDash und Ihrer Website."
+        },
+        "kitchenDisplay": {
+          "title": "Kitchen Display System (KDS)",
+          "description": "Direkte papierlose Kommunikation zwischen Servicebereich und Küche."
+        },
+        "realTimeDispatch": {
+          "title": "Echtzeit-Disposition",
+          "description": "Koordinieren Sie lokale Fahrer oder 3PL-Lieferpartner sofort."
+        }
+      }
+    },
+    "salesAnalytics": {
+      "badge": "Dateneinblicke",
+      "title": "Umsatz und Analysen",
+      "description": "Treffen Sie datenbasierte Entscheidungen. Verstehen Sie Stoßzeiten, die profitabelsten Gerichte und Kundenverhalten mit detaillierten visuellen Berichten.",
+      "button": "Beispiele ansehen",
+      "stats": {
+        "revenueGrowth": {
+          "label": "Umsatzwachstum"
+        },
+        "avgOrderSpeed": {
+          "label": "Durchschn. Bestelltempo"
+        }
+      },
+      "features": {
+        "profitHeatmaps": {
+          "title": "Profit-Heatmaps",
+          "description": "Erkennen Sie margenstarke Artikel im Vergleich zu Volumenbringern."
+        },
+        "laborCostAnalysis": {
+          "title": "Personalkostenanalyse",
+          "description": "Optimieren Sie die Besetzung anhand historischer Verkaufstrends."
+        }
+      },
+      "chart": {
+        "title": "Wöchentliche Performance",
+        "subtitle": "Echtzeit-Umsatztracking"
+      }
+    }
+  },
   "pricing": {},
   "contact": {},
   "register": {},

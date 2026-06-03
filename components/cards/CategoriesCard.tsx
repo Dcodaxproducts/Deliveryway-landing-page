@@ -7,7 +7,7 @@ interface CategoriesCardProps {
   icon: string;
 }
 
-const CategoriesCard = ({
+export const CategoriesCard = ({
   title,
   description,
   icon,
@@ -39,5 +39,3 @@ const CategoriesCard = ({
     </Card>
   );
 };
-
-export default CategoriesCard;

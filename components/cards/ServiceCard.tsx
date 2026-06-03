@@ -1,6 +1,8 @@
 "use client";
 
-import { ArrowRight, LucideIcon } from "lucide-react";
+import { serviceCardAction } from "@/constants/services";
+import { ArrowRight, type LucideIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface ServiceCardProps {
   icon: LucideIcon;
@@ -8,7 +10,9 @@ interface ServiceCardProps {
   description: string;
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ icon: Icon, title, description }) => {
+export const ServiceCard = ({ icon: Icon, title, description }: ServiceCardProps) => {
+  const t = useTranslations();
+
   return (
     <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6 flex flex-col gap-4 hover:shadow-lg transition-shadow duration-300">
       
@@ -25,7 +29,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ icon: Icon, title, descriptio
 
       {/* Learn More */}
       <button className="mt-auto flex items-center gap-1 text-red-600 font-bold hover:underline">
-        Learn More
+        {t(serviceCardAction.learnMoreKey)}
         <span className="flex items-center">
           <ArrowRight className="w-4 h-4 text-red-600" />
         </span>
@@ -33,5 +37,3 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ icon: Icon, title, descriptio
     </div>
   );
 };
-
-export default ServiceCard;
