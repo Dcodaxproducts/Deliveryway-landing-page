@@ -6,7 +6,9 @@
       "view": "View",
       "image": "Image",
       "message": "Message",
-      "more": "More actions"
+      "more": "More actions",
+      "back": "Back",
+      "saveContinue": "Save & Continue"
     },
     "status": {
       "active": "Active",
@@ -623,7 +625,134 @@
       }
     }
   },
-  "register": {},
+  "register": {
+    "title": "Business Onboarding",
+    "subtitle": "Complete the steps below to set up your business",
+    "steps": {
+      "account": "Account",
+      "tenantRestaurant": "Tenant & Restaurant",
+      "branch": "Branch",
+      "type": "Type",
+      "published": "Published"
+    },
+    "user": {
+      "title": "User Info",
+      "profilePhoto": {
+        "optionalLabel": "Profile Photo (Optional)"
+      },
+      "email": {
+        "checking": "Checking email availability...",
+        "checkingShort": "Checking email...",
+        "available": "Email is available for this role",
+        "verifyFailed": "Unable to verify email",
+        "verifyUnavailable": "Unable to verify email right now",
+        "verifyUnavailableWithRetry": "Unable to verify email right now. Please try again.",
+        "existsForRole": "This email already exists for this role",
+        "noAccountForRole": "No account exists with this email for this role",
+        "notAllowed": "This email is not allowed",
+        "waitForVerification": "Please wait while we verify this email",
+        "useAvailable": "Please use an email that is available for this role"
+      }
+    },
+    "tenant": {
+      "title": "Tenant Info",
+      "logo": {
+        "label": "Tenant Logo"
+      }
+    },
+    "restaurant": {
+      "title": "Restaurant Info",
+      "logo": {
+        "label": "Restaurant Logo"
+      }
+    },
+    "support": {
+      "title": "Support Contact"
+    },
+    "branding": {
+      "title": "Branding"
+    },
+    "fields": {
+      "firstName": {
+        "requiredLabel": "First Name*"
+      },
+      "lastName": {
+        "requiredLabel": "Last Name*"
+      },
+      "email": {
+        "requiredLabel": "Email*"
+      },
+      "phone": {
+        "requiredLabel": "Phone Number*"
+      },
+      "password": {
+        "requiredLabel": "Password*"
+      },
+      "tenantName": {
+        "requiredLabel": "Tenant Name*"
+      },
+      "tenantBio": {
+        "requiredLabel": "Tenant Bio*"
+      },
+      "restaurantName": {
+        "requiredLabel": "Restaurant Name*"
+      },
+      "slug": {
+        "requiredLabel": "Slug*"
+      },
+      "tagline": {
+        "requiredLabel": "Tagline*"
+      },
+      "supportEmail": {
+        "requiredLabel": "Support Email*"
+      },
+      "supportPhone": {
+        "requiredLabel": "Support Phone*"
+      },
+      "supportWhatsapp": {
+        "requiredLabel": "Support WhatsApp*"
+      },
+      "primaryColor": {
+        "requiredLabel": "Primary Color*"
+      },
+      "secondaryColor": {
+        "requiredLabel": "Secondary Color*"
+      },
+      "fontFamily": {
+        "label": "Font Family"
+      }
+    },
+    "upload": {
+      "uploading": "Uploading...",
+      "imageUploaded": "Image uploaded",
+      "imageSelected": "Image selected",
+      "chooseFile": "Choose File",
+      "helper2Mb": "PNG, JPG, JPEG upto 2MB"
+    },
+    "otp": {
+      "title": "Verify Email",
+      "description": "Enter the OTP sent to your email address to continue your business onboarding.",
+      "sentTo": "OTP sent to",
+      "fallbackEmail": "your email address",
+      "fieldLabel": "Enter OTP",
+      "placeholder": "Enter OTP",
+      "helper": "Please check your inbox or spam folder for the verification code.",
+      "verifying": "Verifying...",
+      "verify": "Verify OTP",
+      "changeEmail": "Change Email",
+      "enterOtpError": "Please enter OTP",
+      "validOtpError": "Please enter a valid OTP",
+      "verificationFailed": "OTP verification failed",
+      "emailVerified": "Email verified successfully!"
+    },
+    "toasts": {
+      "userAlreadyExists": "User already exists. Please verify the OTP sent to your email.",
+      "registrationFailed": "Failed to register",
+      "accessTokenMissing": "Access token not received",
+      "registrationSuccessful": "Registration successful! Please verify OTP.",
+      "genericError": "Something went wrong. Please try again."
+    }
+  },
   "forms": {
     "fields": {
       "fullName": {
@@ -676,7 +805,14 @@
       "submitError": "Something went wrong. Please try again."
     }
   },
-  "validation": {},
+  "validation": {
+    "register": {
+      "validEmail": "Please enter a valid email address",
+      "profilePhotoMaxSize": "Profile photo must be less than {size}MB.",
+      "tenantLogoMaxSize": "Tenant logo must be less than {size}MB.",
+      "restaurantLogoMaxSize": "Restaurant logo must be less than {size}MB."
+    }
+  },
   "errors": {
     "uploadUrlFailed": "Failed to get upload URL",
     "invalidPresignedResponse": "Invalid presigned response",

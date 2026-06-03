@@ -11,13 +11,19 @@ import { API_BASE_URL } from "@/lib/constants";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
-const steps = [
-  { id: 1, label: "Account" },
-  { id: 2, label: "Tenant & Restaurant" },
-  { id: 3, label: "Branch" },
-  { id: 4, label: "Type" },
-  { id: 5, label: "Published" },
+type OnboardingStepConfig = {
+  id: number;
+  labelKey: string;
+};
+
+const ONBOARDING_STEPS: OnboardingStepConfig[] = [
+  { id: 1, labelKey: "steps.account" },
+  { id: 2, labelKey: "steps.tenantRestaurant" },
+  { id: 3, labelKey: "steps.branch" },
+  { id: 4, labelKey: "steps.type" },
+  { id: 5, labelKey: "steps.published" },
 ];
 
 const normalizeEmail = (email?: string) => {
@@ -185,6 +191,7 @@ const buildBranchSettingsPayload = (settings: any) => {
 };
 
 export default function BusinessOnboarding() {
+  const tRegister = useTranslations("register");
   const [activeStep, setActiveStep] = useState<number>(1);
   const [publishedData, setPublishedData] = useState<any>(null);
 
@@ -318,7 +325,7 @@ export default function BusinessOnboarding() {
 
   /* ================= DERIVED VALUES ================= */
 
-  const activeIndex = steps.findIndex((s) => s.id === activeStep);
+  const activeIndex = ONBOARDING_STEPS.findIndex((s) => s.id === activeStep);
 
   const verificationEmail = useMemo(() => {
     return normalizeEmail(otpEmail || formData.user.email);
@@ -466,11 +473,11 @@ export default function BusinessOnboarding() {
             step: 1,
           });
 
-          toast.info("User already exists. Please verify the OTP sent to your email.");
+          toast.info(tRegister("toasts.userAlreadyExists"));
           return;
         }
 
-        toast.error(data?.message || "Failed to register");
+        toast.error(data?.message || tRegister("toasts.registrationFailed"));
         return;
       }
 
@@ -482,7 +489,7 @@ export default function BusinessOnboarding() {
       setPublishedData(rest);
 
       if (!token) {
-        toast.error("Access token not received");
+        toast.error(tRegister("toasts.accessTokenMissing"));
         return;
       }
 
@@ -492,9 +499,9 @@ export default function BusinessOnboarding() {
         step: 4,
       });
 
-      toast.success("Registration successful! Please verify OTP.");
+      toast.success(tRegister("toasts.registrationSuccessful"));
     } catch (error: any) {
-      toast.error(error?.message || "Something went wrong. Please try again.");
+      toast.error(error?.message || tRegister("toasts.genericError"));
     } finally {
       setLoading(false);
     }
@@ -504,12 +511,12 @@ export default function BusinessOnboarding() {
 
   const handleVerifyOtp = async () => {
     if (!cleanedOtp) {
-      toast.error("Please enter OTP");
+      toast.error(tRegister("otp.enterOtpError"));
       return;
     }
 
     if (!isOtpValid) {
-      toast.error("Please enter a valid OTP");
+      toast.error(tRegister("otp.validOtpError"));
       return;
     }
 
@@ -538,13 +545,13 @@ export default function BusinessOnboarding() {
 
       if (!res.ok) {
         throw new Error(
-          data?.message ||
+            data?.message ||
             data?.error?.message ||
-            "OTP verification failed"
+            tRegister("otp.verificationFailed")
         );
       }
 
-      toast.success("Email verified successfully!");
+      toast.success(tRegister("otp.emailVerified"));
 
       localStorage.removeItem("tenantSignupToken");
 
@@ -555,7 +562,7 @@ export default function BusinessOnboarding() {
 
       setActiveStep(5);
     } catch (error: any) {
-      toast.error(error?.message || "Verification failed");
+      toast.error(error?.message || tRegister("otp.verificationFailed"));
     } finally {
       setOtpLoading(false);
     }
@@ -572,18 +579,19 @@ export default function BusinessOnboarding() {
           </div>
 
           <h2 className="text-xl font-semibold text-gray-900">
-            Verify Email
+            {tRegister("otp.title")}
           </h2>
 
           <p className="text-sm text-gray-500 mt-2 leading-6">
-            Enter the OTP sent to your email address to continue your business
-            onboarding.
+            {tRegister("otp.description")}
           </p>
 
           <div className="mt-4 rounded-xl bg-gray-50 border border-gray-100 px-4 py-3">
-            <p className="text-xs text-gray-500">OTP sent to</p>
+            <p className="text-xs text-gray-500">
+              {tRegister("otp.sentTo")}
+            </p>
             <p className="text-sm font-semibold text-gray-900 break-all mt-1">
-              {verificationEmail || "your email address"}
+              {verificationEmail || tRegister("otp.fallbackEmail")}
             </p>
           </div>
         </div>
@@ -591,13 +599,13 @@ export default function BusinessOnboarding() {
         <div className="mt-6 space-y-4">
           <div>
             <label className="text-sm font-medium text-gray-800">
-              Enter OTP
+              {tRegister("otp.fieldLabel")}
             </label>
 
             <Input
               inputMode="numeric"
               autoComplete="one-time-code"
-              placeholder="Enter OTP"
+              placeholder={tRegister("otp.placeholder")}
               value={cleanedOtp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
               onKeyDown={(e) => {
@@ -609,7 +617,7 @@ export default function BusinessOnboarding() {
             />
 
             <p className="text-xs text-gray-500 mt-2">
-              Please check your inbox or spam folder for the verification code.
+              {tRegister("otp.helper")}
             </p>
           </div>
 
@@ -618,7 +626,7 @@ export default function BusinessOnboarding() {
             disabled={otpLoading || !isOtpValid}
             className="w-full py-5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {otpLoading ? "Verifying..." : "Verify OTP"}
+            {otpLoading ? tRegister("otp.verifying") : tRegister("otp.verify")}
           </Button>
 
           <Button
@@ -628,7 +636,7 @@ export default function BusinessOnboarding() {
             disabled={otpLoading}
             className="w-full py-5 rounded-xl"
           >
-            Change Email
+            {tRegister("otp.changeEmail")}
           </Button>
         </div>
       </div>
@@ -698,10 +706,10 @@ export default function BusinessOnboarding() {
       {/* HEADER */}
       <div className="text-center mb-8 sm:mb-10">
         <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
-          Business Onboarding
+          {tRegister("title")}
         </h1>
         <p className="text-xs sm:text-sm text-gray-500 mt-1">
-          Complete the steps below to set up your business
+          {tRegister("subtitle")}
         </p>
       </div>
 
@@ -713,11 +721,11 @@ export default function BusinessOnboarding() {
           <div
             className="absolute top-5 left-0 border-t border-dashed border-primary z-0"
             style={{
-              width: `${((activeIndex + 0.5) / steps.length) * 100}%`,
+              width: `${((activeIndex + 0.5) / ONBOARDING_STEPS.length) * 100}%`,
             }}
           />
 
-          {steps.map((step, index) => {
+          {ONBOARDING_STEPS.map((step, index) => {
             const isCompleted = index < activeIndex;
             const isActive = step.id === activeStep;
 
@@ -741,7 +749,7 @@ export default function BusinessOnboarding() {
                   className={`mt-2 text-[9px] sm:text-xs text-center
                   ${isActive ? "text-primary font-medium" : "text-[#909090]"}`}
                 >
-                  {step.label}
+                  {tRegister(step.labelKey)}
                 </span>
               </div>
             );

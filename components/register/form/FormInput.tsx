@@ -3,14 +3,14 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
-import { useState, forwardRef } from "react";
+import { useState, forwardRef, type ComponentPropsWithoutRef } from "react";
 
-interface FormInputProps {
+interface FormInputProps
+  extends Omit<ComponentPropsWithoutRef<typeof Input>, "onChange" | "value"> {
   label: string;
   placeholder: string;
   value?: string;
   onChange?: (val: string) => void;
-  onBlur?: () => void;
   required?: boolean;
   error?: boolean;
   errorText?: string;
@@ -29,6 +29,8 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       error,
       errorText,
       showPasswordToggle,
+      className,
+      ...inputProps
     },
     ref
   ) => {
@@ -57,7 +59,9 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
               focus:ring-primary
               pr-10
               ${error ? "border-primary bg-primary/5" : ""}
+              ${className || ""}
             `}
+            {...inputProps}
           />
 
           {showPasswordToggle && (

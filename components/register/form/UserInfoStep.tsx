@@ -8,6 +8,7 @@ import { validateZod } from "@/hooks/useZodValidator";
 import { userSchema } from "@/lib/RegisterSchemas";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { API_BASE_URL } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 
 interface Props {
   formData: any;
@@ -50,6 +51,9 @@ const isValidEmailFormat = (email: string) => {
 };
 
 export default function UserInfoStep({ formData, updateFormData, next }: Props) {
+  const tCommon = useTranslations("common");
+  const tRegister = useTranslations("register");
+  const tValidation = useTranslations("validation");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -108,7 +112,7 @@ export default function UserInfoStep({ formData, updateFormData, next }: Props) 
     const controller = new AbortController();
 
     setEmailCheckStatus("checking");
-    setEmailCheckMessage("Checking email availability...");
+    setEmailCheckMessage(tRegister("user.email.checking"));
     setCheckedEmail("");
 
     const timer = window.setTimeout(async () => {
@@ -132,7 +136,7 @@ export default function UserInfoStep({ formData, updateFormData, next }: Props) 
           !result.success ||
           typeof result.data?.exists !== "boolean"
         ) {
-          throw new Error(result.message || "Unable to verify email");
+          throw new Error(result.message || tRegister("user.email.verifyFailed"));
         }
 
         const exists = result.data.exists;
@@ -144,7 +148,7 @@ export default function UserInfoStep({ formData, updateFormData, next }: Props) 
 
         if (canProceed) {
           setEmailCheckMessage(
-            result.message || "Email is available for this role"
+            result.message || tRegister("user.email.available")
           );
 
           setErrors((prev) => {
@@ -154,8 +158,8 @@ export default function UserInfoStep({ formData, updateFormData, next }: Props) 
           });
         } else {
           const fallbackMessage = SHOULD_ALLOW_EXISTING_EMAIL
-            ? "No account exists with this email for this role"
-            : "This email already exists for this role";
+            ? tRegister("user.email.noAccountForRole")
+            : tRegister("user.email.existsForRole");
 
           const message = result.message || fallbackMessage;
 
@@ -166,18 +170,20 @@ export default function UserInfoStep({ formData, updateFormData, next }: Props) 
             email: message,
           }));
         }
-      } catch (error: any) {
-        if (error?.name === "AbortError") return;
+      } catch (error: unknown) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
 
         setCheckedEmail(normalizedEmail);
         setEmailCheckStatus("error");
         setEmailCheckMessage(
-          error?.message || "Unable to verify email right now"
+          error instanceof Error
+            ? error.message
+            : tRegister("user.email.verifyUnavailable")
         );
 
         setErrors((prev) => ({
           ...prev,
-          email: "Unable to verify email right now. Please try again.",
+          email: tRegister("user.email.verifyUnavailableWithRetry"),
         }));
       }
     }, EMAIL_DEBOUNCE_MS);
@@ -186,7 +192,7 @@ export default function UserInfoStep({ formData, updateFormData, next }: Props) 
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [normalizedEmail, emailLooksValid]);
+  }, [normalizedEmail, emailLooksValid, tRegister]);
 
   /* ---------------- FILE UPLOAD ---------------- */
 const MAX_PROFILE_IMAGE_SIZE_MB = 2;
@@ -201,8 +207,12 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
     setErrors((prev) => ({
       ...prev,
-      profileFile: `Profile photo must be less than ${MAX_PROFILE_IMAGE_SIZE_MB}MB.`,
-      profileUrl: `Profile photo must be less than ${MAX_PROFILE_IMAGE_SIZE_MB}MB.`,
+      profileFile: tValidation("register.profilePhotoMaxSize", {
+        size: MAX_PROFILE_IMAGE_SIZE_MB,
+      }),
+      profileUrl: tValidation("register.profilePhotoMaxSize", {
+        size: MAX_PROFILE_IMAGE_SIZE_MB,
+      }),
     }));
 
     return;
@@ -269,7 +279,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         emailCheckStatus === "unavailable" &&
         checkedEmail === normalizedEmail
       ) {
-        newErrors.email = emailCheckMessage || "This email is not allowed";
+        newErrors.email = emailCheckMessage || tRegister("user.email.notAllowed");
         return newErrors;
       }
 
@@ -279,7 +289,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         checkedEmail === normalizedEmail
       ) {
         newErrors.email =
-          emailCheckMessage || "Unable to verify email right now";
+          emailCheckMessage || tRegister("user.email.verifyUnavailable");
         return newErrors;
       }
 
@@ -313,7 +323,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!emailLooksValid) {
       setErrors((prev) => ({
         ...prev,
-        email: "Please enter a valid email address",
+        email: tValidation("register.validEmail"),
       }));
       inputRefs.email.current?.focus();
       return;
@@ -322,7 +332,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (emailCheckStatus === "checking") {
       setErrors((prev) => ({
         ...prev,
-        email: "Please wait while we verify this email",
+        email: tRegister("user.email.waitForVerification"),
       }));
       inputRefs.email.current?.focus();
       return;
@@ -333,8 +343,8 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         ...prev,
         email:
           emailCheckStatus === "error"
-            ? "Unable to verify email right now. Please try again."
-            : "Please use an email that is available for this role",
+            ? tRegister("user.email.verifyUnavailableWithRetry")
+            : tRegister("user.email.useAvailable"),
       }));
       inputRefs.email.current?.focus();
       return;
@@ -350,7 +360,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (emailCheckStatus === "checking") {
       return (
         <p className="text-xs mt-1 text-gray-500">
-          Checking email availability...
+          {tRegister("user.email.checking")}
         </p>
       );
     }
@@ -358,7 +368,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (emailCheckStatus === "available") {
       return (
         <p className="text-xs mt-1 text-green-600">
-          {emailCheckMessage || "Email is available for this role"}
+          {emailCheckMessage || tRegister("user.email.available")}
         </p>
       );
     }
@@ -369,7 +379,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   return (
     <div className="max-w-5xl mx-auto bg-white rounded-xl p-8">
       <h2 className="text-[20px] font-semibold text-gray-900 mb-6">
-        User Info
+        {tRegister("user.title")}
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -377,7 +387,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         <div>
           <FormInput
             ref={inputRefs.firstName}
-            label="First Name*"
+            label={tRegister("fields.firstName.requiredLabel")}
             placeholder="Ahmed"
             value={user.firstName || ""}
             onChange={(val: string) => {
@@ -395,7 +405,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         <div>
           <FormInput
             ref={inputRefs.lastName}
-            label="Last Name*"
+            label={tRegister("fields.lastName.requiredLabel")}
             placeholder="Ali"
             value={user.lastName || ""}
             onChange={(val: string) => {
@@ -413,7 +423,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         <div>
           <FormInput
             ref={inputRefs.email}
-            label="Email*"
+            label={tRegister("fields.email.requiredLabel")}
             placeholder="owner@indusfoods.com"
             value={user.email || ""}
             onChange={(val: string) => {
@@ -438,7 +448,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         <div>
           <FormInput
             ref={inputRefs.phone}
-            label="Phone Number*"
+            label={tRegister("fields.phone.requiredLabel")}
             placeholder="+923001234567"
             value={user.phone || ""}
             onChange={(val: string) => {
@@ -456,7 +466,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         <div>
           <FormInput
             ref={inputRefs.password}
-            label="Password*"
+            label={tRegister("fields.password.requiredLabel")}
             placeholder="StrongPassword123!"
             value={user.password || ""}
             onChange={(val: string) => {
@@ -472,7 +482,9 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
         {/* FILE UPLOAD */}
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Profile Photo (Optional)</label>
+          <label className="text-sm font-medium">
+            {tRegister("user.profilePhoto.optionalLabel")}
+          </label>
 
           <label className="flex items-center gap-4 cursor-pointer rounded-lg pt-1 hover:bg-gray-50 transition">
             {/* AVATAR BOX */}
@@ -512,13 +524,15 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             <div>
               <p className="text-sm font-medium">
                 {uploading
-                  ? "Uploading..."
+                  ? tRegister("upload.uploading")
                   : user.profileUrl
-                  ? "Image uploaded"
-                  : "Choose File"}
+                  ? tRegister("upload.imageUploaded")
+                  : tRegister("upload.chooseFile")}
               </p>
 
-              <p className="text-xs text-[#909090]">PNG, JPG, JPEG upto 2MB</p>
+              <p className="text-xs text-[#909090]">
+                {tRegister("upload.helper2Mb")}
+              </p>
             </div>
 
             <input
@@ -544,10 +558,10 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
           className="bg-primary hover:bg-red-800 px-6 py-2.5 rounded-[10px] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {uploading
-            ? "Uploading..."
+            ? tRegister("upload.uploading")
             : emailCheckStatus === "checking"
-            ? "Checking email..."
-            : "Save & Continue"}
+            ? tRegister("user.email.checkingShort")
+            : tCommon("actions.saveContinue")}
         </Button>
       </div>
     </div>

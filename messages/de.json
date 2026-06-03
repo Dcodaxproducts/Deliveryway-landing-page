@@ -6,7 +6,9 @@
       "view": "Ansehen",
       "image": "Bild",
       "message": "Nachricht",
-      "more": "Weitere Aktionen"
+      "more": "Weitere Aktionen",
+      "back": "Zurück",
+      "saveContinue": "Speichern und fortfahren"
     },
     "status": {
       "active": "Aktiv",
@@ -623,7 +625,134 @@
       }
     }
   },
-  "register": {},
+  "register": {
+    "title": "Business-Onboarding",
+    "subtitle": "Schließen Sie die Schritte unten ab, um Ihr Unternehmen einzurichten",
+    "steps": {
+      "account": "Konto",
+      "tenantRestaurant": "Mandant & Restaurant",
+      "branch": "Filiale",
+      "type": "Typ",
+      "published": "Veröffentlicht"
+    },
+    "user": {
+      "title": "Benutzerinformationen",
+      "profilePhoto": {
+        "optionalLabel": "Profilfoto (optional)"
+      },
+      "email": {
+        "checking": "E-Mail-Verfügbarkeit wird geprüft...",
+        "checkingShort": "E-Mail wird geprüft...",
+        "available": "E-Mail ist für diese Rolle verfügbar",
+        "verifyFailed": "E-Mail konnte nicht geprüft werden",
+        "verifyUnavailable": "E-Mail kann momentan nicht geprüft werden",
+        "verifyUnavailableWithRetry": "E-Mail kann momentan nicht geprüft werden. Bitte versuchen Sie es erneut.",
+        "existsForRole": "Diese E-Mail existiert bereits für diese Rolle",
+        "noAccountForRole": "Für diese E-Mail existiert kein Konto mit dieser Rolle",
+        "notAllowed": "Diese E-Mail ist nicht erlaubt",
+        "waitForVerification": "Bitte warten Sie, während wir diese E-Mail prüfen",
+        "useAvailable": "Bitte verwenden Sie eine E-Mail, die für diese Rolle verfügbar ist"
+      }
+    },
+    "tenant": {
+      "title": "Mandanteninformationen",
+      "logo": {
+        "label": "Mandantenlogo"
+      }
+    },
+    "restaurant": {
+      "title": "Restaurantinformationen",
+      "logo": {
+        "label": "Restaurantlogo"
+      }
+    },
+    "support": {
+      "title": "Support-Kontakt"
+    },
+    "branding": {
+      "title": "Branding"
+    },
+    "fields": {
+      "firstName": {
+        "requiredLabel": "Vorname*"
+      },
+      "lastName": {
+        "requiredLabel": "Nachname*"
+      },
+      "email": {
+        "requiredLabel": "E-Mail*"
+      },
+      "phone": {
+        "requiredLabel": "Telefonnummer*"
+      },
+      "password": {
+        "requiredLabel": "Passwort*"
+      },
+      "tenantName": {
+        "requiredLabel": "Mandantenname*"
+      },
+      "tenantBio": {
+        "requiredLabel": "Mandantenbeschreibung*"
+      },
+      "restaurantName": {
+        "requiredLabel": "Restaurantname*"
+      },
+      "slug": {
+        "requiredLabel": "Slug*"
+      },
+      "tagline": {
+        "requiredLabel": "Tagline*"
+      },
+      "supportEmail": {
+        "requiredLabel": "Support-E-Mail*"
+      },
+      "supportPhone": {
+        "requiredLabel": "Support-Telefon*"
+      },
+      "supportWhatsapp": {
+        "requiredLabel": "Support-WhatsApp*"
+      },
+      "primaryColor": {
+        "requiredLabel": "Primärfarbe*"
+      },
+      "secondaryColor": {
+        "requiredLabel": "Sekundärfarbe*"
+      },
+      "fontFamily": {
+        "label": "Schriftart"
+      }
+    },
+    "upload": {
+      "uploading": "Wird hochgeladen...",
+      "imageUploaded": "Bild hochgeladen",
+      "imageSelected": "Bild ausgewählt",
+      "chooseFile": "Datei auswählen",
+      "helper2Mb": "PNG, JPG, JPEG bis 2 MB"
+    },
+    "otp": {
+      "title": "E-Mail verifizieren",
+      "description": "Geben Sie den OTP ein, der an Ihre E-Mail-Adresse gesendet wurde, um Ihr Business-Onboarding fortzusetzen.",
+      "sentTo": "OTP gesendet an",
+      "fallbackEmail": "Ihre E-Mail-Adresse",
+      "fieldLabel": "OTP eingeben",
+      "placeholder": "OTP eingeben",
+      "helper": "Bitte prüfen Sie Ihren Posteingang oder Spam-Ordner auf den Verifizierungscode.",
+      "verifying": "Wird verifiziert...",
+      "verify": "OTP verifizieren",
+      "changeEmail": "E-Mail ändern",
+      "enterOtpError": "Bitte geben Sie den OTP ein",
+      "validOtpError": "Bitte geben Sie einen gültigen OTP ein",
+      "verificationFailed": "OTP-Verifizierung fehlgeschlagen",
+      "emailVerified": "E-Mail erfolgreich verifiziert!"
+    },
+    "toasts": {
+      "userAlreadyExists": "Benutzer existiert bereits. Bitte verifizieren Sie den OTP, der an Ihre E-Mail gesendet wurde.",
+      "registrationFailed": "Registrierung fehlgeschlagen",
+      "accessTokenMissing": "Access Token nicht erhalten",
+      "registrationSuccessful": "Registrierung erfolgreich! Bitte verifizieren Sie den OTP.",
+      "genericError": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+    }
+  },
   "forms": {
     "fields": {
       "fullName": {
@@ -676,7 +805,14 @@
       "submitError": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
     }
   },
-  "validation": {},
+  "validation": {
+    "register": {
+      "validEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "profilePhotoMaxSize": "Profilfoto muss kleiner als {size} MB sein.",
+      "tenantLogoMaxSize": "Mandantenlogo muss kleiner als {size} MB sein.",
+      "restaurantLogoMaxSize": "Restaurantlogo muss kleiner als {size} MB sein."
+    }
+  },
   "errors": {
     "uploadUrlFailed": "Upload-URL konnte nicht abgerufen werden",
     "invalidPresignedResponse": "Ungültige Presigned-Antwort",

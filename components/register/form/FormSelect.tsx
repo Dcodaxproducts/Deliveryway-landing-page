@@ -9,17 +9,31 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+interface FormSelectOption {
+  label: string;
+  value: string;
+}
+
 interface FormSelectProps {
   label?: string;
   placeholder: string;
-  options: string[];
+  options: string[] | FormSelectOption[];
   value?: string;
   onChange?: (val: string) => void;
-
-  /* ✅ NEW (optional, backward-safe) */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
+
+const resolveOption = (option: string | FormSelectOption): FormSelectOption => {
+  if (typeof option === "string") {
+    return {
+      label: option,
+      value: option.toLowerCase(),
+    };
+  }
+
+  return option;
+};
 
 export default function FormSelect({
   label,
@@ -45,11 +59,15 @@ export default function FormSelect({
         </SelectTrigger>
 
         <SelectContent>
-          {options.map((opt) => (
-            <SelectItem key={opt} value={opt.toLowerCase()}>
-              {opt}
+          {options.map((option) => {
+            const resolvedOption = resolveOption(option);
+
+            return (
+            <SelectItem key={resolvedOption.value} value={resolvedOption.value}>
+              {resolvedOption.label}
             </SelectItem>
-          ))}
+            );
+          })}
         </SelectContent>
       </Select>
     </div>
