@@ -3,15 +3,30 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { API_BASE_URL } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 
 interface UploadResult {
   key: string;
   fileUrl: string;
 }
 
+type PresignedUploadData = {
+  uploadUrl?: string;
+  method?: string;
+  headers?: Record<string, string>;
+  key: string;
+  fileUrl: string;
+};
+
+type PresignedUploadResponse = {
+  data?: PresignedUploadData;
+};
+
 export const useFileUpload = () => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const tCommon = useTranslations("common");
+  const tErrors = useTranslations("errors");
 
   const uploadFile = async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -45,26 +60,28 @@ export const useFileUpload = () => {
       );
 
       if (!presignedRes.ok) {
-        throw new Error("Failed to get upload URL");
+        throw new Error(tErrors("uploadUrlFailed"));
       }
 
-      const presigned = await presignedRes.json();
+      const presigned = (await presignedRes.json()) as PresignedUploadResponse;
       const uploadData = presigned?.data;
 
       if (!uploadData?.uploadUrl) {
-        throw new Error("Invalid presigned response");
+        throw new Error(tErrors("invalidPresignedResponse"));
       }
+
+      const uploadUrl = uploadData.uploadUrl;
 
       /* 🔥 STEP 2: UPLOAD WITH XHR (PROGRESS) */
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
 
-        xhr.open(uploadData.method || "PUT", uploadData.uploadUrl);
+        xhr.open(uploadData.method || "PUT", uploadUrl);
 
         /* headers */
         if (uploadData.headers) {
           Object.entries(uploadData.headers).forEach(([key, value]) => {
-            xhr.setRequestHeader(key, value as string);
+            xhr.setRequestHeader(key, value);
           });
         }
 
@@ -80,24 +97,28 @@ export const useFileUpload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             resolve();
           } else {
-            reject(new Error("Upload failed"));
+            reject(new Error(tErrors("uploadFailed")));
           }
         };
 
-        xhr.onerror = () => reject(new Error("Upload failed"));
+        xhr.onerror = () => reject(new Error(tErrors("uploadFailed")));
 
         xhr.send(file);
       });
 
-      toast.success("File uploaded");
+      toast.success(tCommon("fileUploaded"));
 
       return {
         key: uploadData.key,
         fileUrl: uploadData.fileUrl,
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(err?.message || "Upload failed");
+      toast.error(
+        err instanceof Error && err.message
+          ? err.message
+          : tErrors("uploadFailed")
+      );
       return null;
     } finally {
       setUploading(false);

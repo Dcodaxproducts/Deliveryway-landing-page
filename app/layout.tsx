@@ -5,7 +5,7 @@ import "./globals.css";
 import { onest } from "@/lib/fonts";
 import { Navbar } from "@/components/navbar/navbar";
 import { usePathname } from "next/navigation";
-import Footer from "@/components/footer/Footer";
+import { Footer } from "@/components/footer/Footer";
 import { Toaster } from "sonner";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 

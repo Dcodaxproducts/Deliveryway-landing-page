@@ -7,10 +7,27 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { LanguageSelector } from "@/components/navbar/LanguageSelector";
+import { useTranslations } from "next-intl";
+
+const NAVIGATION_LINKS = [
+  { href: "/about", labelKey: "about" },
+  { href: "/services", labelKey: "services" },
+  { href: "/pricing", labelKey: "pricing" },
+  { href: "/contact", labelKey: "contact" },
+] as const;
+
+const MOBILE_NAVIGATION_LINKS = [
+  { href: "#", labelKey: "about" },
+  { href: "#", labelKey: "services" },
+  { href: "#", labelKey: "pricing" },
+  { href: "#", labelKey: "contact" },
+] as const;
 
 export function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
+  const t = useTranslations("navigation");
+
   return (
     <>
       {/* OUTER BAR */}
@@ -33,18 +50,11 @@ export function Navbar() {
 
             {/* CENTER: LINKS (DESKTOP) */}
             <div className="hidden md:flex items-center gap-8 text-[15px] font-sans text-white ml-20">
-              <Link href="/about" className="hover:opacity-80">
-                About
-              </Link>
-              <Link href="/services" className="hover:opacity-80">
-                Services
-              </Link>
-              <Link href="/pricing" className="hover:opacity-80">
-                Pricing
-              </Link>
-              <Link href="/contact" className="hover:opacity-80">
-                Contact
-              </Link>
+              {NAVIGATION_LINKS.map((link) => (
+                <Link href={link.href} className="hover:opacity-80" key={link.href}>
+                  {t(link.labelKey)}
+                </Link>
+              ))}
             </div>
 
             {/* RIGHT: CTA + MOBILE MENU */}
@@ -57,7 +67,7 @@ export function Navbar() {
                 className="hidden md:inline-flex rounded-full bg-white px-7 py-3 text-[15px] font-sans font-medium text-[#CE181B] hover:bg-white/90"
               onClick={()=>router.push("/register")}
               >
-                Registration
+                {t("registration")}
               </Button>
 
               {/* MOBILE MENU BUTTON */}
@@ -65,6 +75,7 @@ export function Navbar() {
                 type="button"
                 className="inline-flex items-center justify-center rounded-full bg-white/20 p-2 text-white md:hidden"
                 onClick={() => setIsSidebarOpen(true)}
+                aria-label={t("openMenu")}
               >
                 <Menu size={20} />
               </button>
@@ -89,6 +100,7 @@ export function Navbar() {
               <button
                 onClick={() => setIsSidebarOpen(false)}
                 className="rounded-lg bg-gray-100 p-2"
+                aria-label={t("closeMenu")}
               >
                 <X size={18} />
               </button>
@@ -96,17 +108,18 @@ export function Navbar() {
 
             {/* LINKS */}
             <div className="flex flex-col gap-6 px-6 text-sm font-medium text-gray-800">
-              <Link href="#">About</Link>
-              <Link href="#">Services</Link>
-              <Link href="#">Pricing</Link>
-              <Link href="#">Contact</Link>
+              {MOBILE_NAVIGATION_LINKS.map((link) => (
+                <Link href={link.href} key={link.labelKey}>
+                  {t(link.labelKey)}
+                </Link>
+              ))}
 
               <div className="w-fit rounded-full bg-[#CE181B]">
                 <LanguageSelector />
               </div>
 
               <Button className="mt-4 py-3 rounded-full bg-[#CE181B] text-white hover:bg-[#b51619]" onClick={()=>router.push("/register")}>
-                Registration / Sign In
+                {t("registrationSignIn")}
               </Button>
             </div>
           </div>

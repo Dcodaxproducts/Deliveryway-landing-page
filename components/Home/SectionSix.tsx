@@ -1,6 +1,6 @@
-import ContentWithChecklistSection from "../shared/ContentWithChecklistSection";
+import { ContentWithChecklistSection } from "../shared/ContentWithChecklistSection";
 
-export default function SectionSix() {
+export function SectionSix() {
   return (
     <ContentWithChecklistSection
       reverseOnMobile

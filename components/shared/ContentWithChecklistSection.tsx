@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 import ChecklistItem from "./ChecklistItem";
 
 interface ContentWithChecklistSectionProps {
@@ -14,7 +17,7 @@ interface ContentWithChecklistSectionProps {
   imagePosition?: "left" | "right"; // ✅ NEW
 }
 
-const ContentWithChecklistSection = ({
+export function ContentWithChecklistSection({
   title,
   description,
   checklist,
@@ -24,7 +27,9 @@ const ContentWithChecklistSection = ({
   imageHeight,
   reverseOnMobile = false,
   imagePosition = "left", // default keeps backward compatibility
-}: ContentWithChecklistSectionProps) => {
+}: ContentWithChecklistSectionProps) {
+  const t = useTranslations("common");
+
   return (
     <section className="w-full bg-white py-12 md:py-15">
       <div className="mx-auto max-w-7xl px-4">
@@ -76,7 +81,7 @@ const ContentWithChecklistSection = ({
 
             <div className="mt-10 flex justify-center lg:justify-start">
               <Button className="rounded-full bg-black px-8 py-3.5 text-sm font-medium text-white hover:bg-black/90">
-                Get Started
+                {t("getStarted")}
               </Button>
             </div>
           </div>
@@ -84,6 +89,4 @@ const ContentWithChecklistSection = ({
       </div>
     </section>
   );
-};
-
-export default ContentWithChecklistSection;
+}

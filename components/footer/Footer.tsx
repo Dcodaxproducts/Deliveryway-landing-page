@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import {
   FaFacebookF,
@@ -5,9 +7,28 @@ import {
   FaInstagram,
   FaYoutube,
 } from "react-icons/fa";
+import { useTranslations } from "next-intl";
 
+const QUICK_LINKS = ["home", "about", "services", "contact"] as const;
 
-export default function Footer() {
+const PRODUCT_LINKS = [
+  "superAdminDashboard",
+  "restaurantAdminDashboard",
+  "customerApp",
+  "driverApp",
+  "merchantRestaurantApp",
+] as const;
+
+const COMPANY_LINKS = [
+  "about",
+  "privacyPolicy",
+  "support",
+  "termsOfService",
+] as const;
+
+export function Footer() {
+  const t = useTranslations("footer");
+
   return (
     <footer className="relative bg-gray-100 pt-20">
   
@@ -30,66 +51,62 @@ export default function Footer() {
             </div>
 
             <h4 className="mt-6 font-heading font-semibold text-gray-900">
-              Subscribe
+              {t("subscribe")}
             </h4>
             <p className="mt-2 text-[15px] text-gray-600">
-              Join our newsletter to stay up to date on features and releases.
+              {t("newsletterText")}
             </p>
 
             <div className="mt-4 flex items-center gap-2 rounded-full bg-white p-2 shadow-sm">
               <input
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t("emailPlaceholder")}
                 className="w-full bg-transparent px-3 text-sm outline-none"
               />
               <button className="rounded-full bg-black px-5 py-2 text-sm text-white">
-                Subscribe
+                {t("subscribe")}
               </button>
             </div>
 
             <p className="mt-3.5 text-[13px] text-gray-500">
-              By subscribing you agree to our{" "}
-              <span className="underline">Privacy Policy</span>
+              {t("privacyAgreement")}{" "}
+              <span className="underline">{t("privacyPolicy")}</span>
             </p>
           </div>
 
           {/* QUICK LINKS (CENTER LEFT) */}
           <div>
             <h4 className="font-heading font-bold text-gray-900">
-              Quick Links
+              {t("quickLinks")}
             </h4>
             <ul className="mt-4 space-y-2 text-[15px] text-gray-600">
-              <li>Home</li>
-              <li>About</li>
-              <li>Services</li>
-              <li>Contact</li>
+              {QUICK_LINKS.map((link) => (
+                <li key={link}>{t(link)}</li>
+              ))}
             </ul>
           </div>
 
           {/* PRODUCTS (CENTER RIGHT) */}
           <div>
             <h4 className="font-medium text-gray-900">
-              Products
+              {t("products")}
             </h4>
             <ul className="mt-4 space-y-2 text-[15px] text-gray-600">
-              <li>Super Admin Dashboard</li>
-              <li>Restaurant Admin Dashboard</li>
-              <li>Customer App</li>
-              <li>Driver App</li>
-              <li>Merchant (Restaurant) App</li>
+              {PRODUCT_LINKS.map((link) => (
+                <li key={link}>{t(link)}</li>
+              ))}
             </ul>
           </div>
 
           {/* COMPANY (RIGHT) */}
           <div className="md:text-left">
             <h4 className="font-medium text-gray-900">
-              Company
+              {t("company")}
             </h4>
             <ul className="mt-4 space-y-2 text-[15px] text-gray-600">
-              <li>About</li>
-              <li>Privacy Policy</li>
-              <li>Support</li>
-              <li>Terms of Service</li>
+              {COMPANY_LINKS.map((link) => (
+                <li key={link}>{t(link)}</li>
+              ))}
             </ul>
           </div>
         </div>
@@ -100,7 +117,7 @@ export default function Footer() {
         {/* BOTTOM ROW */}
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-sm text-gray-600">
-            Copyright © 2025 Investo. All Rights Reserved
+            {t("copyright")}
           </p>
 
           <div className="flex items-center gap-4">

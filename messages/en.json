@@ -1,9 +1,52 @@
 {
-  "common": {},
+  "common": {
+    "getStarted": "Get Started",
+    "actions": {
+      "edit": "Edit",
+      "view": "View",
+      "image": "Image",
+      "message": "Message",
+      "more": "More actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "fileUploaded": "File uploaded"
+  },
   "navigation": {
+    "about": "About",
+    "services": "Services",
+    "pricing": "Pricing",
+    "contact": "Contact",
+    "registration": "Registration",
+    "registrationSignIn": "Registration / Sign In",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
     "changeLanguage": "Change language"
   },
-  "footer": {},
+  "footer": {
+    "subscribe": "Subscribe",
+    "newsletterText": "Join our newsletter to stay up to date on features and releases.",
+    "emailPlaceholder": "Enter your email",
+    "privacyAgreement": "By subscribing you agree to our",
+    "quickLinks": "Quick Links",
+    "products": "Products",
+    "company": "Company",
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "contact": "Contact",
+    "superAdminDashboard": "Super Admin Dashboard",
+    "restaurantAdminDashboard": "Restaurant Admin Dashboard",
+    "customerApp": "Customer App",
+    "driverApp": "Driver App",
+    "merchantRestaurantApp": "Merchant (Restaurant) App",
+    "privacyPolicy": "Privacy Policy",
+    "support": "Support",
+    "termsOfService": "Terms of Service",
+    "copyright": "Copyright © 2025 Investo. All Rights Reserved"
+  },
   "home": {},
   "about": {},
   "services": {},
@@ -13,5 +56,9 @@
   "register": {},
   "forms": {},
   "validation": {},
-  "errors": {}
+  "errors": {
+    "uploadUrlFailed": "Failed to get upload URL",
+    "invalidPresignedResponse": "Invalid presigned response",
+    "uploadFailed": "Upload failed"
+  }
 }

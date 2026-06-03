@@ -1,6 +1,6 @@
-import ContentWithChecklistSection from "../shared/ContentWithChecklistSection";
+import { ContentWithChecklistSection } from "../shared/ContentWithChecklistSection";
 
-export default function SectionSeven() {
+export function SectionSeven() {
   return (
     <ContentWithChecklistSection
       imagePosition="right" 

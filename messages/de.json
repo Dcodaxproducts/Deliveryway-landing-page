@@ -1,9 +1,52 @@
 {
-  "common": {},
+  "common": {
+    "getStarted": "Loslegen",
+    "actions": {
+      "edit": "Bearbeiten",
+      "view": "Ansehen",
+      "image": "Bild",
+      "message": "Nachricht",
+      "more": "Weitere Aktionen"
+    },
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "fileUploaded": "Datei hochgeladen"
+  },
   "navigation": {
+    "about": "Über uns",
+    "services": "Services",
+    "pricing": "Preise",
+    "contact": "Kontakt",
+    "registration": "Registrierung",
+    "registrationSignIn": "Registrierung / Anmelden",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
     "changeLanguage": "Sprache wechseln"
   },
-  "footer": {},
+  "footer": {
+    "subscribe": "Abonnieren",
+    "newsletterText": "Abonnieren Sie unseren Newsletter, um über Funktionen und Veröffentlichungen auf dem Laufenden zu bleiben.",
+    "emailPlaceholder": "E-Mail-Adresse eingeben",
+    "privacyAgreement": "Mit dem Abonnieren stimmen Sie unserer",
+    "quickLinks": "Schnelllinks",
+    "products": "Produkte",
+    "company": "Unternehmen",
+    "home": "Startseite",
+    "about": "Über uns",
+    "services": "Services",
+    "contact": "Kontakt",
+    "superAdminDashboard": "Super-Admin-Dashboard",
+    "restaurantAdminDashboard": "Restaurant-Admin-Dashboard",
+    "customerApp": "Kunden-App",
+    "driverApp": "Fahrer-App",
+    "merchantRestaurantApp": "Händler-App (Restaurant)",
+    "privacyPolicy": "Datenschutzerklärung",
+    "support": "Support",
+    "termsOfService": "Nutzungsbedingungen",
+    "copyright": "Copyright © 2025 Investo. Alle Rechte vorbehalten"
+  },
   "home": {},
   "about": {},
   "services": {},
@@ -13,5 +56,9 @@
   "register": {},
   "forms": {},
   "validation": {},
-  "errors": {}
+  "errors": {
+    "uploadUrlFailed": "Upload-URL konnte nicht abgerufen werden",
+    "invalidPresignedResponse": "Ungültige Presigned-Antwort",
+    "uploadFailed": "Upload fehlgeschlagen"
+  }
 }
