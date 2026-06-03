@@ -2,29 +2,37 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Image as ImageIcon,
-  Loader2,
-  MapPin,
-  Search,
-} from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 import FormInput from "./form/FormInput";
 import { validateZod } from "@/hooks/useZodValidator";
 import { branchSchema } from "@/lib/RegisterSchemas";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import BranchDeliveryAreaSettings from "./BranchDeliveryAreaSettings";
-
-declare global {
-  interface Window {
-    google?: any;
-  }
-}
+import { BranchAddressFields } from "./branch/BranchAddressFields";
+import { BranchAdminInfo } from "./branch/BranchAdminInfo";
+import { BranchBasicInfo } from "./branch/BranchBasicInfo";
+import { BranchLocationSearch } from "./branch/BranchLocationSearch";
+import { useTranslations } from "next-intl";
+import type {
+  BranchAddressField,
+  BranchAddressValue,
+  BranchAdminField,
+  BranchBasicField,
+  BranchSettingsValue,
+  BranchValue,
+  GoogleAddressComponent,
+  GoogleAutocomplete,
+  GoogleGeocoderResult,
+  GoogleMapInstance,
+  GoogleMapsNamespace,
+  GoogleMarkerInstance,
+  GooglePlaceResult,
+  RegisterFormData,
+} from "@/types/register";
 
 interface Props {
-  formData: any;
-  updateFormData: (section: string, data: any) => void;
+  formData: RegisterFormData;
+  updateFormData: (section: string, data: Record<string, unknown>) => void;
   next: () => void;
   back: () => void;
 }
@@ -38,6 +46,10 @@ const DEFAULT_MAP_CENTER = {
   lng: 73.0479,
 };
 
+const MAX_BRANCH_COVER_IMAGE_SIZE_MB = 2;
+const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
+  MAX_BRANCH_COVER_IMAGE_SIZE_MB * 1024 * 1024;
+
 const isGoogleMapsKeyConfigured = () => {
   return (
     Boolean(GOOGLE_MAPS_API_KEY) &&
@@ -50,15 +62,22 @@ const toFiniteNumber = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
-export default function BranchStep({
+const getGoogleMaps = () => {
+  return window.google?.maps as GoogleMapsNamespace | undefined;
+};
+
+export function BranchStep({
   formData,
   updateFormData,
   next,
   back,
 }: Props) {
-  const branch = formData.branch || {};
+  const tCommon = useTranslations("common");
+  const tRegister = useTranslations("register");
+  const tValidation = useTranslations("validation");
+  const branch: BranchValue = formData.branch || {};
   const branchAdmin = formData.branchAdmin || {};
-  const branchAddress = branch.address || {};
+  const branchAddress: BranchAddressValue = branch.address || {};
   const branchSettings = branch.settings || {};
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -70,15 +89,12 @@ export default function BranchStep({
   const [mapsError, setMapsError] = useState("");
   const [selectedGoogleAddress, setSelectedGoogleAddress] = useState("");
   const [addressSearching, setAddressSearching] = useState(false);
-const MAX_BRANCH_COVER_IMAGE_SIZE_MB = 2;
-const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
-  MAX_BRANCH_COVER_IMAGE_SIZE_MB * 1024 * 1024;
   const autocompleteInputRef = useRef<HTMLInputElement | null>(null);
-  const autocompleteInstanceRef = useRef<any>(null);
+  const autocompleteInstanceRef = useRef<GoogleAutocomplete | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const markerRef = useRef<any>(null);
-  const branchAddressRef = useRef<any>(branchAddress);
+  const mapInstanceRef = useRef<GoogleMapInstance | null>(null);
+  const markerRef = useRef<GoogleMarkerInstance | null>(null);
+  const branchAddressRef = useRef<BranchAddressValue>(branchAddress);
 
   useEffect(() => {
     branchAddressRef.current = branchAddress;
@@ -98,7 +114,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
 
   const error = (path: string) => errors[path];
 
-  const composeAddress = (address: any) => {
+  const composeAddress = (address: BranchAddressValue) => {
     return [
       address?.street,
       address?.area,
@@ -110,7 +126,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
       .join(", ");
   };
 
-  const hasMeaningfulAddress = (address: any) => {
+  const hasMeaningfulAddress = (address: BranchAddressValue) => {
     return Boolean(
       address?.street ||
         address?.area ||
@@ -120,19 +136,19 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
     );
   };
 
-  const updateField = (field: keyof typeof branch, value: any) => {
+  const updateField = (field: BranchBasicField, value: string) => {
     updateFormData("branch", { [field]: value });
     clearError(`branch.${String(field)}`);
   };
 
-  const updateBranchAdminField = (field: keyof typeof branchAdmin, value: any) => {
+  const updateBranchAdminField = (field: BranchAdminField, value: string) => {
     updateFormData("branchAdmin", { [field]: value });
     clearError(`branchAdmin.${String(field)}`);
   };
 
   const updateAddressField = (
-    field: keyof typeof branchAddress,
-    value: any
+    field: BranchAddressField,
+    value: string
   ) => {
     updateFormData("branch", {
       [field]: value,
@@ -142,7 +158,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
     clearError(`branch.${String(field)}`);
   };
 
-  const handleBranchSettingsChange = (nextSettings: any) => {
+  const handleBranchSettingsChange = (nextSettings: BranchSettingsValue) => {
     updateFormData("branch", {
       settings: nextSettings,
     });
@@ -155,7 +171,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
   };
 
   const getAddressComponent = (
-    components: any[],
+    components: GoogleAddressComponent[],
     types: string[],
     mode: "long_name" | "short_name" = "long_name"
   ) => {
@@ -187,21 +203,22 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
   ) => {
     const nextLat = Number(lat);
     const nextLng = Number(lng);
+    const maps = getGoogleMaps();
 
     if (!Number.isFinite(nextLat) || !Number.isFinite(nextLng)) return;
-    if (!window.google?.maps || !mapInstanceRef.current) return;
+    if (!maps?.Marker || !mapInstanceRef.current) return;
 
     const position = { lat: nextLat, lng: nextLng };
 
     if (!markerRef.current) {
-      markerRef.current = new window.google.maps.Marker({
+      const marker = new maps.Marker({
         position,
         map: mapInstanceRef.current,
         draggable: true,
-        title: "Branch location",
+        title: tRegister("branch.map.markerTitle"),
       });
 
-      markerRef.current.addListener("dragend", () => {
+      marker.addListener("dragend", () => {
         const markerPosition = markerRef.current?.getPosition?.();
         const markerLat = markerPosition?.lat?.();
         const markerLng = markerPosition?.lng?.();
@@ -217,6 +234,8 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
           });
         }
       });
+
+      markerRef.current = marker;
     } else {
       markerRef.current.setPosition(position);
     }
@@ -244,7 +263,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
     clearError("branch.address.lng");
   };
 
-  const applyPlaceToForm = (place: any) => {
+  const applyPlaceToForm = (place: GooglePlaceResult) => {
     if (!place) return false;
 
     const components = Array.isArray(place.address_components)
@@ -258,7 +277,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
       Number.isFinite(Number(lat)) && Number.isFinite(Number(lng));
 
     if (!components.length && !hasCoordinates) {
-      setLocationError("Please select a valid Google Maps address.");
+      setLocationError(tRegister("branch.map.selectValidAddress"));
       return false;
     }
 
@@ -361,8 +380,12 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
 
     setErrors((prev) => ({
       ...prev,
-      "branch.coverImageFile": `Cover image must be less than ${MAX_BRANCH_COVER_IMAGE_SIZE_MB}MB.`,
-      "branch.coverImage": `Cover image must be less than ${MAX_BRANCH_COVER_IMAGE_SIZE_MB}MB.`,
+      "branch.coverImageFile": tValidation("register.branchCoverImageMaxSize", {
+        size: MAX_BRANCH_COVER_IMAGE_SIZE_MB,
+      }),
+      "branch.coverImage": tValidation("register.branchCoverImageMaxSize", {
+        size: MAX_BRANCH_COVER_IMAGE_SIZE_MB,
+      }),
     }));
 
     updateFormData("branch", {
@@ -412,7 +435,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    if (window.google?.maps?.places) {
+    if (getGoogleMaps()?.places) {
       setMapsReady(true);
       setMapsLoading(false);
       setMapsError("");
@@ -423,7 +446,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
       setMapsReady(false);
       setMapsLoading(false);
       setMapsError(
-        "Google Maps API key is missing. Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in env."
+        tRegister("branch.map.missingApiKey")
       );
       return;
     }
@@ -441,7 +464,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
     const handleError = () => {
       setMapsReady(false);
       setMapsLoading(false);
-      setMapsError("Failed to load Google Maps. Please verify the API key.");
+      setMapsError(tRegister("branch.map.loadFailed"));
     };
 
     setMapsLoading(true);
@@ -450,7 +473,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
       existingScript.addEventListener("load", handleLoad);
       existingScript.addEventListener("error", handleError);
 
-      if (window.google?.maps?.places) {
+      if (getGoogleMaps()?.places) {
         handleLoad();
       }
 
@@ -482,11 +505,13 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
   /* ---------------- GOOGLE MAP + AUTOCOMPLETE ---------------- */
 
   useEffect(() => {
+    const maps = getGoogleMaps();
+
     if (!mapsReady || !autocompleteInputRef.current) return;
-    if (!window.google?.maps?.places?.Autocomplete) return;
+    if (!maps?.places?.Autocomplete) return;
     if (autocompleteInstanceRef.current) return;
 
-    autocompleteInstanceRef.current = new window.google.maps.places.Autocomplete(
+    const autocomplete = new maps.places.Autocomplete(
       autocompleteInputRef.current,
       {
         fields: [
@@ -500,20 +525,24 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
       }
     );
 
-    autocompleteInstanceRef.current.addListener("place_changed", () => {
+    autocomplete.addListener("place_changed", () => {
       const place = autocompleteInstanceRef.current?.getPlace?.();
 
       if (!place?.geometry) {
-        setLocationError("Please select an address from Google Maps suggestions.");
+        setLocationError(tRegister("branch.map.selectSuggestion"));
         return;
       }
 
       applyPlaceToForm(place);
     });
 
+    autocompleteInstanceRef.current = autocomplete;
+
     return () => {
-      if (window.google?.maps?.event && autocompleteInstanceRef.current) {
-        window.google.maps.event.clearInstanceListeners(
+      const currentMaps = getGoogleMaps();
+
+      if (currentMaps?.event && autocompleteInstanceRef.current) {
+        currentMaps.event.clearInstanceListeners(
           autocompleteInstanceRef.current
         );
       }
@@ -524,14 +553,16 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
   }, [mapsReady]);
 
   useEffect(() => {
-    if (!mapsReady || !mapContainerRef.current || !window.google?.maps?.Map) {
+    const maps = getGoogleMaps();
+
+    if (!mapsReady || !mapContainerRef.current || !maps?.Map || !maps.Marker) {
       return;
     }
 
     const currentCoordinates = getCurrentCoordinates();
 
     if (!mapInstanceRef.current) {
-      mapInstanceRef.current = new window.google.maps.Map(mapContainerRef.current, {
+      const map = new maps.Map(mapContainerRef.current, {
         center: {
           lat: currentCoordinates.lat,
           lng: currentCoordinates.lng,
@@ -543,17 +574,19 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
         clickableIcons: false,
       });
 
-      markerRef.current = new window.google.maps.Marker({
+      mapInstanceRef.current = map;
+
+      const marker = new maps.Marker({
         position: {
           lat: currentCoordinates.lat,
           lng: currentCoordinates.lng,
         },
-        map: mapInstanceRef.current,
+        map,
         draggable: true,
-        title: "Branch location",
+        title: tRegister("branch.map.markerTitle"),
       });
 
-      markerRef.current.addListener("dragend", () => {
+      marker.addListener("dragend", () => {
         const position = markerRef.current?.getPosition?.();
         const lat = position?.lat?.();
         const lng = position?.lng?.();
@@ -567,7 +600,9 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
         }
       });
 
-      mapInstanceRef.current.addListener("click", (event: any) => {
+      markerRef.current = marker;
+
+      map.addListener("click", (event) => {
         const lat = event?.latLng?.lat?.();
         const lng = event?.latLng?.lng?.();
 
@@ -610,32 +645,33 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
   };
 
   const handleAddressSearch = () => {
+    const maps = getGoogleMaps();
     const query = addressQuery.trim();
 
     if (!query) {
-      setLocationError("Please enter an address to search.");
+      setLocationError(tRegister("branch.map.enterAddress"));
       return;
     }
 
-    if (!window.google?.maps?.Geocoder) {
-      setMapsError("Google Maps is not ready yet.");
+    if (!maps?.Geocoder) {
+      setMapsError(tRegister("branch.map.notReady"));
       return;
     }
 
     setAddressSearching(true);
     setLocationError("");
 
-    const geocoder = new window.google.maps.Geocoder();
+    const geocoder = new maps.Geocoder();
 
     geocoder.geocode(
       {
         address: query,
       },
-      (results: any, status: string) => {
+      (results: GoogleGeocoderResult[] | null, status: string) => {
         if (status === "OK" && results?.[0]) {
           applyPlaceToForm(results[0]);
         } else {
-          setLocationError("No matching address found. Try a more specific address.");
+          setLocationError(tRegister("branch.map.noMatch"));
         }
 
         setAddressSearching(false);
@@ -660,9 +696,11 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
       showFallbackError?: boolean;
     }
   ) => {
-    if (!window.google?.maps?.Geocoder) {
+    const maps = getGoogleMaps();
+
+    if (!maps?.Geocoder) {
       if (options?.showFallbackError) {
-        setMapsError("Google Maps is not ready yet. Coordinates were saved only.");
+        setMapsError(tRegister("branch.map.coordinatesSavedOnly"));
       }
 
       if (options?.stopLocationLoading) {
@@ -672,17 +710,17 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
       return;
     }
 
-    const geocoder = new window.google.maps.Geocoder();
+    const geocoder = new maps.Geocoder();
 
     geocoder.geocode(
       {
         location: { lat: Number(lat), lng: Number(lng) },
       },
-      (results: any, status: string) => {
+      (results: GoogleGeocoderResult[] | null, status: string) => {
         if (status === "OK" && results?.[0]) {
           applyPlaceToForm(results[0]);
         } else if (options?.showFallbackError) {
-          setLocationError("Location found, but address could not be resolved.");
+          setLocationError(tRegister("branch.map.addressNotResolved"));
         }
 
         if (options?.stopLocationLoading) {
@@ -696,7 +734,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
     setLocationError("");
 
     if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported in this browser.");
+      setLocationError(tRegister("branch.location.unsupported"));
       return;
     }
 
@@ -711,7 +749,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
         if (permission.state === "denied") {
           setGettingLocation(false);
           setLocationError(
-            "Location access is blocked. Please enable it in browser settings."
+            tRegister("branch.location.blocked")
           );
           return;
         }
@@ -725,7 +763,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
           applyCoordinatesToForm(lat, lng);
           updateMapMarker(lat, lng, true);
 
-          if (mapsReady && window.google?.maps?.Geocoder) {
+          if (mapsReady && getGoogleMaps()?.Geocoder) {
             reverseGeocodeCoordinates(lat, lng, {
               stopLocationLoading: true,
               showFallbackError: true,
@@ -734,19 +772,19 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
           }
 
           setGettingLocation(false);
-          setMapsError("Google Maps is not ready yet. Coordinates were saved only.");
+          setMapsError(tRegister("branch.map.coordinatesSavedOnly"));
         },
         (geoError) => {
           setGettingLocation(false);
 
           if (geoError.code === geoError.PERMISSION_DENIED) {
-            setLocationError("Please allow location access in your browser.");
+            setLocationError(tRegister("branch.location.permissionDenied"));
           } else if (geoError.code === geoError.POSITION_UNAVAILABLE) {
-            setLocationError("Location unavailable.");
+            setLocationError(tRegister("branch.location.unavailable"));
           } else if (geoError.code === geoError.TIMEOUT) {
-            setLocationError("Request timed out.");
+            setLocationError(tRegister("branch.location.timeout"));
           } else {
-            setLocationError("Unable to fetch location.");
+            setLocationError(tRegister("branch.location.fetchFailed"));
           }
         },
         {
@@ -757,7 +795,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
       );
     } catch (err) {
       setGettingLocation(false);
-      setLocationError("Permission check failed.");
+      setLocationError(tRegister("branch.location.permissionCheckFailed"));
     }
   };
 
@@ -781,405 +819,65 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
 
   return (
     <div className="max-w-5xl mx-auto bg-white rounded-xl p-8">
-      {/* Branch Info */}
-      <h2 className="text-[20px] font-semibold text-gray-900 mb-6">
-        Branch Info
-      </h2>
+      <BranchBasicInfo
+        branch={branch}
+        error={error}
+        onFieldChange={(field, value) => updateField(field, value)}
+        onImageChange={handleImageChange}
+        progress={progress}
+        uploading={uploading}
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-        <div>
-          <FormInput
-            label="Branch Name*"
-            placeholder="F-6 Super Market"
-            value={branch.name || ""}
-            onChange={(val) => updateField("name", val)}
-          />
-          {error("branch.name") && (
-            <p className="text-red-500 text-xs mt-1">{error("branch.name")}</p>
-          )}
-        </div>
-
-        <div>
-          <FormInput
-            label="Description*"
-            placeholder="Our flagship branch in Islamabad."
-            value={branch.description || ""}
-            onChange={(val) => updateField("description", val)}
-          />
-          {error("branch.description") && (
-            <p className="text-red-500 text-xs mt-1">
-              {error("branch.description")}
-            </p>
-          )}
-        </div>
-
-        {/* Cover Image */}
-        <div className="sm:col-span-2">
-          <label className="text-[16px] mb-2 block">Cover Image</label>
-
-          <label className="h-[190px] rounded-xl border border-dashed border-[#bbbbbb] bg-[#F5F5F5] flex flex-col items-center justify-center text-center cursor-pointer relative overflow-hidden">
-            {branch.coverImagePreviewUrl ? (
-              <>
-                <img
-                  src={branch.coverImagePreviewUrl}
-                  alt="cover preview"
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/40" />
-              </>
-            ) : null}
-
-            {uploading && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 z-20">
-                <Loader2 className="animate-spin text-white mb-2" size={28} />
-                <p className="text-white text-sm font-semibold">{progress}%</p>
-              </div>
-            )}
-
-            <div className="relative z-10 flex flex-col items-center justify-center px-4">
-              {!branch.coverImagePreviewUrl && (
-                <ImageIcon className="text-gray-400 mb-2" size={30} />
-              )}
-
-              <p
-                className={`text-sm font-medium mt-2 ${
-                  branch.coverImagePreviewUrl ? "text-white" : ""
-                }`}
-              >
-                <span className="text-primary">Click to upload</span>
-                <span
-                  className={`font-semibold ml-1 ${
-                    branch.coverImagePreviewUrl
-                      ? "text-white"
-                      : "text-[#909090]"
-                  }`}
-                >
-                  or drag and drop
-                </span>
-              </p>
-
-              <p
-                className={`text-xs mt-1 ${
-                  branch.coverImagePreviewUrl ? "text-white/90" : "text-gray-400"
-                }`}
-              >
-                JPG, JPEG, PNG less than 2MB
-              </p>
-            </div>
-
-            <input
-              type="file"
-              accept=".jpg,.jpeg,.png"
-              className="hidden"
-              onChange={handleImageChange}
-            />
-          </label>
-
-          {(error("branch.coverImageFile") || error("branch.coverImage")) && (
-            <p className="text-red-500 text-xs mt-1">
-              {error("branch.coverImageFile") || error("branch.coverImage")}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Branch Admin */}
-      <section className="mb-10 rounded-2xl border border-gray-100 bg-gray-50/70 p-5">
-        <div className="mb-5 flex flex-col gap-1">
-          <h2 className="text-[20px] font-semibold text-gray-900">
-            Branch Admin Account
-          </h2>
-          <p className="text-sm text-gray-500">
-            Create the branch-level administrator who will manage this branch after registration.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <div>
-            <FormInput
-              label="First Name"
-              placeholder="Branch admin first name"
-              value={branchAdmin.firstName || ""}
-              onChange={(val) => updateBranchAdminField("firstName", val)}
-            />
-            {error("branchAdmin.firstName") && (
-              <p className="mt-1 text-xs text-red-500">
-                {error("branchAdmin.firstName")}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <FormInput
-              label="Last Name"
-              placeholder="Branch admin last name"
-              value={branchAdmin.lastName || ""}
-              onChange={(val) => updateBranchAdminField("lastName", val)}
-            />
-            {error("branchAdmin.lastName") && (
-              <p className="mt-1 text-xs text-red-500">
-                {error("branchAdmin.lastName")}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <FormInput
-              label="Email"
-              placeholder="branch.admin@example.com"
-              value={branchAdmin.email || ""}
-              onChange={(val) => updateBranchAdminField("email", val)}
-            />
-            {error("branchAdmin.email") && (
-              <p className="mt-1 text-xs text-red-500">
-                {error("branchAdmin.email")}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <FormInput
-              label="Phone"
-              placeholder="+92 300 0000000"
-              value={branchAdmin.phone || ""}
-              onChange={(val) => updateBranchAdminField("phone", val)}
-            />
-            {error("branchAdmin.phone") && (
-              <p className="mt-1 text-xs text-red-500">
-                {error("branchAdmin.phone")}
-              </p>
-            )}
-          </div>
-
-          <div className="sm:col-span-2">
-            <FormInput
-              label="Password"
-              placeholder="Set branch admin password"
-              value={branchAdmin.password || ""}
-              onChange={(val) => updateBranchAdminField("password", val)}
-            />
-            {error("branchAdmin.password") && (
-              <p className="mt-1 text-xs text-red-500">
-                {error("branchAdmin.password")}
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
-
+      <BranchAdminInfo
+        branchAdmin={branchAdmin}
+        error={error}
+        onFieldChange={(field, value) => updateBranchAdminField(field, value)}
+      />
 
       {/* Address */}
       <h2 className="text-[20px] font-semibold text-gray-900 mb-6">
-        Address
+        {tRegister("branch.address.title")}
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-        <div className="sm:col-span-2">
-          <label className="text-[16px] mb-2 block">
-            Address from Google Maps*
-          </label>
+        <BranchLocationSearch
+          addressQuery={addressQuery}
+          addressSearching={addressSearching}
+          autocompleteInputRef={autocompleteInputRef}
+          coordinatesLabel={
+            branchAddress.lat && branchAddress.lng
+              ? `${branchAddress.lat}, ${branchAddress.lng}`
+              : tRegister("branch.map.coordinatesNotSelected")
+          }
+          gettingLocation={gettingLocation}
+          locationError={locationError}
+          mapContainerRef={mapContainerRef}
+          mapsError={mapsError}
+          mapsLoading={mapsLoading}
+          mapsReady={mapsReady}
+          onAddressKeyDown={handleAddressKeyDown}
+          onAddressQueryChange={handleAddressQueryChange}
+          onAddressSearch={handleAddressSearch}
+          selectedGoogleAddress={selectedGoogleAddress}
+        />
 
-          <div className="flex flex-col gap-3 md:flex-row">
-            <div className="relative flex-1">
-              <Search
-                size={18}
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-              />
-
-              <input
-                ref={autocompleteInputRef}
-                type="text"
-                value={addressQuery}
-                onChange={(e) => handleAddressQueryChange(e.target.value)}
-                onKeyDown={handleAddressKeyDown}
-                placeholder="Search restaurant address"
-                className="h-[52px] w-full rounded-[10px] border border-[#bbbbbb] bg-white pl-11 pr-11 text-sm text-gray-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
-              />
-
-              {(mapsLoading || gettingLocation || addressSearching) && (
-                <Loader2
-                  size={18}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-primary"
-                />
-              )}
-
-              {!mapsLoading &&
-              !gettingLocation &&
-              !addressSearching &&
-              mapsReady &&
-              selectedGoogleAddress ? (
-                <CheckCircle2
-                  size={18}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-green-600"
-                />
-              ) : null}
-
-              {!mapsLoading &&
-              !gettingLocation &&
-              !addressSearching &&
-              mapsError ? (
-                <AlertCircle
-                  size={18}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-amber-500"
-                />
-              ) : null}
-            </div>
-
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleAddressSearch}
-              disabled={!mapsReady || addressSearching || mapsLoading}
-              className="h-[52px] rounded-[10px] border-primary px-5 text-primary disabled:opacity-50"
-            >
-              {addressSearching ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Search size={16} />
-              )}
-              Search Map
-            </Button>
-          </div>
-
-          <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
-            {mapsReady ? (
-              <>
-                <div ref={mapContainerRef} className="h-[280px] w-full" />
-
-                <div className="flex flex-col gap-2 border-t border-gray-200 bg-white px-4 py-3 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between">
-                  <span>
-                    Select a suggestion, search the address, click the map, or
-                    drag the marker to set the branch location.
-                  </span>
-
-                  <span className="shrink-0 font-medium text-gray-700">
-                    {branchAddress.lat && branchAddress.lng
-                      ? `${branchAddress.lat}, ${branchAddress.lng}`
-                      : "Coordinates not selected"}
-                  </span>
-                </div>
-              </>
-            ) : (
-              <div className="flex min-h-[220px] flex-col items-center justify-center px-5 text-center">
-                {mapsLoading ? (
-                  <>
-                    <Loader2 className="mb-3 animate-spin text-primary" size={28} />
-                    <p className="text-sm font-medium text-gray-700">
-                      Loading Google Map
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <MapPin className="mb-3 text-gray-400" size={30} />
-                    <p className="text-sm font-medium text-gray-700">
-                      Google Map preview unavailable
-                    </p>
-                    <p className="mt-1 text-xs text-gray-400">
-                      Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in env to enable map
-                      search and preview.
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="mt-2 space-y-1">
-            {mapsError ? (
-              <p className="text-xs text-amber-600">{mapsError}</p>
-            ) : null}
-
-            {selectedGoogleAddress ? (
-              <p className="text-xs text-gray-500">
-                Selected: {selectedGoogleAddress}
-              </p>
-            ) : null}
-
-            {locationError ? (
-              <p className="text-xs text-red-500">{locationError}</p>
-            ) : null}
-          </div>
-        </div>
-
-        <div>
-          <FormInput
-            label="Street*"
-            placeholder="Shop 12, Block A"
-            value={branchAddress.street || ""}
-            onChange={(val) => updateAddressField("street", val)}
-          />
-          {error("branch.address.street") && (
-            <p className="text-red-500 text-xs mt-1">
-              {error("branch.address.street")}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <FormInput
-            label="Area*"
-            placeholder="F-6 Super Market"
-            value={branchAddress.area || ""}
-            onChange={(val) => updateAddressField("area", val)}
-          />
-          {error("branch.address.area") && (
-            <p className="text-red-500 text-xs mt-1">
-              {error("branch.address.area")}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <FormInput
-            label="City*"
-            placeholder="Islamabad"
-            value={branchAddress.city || ""}
-            onChange={(val) => updateAddressField("city", val)}
-          />
-          {error("branch.address.city") && (
-            <p className="text-red-500 text-xs mt-1">
-              {error("branch.address.city")}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <FormInput
-            label="State*"
-            placeholder="ICT"
-            value={branchAddress.state || ""}
-            onChange={(val) => updateAddressField("state", val)}
-          />
-          {error("branch.address.state") && (
-            <p className="text-red-500 text-xs mt-1">
-              {error("branch.address.state")}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <FormInput
-            label="Country*"
-            placeholder="Germany"
-            value={branchAddress.country || ""}
-            onChange={(val) => updateAddressField("country", val)}
-          />
-          {error("branch.address.country") && (
-            <p className="text-red-500 text-xs mt-1">
-              {error("branch.address.country")}
-            </p>
-          )}
-        </div>
+        <BranchAddressFields
+          address={branchAddress}
+          error={error}
+          onFieldChange={(field, value) => updateAddressField(field, value)}
+        />
       </div>
 
       {/* Location */}
       <h2 className="text-[20px] font-semibold text-gray-900 mb-6">
-        Location
+        {tRegister("branch.location.title")}
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
         <div>
-          <label className="text-[16px] mb-2 block">Get Location</label>
+          <label className="text-[16px] mb-2 block">
+            {tRegister("branch.location.getLocation")}
+          </label>
 
           <Button
             type="button"
@@ -1193,14 +891,16 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
             ) : (
               <MapPin size={16} />
             )}
-            {gettingLocation ? "Fetching Location..." : "Use Current Location"}
+            {gettingLocation
+              ? tRegister("branch.location.fetching")
+              : tRegister("branch.location.useCurrent")}
           </Button>
         </div>
 
         <div>
           <FormInput
-            label="Latitude*"
-            placeholder="33.7297"
+            label={tRegister("branch.address.fields.latitude.requiredLabel")}
+            placeholder={tRegister("branch.address.fields.latitude.placeholder")}
             value={branchAddress.lat || ""}
             onChange={(val) => updateAddressField("lat", val)}
           />
@@ -1213,8 +913,8 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
 
         <div>
           <FormInput
-            label="Longitude*"
-            placeholder="73.0745"
+            label={tRegister("branch.address.fields.longitude.requiredLabel")}
+            placeholder={tRegister("branch.address.fields.longitude.placeholder")}
             value={branchAddress.lng || ""}
             onChange={(val) => updateAddressField("lng", val)}
           />
@@ -1239,7 +939,7 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
           onClick={back}
           className="px-6 py-2 rounded-full bg-[#F5F5F5] text-sm text-gray-500"
         >
-          Back
+          {tCommon("actions.back")}
         </Button>
 
         <Button
@@ -1247,7 +947,9 @@ const MAX_BRANCH_COVER_IMAGE_SIZE_BYTES =
           disabled={uploading || gettingLocation}
           className="bg-primary hover:bg-red-800 px-16 py-2.5 rounded-[10px] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {uploading ? "Uploading..." : "Save & Continue"}
+          {uploading
+            ? tRegister("upload.uploading")
+            : tCommon("actions.saveContinue")}
         </Button>
       </div>
     </div>

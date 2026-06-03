@@ -672,6 +672,121 @@
     "branding": {
       "title": "Branding"
     },
+    "branch": {
+      "basic": {
+        "title": "Filialinformationen"
+      },
+      "fields": {
+        "name": {
+          "requiredLabel": "Filialname*",
+          "placeholder": "F-6 Super Market"
+        },
+        "description": {
+          "requiredLabel": "Beschreibung*",
+          "placeholder": "Unsere Hauptfiliale in Islamabad."
+        }
+      },
+      "coverImage": {
+        "label": "Titelbild",
+        "previewAlt": "Titelbild-Vorschau",
+        "clickToUpload": "Zum Hochladen klicken",
+        "dragDrop": "oder per Drag-and-drop",
+        "helper": "JPG, JPEG, PNG unter 2 MB"
+      },
+      "admin": {
+        "title": "Filial-Admin-Konto",
+        "description": "Erstellen Sie den Administrator auf Filialebene, der diese Filiale nach der Registrierung verwaltet.",
+        "fields": {
+          "firstName": {
+            "label": "Vorname",
+            "placeholder": "Vorname des Filial-Admins"
+          },
+          "lastName": {
+            "label": "Nachname",
+            "placeholder": "Nachname des Filial-Admins"
+          },
+          "email": {
+            "label": "E-Mail",
+            "placeholder": "branch.admin@example.com"
+          },
+          "phone": {
+            "label": "Telefon",
+            "placeholder": "+92 300 0000000"
+          },
+          "password": {
+            "label": "Passwort",
+            "placeholder": "Passwort für Filial-Admin festlegen"
+          }
+        }
+      },
+      "address": {
+        "title": "Adresse",
+        "fields": {
+          "street": {
+            "requiredLabel": "Straße*",
+            "placeholder": "Shop 12, Block A"
+          },
+          "area": {
+            "requiredLabel": "Gebiet*",
+            "placeholder": "F-6 Super Market"
+          },
+          "city": {
+            "requiredLabel": "Stadt*",
+            "placeholder": "Islamabad"
+          },
+          "state": {
+            "requiredLabel": "Bundesland*",
+            "placeholder": "ICT"
+          },
+          "country": {
+            "requiredLabel": "Land*",
+            "placeholder": "Deutschland"
+          },
+          "latitude": {
+            "requiredLabel": "Breitengrad*",
+            "placeholder": "33.7297"
+          },
+          "longitude": {
+            "requiredLabel": "Längengrad*",
+            "placeholder": "73.0745"
+          }
+        }
+      },
+      "map": {
+        "addressFromGoogle": "Adresse aus Google Maps*",
+        "searchPlaceholder": "Restaurantadresse suchen",
+        "searchButton": "Karte suchen",
+        "helper": "Wählen Sie einen Vorschlag, suchen Sie die Adresse, klicken Sie auf die Karte oder ziehen Sie den Marker, um den Standort der Filiale festzulegen.",
+        "coordinatesNotSelected": "Koordinaten nicht ausgewählt",
+        "loading": "Google Map wird geladen",
+        "previewUnavailable": "Google-Map-Vorschau nicht verfügbar",
+        "enableMapHelp": "Fügen Sie NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in der Umgebung hinzu, um Kartensuche und Vorschau zu aktivieren.",
+        "selectedAddress": "Ausgewählt: {address}",
+        "markerTitle": "Filialstandort",
+        "selectValidAddress": "Bitte wählen Sie eine gültige Google-Maps-Adresse aus.",
+        "missingApiKey": "Google Maps API-Schlüssel fehlt. Fügen Sie NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in der Umgebung hinzu.",
+        "loadFailed": "Google Maps konnte nicht geladen werden. Bitte prüfen Sie den API-Schlüssel.",
+        "selectSuggestion": "Bitte wählen Sie eine Adresse aus den Google-Maps-Vorschlägen aus.",
+        "enterAddress": "Bitte geben Sie eine Adresse für die Suche ein.",
+        "notReady": "Google Maps ist noch nicht bereit.",
+        "noMatch": "Keine passende Adresse gefunden. Versuchen Sie eine genauere Adresse.",
+        "coordinatesSavedOnly": "Google Maps ist noch nicht bereit. Nur die Koordinaten wurden gespeichert.",
+        "addressNotResolved": "Standort gefunden, aber die Adresse konnte nicht aufgelöst werden."
+      },
+      "location": {
+        "title": "Standort",
+        "getLocation": "Standort abrufen",
+        "useCurrent": "Aktuellen Standort verwenden",
+        "fetching": "Standort wird abgerufen...",
+        "unsupported": "Geolocation wird in diesem Browser nicht unterstützt.",
+        "blocked": "Standortzugriff ist blockiert. Bitte aktivieren Sie ihn in den Browsereinstellungen.",
+        "permissionDenied": "Bitte erlauben Sie den Standortzugriff in Ihrem Browser.",
+        "unavailable": "Standort nicht verfügbar.",
+        "timeout": "Anfrage abgelaufen.",
+        "fetchFailed": "Standort konnte nicht abgerufen werden.",
+        "permissionCheckFailed": "Berechtigungsprüfung fehlgeschlagen."
+      }
+    },
     "fields": {
       "firstName": {
         "requiredLabel": "Vorname*"
@@ -810,7 +925,8 @@
       "validEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
       "profilePhotoMaxSize": "Profilfoto muss kleiner als {size} MB sein.",
       "tenantLogoMaxSize": "Mandantenlogo muss kleiner als {size} MB sein.",
-      "restaurantLogoMaxSize": "Restaurantlogo muss kleiner als {size} MB sein."
+      "restaurantLogoMaxSize": "Restaurantlogo muss kleiner als {size} MB sein.",
+      "branchCoverImageMaxSize": "Titelbild muss kleiner als {size} MB sein."
     }
   },
   "errors": {

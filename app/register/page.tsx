@@ -1,5 +1,5 @@
 import Container from '@/components/container'
-import BusinessOnboarding from '@/components/register/BusinessOnboarding'
+import { BusinessOnboarding } from '@/components/register/BusinessOnboarding'
 
 const page = () => {
   return (

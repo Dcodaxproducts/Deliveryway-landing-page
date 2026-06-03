@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import StorePublished from "./StorePublished";
 import UserInfoStep from "./form/UserInfoStep";
 import TenantInfoStep from "./TenantInfoStep";
-import BranchStep from "./BranchStep";
+import { BranchStep } from "./BranchStep";
 import SettingsStep from "./SettingsStep";
 import { API_BASE_URL } from "@/lib/constants";
 import { toast } from "sonner";
@@ -17,6 +17,8 @@ type OnboardingStepConfig = {
   id: number;
   labelKey: string;
 };
+
+type PlainObject = Record<string, unknown>;
 
 const ONBOARDING_STEPS: OnboardingStepConfig[] = [
   { id: 1, labelKey: "steps.account" },
@@ -30,12 +32,23 @@ const normalizeEmail = (email?: string) => {
   return String(email || "").trim().toLowerCase();
 };
 
-const isUserAlreadyExistsError = (data: any) => {
+const isPlainObject = (value: unknown): value is PlainObject => {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+};
+
+const getMessageValue = (value: unknown) => {
+  return typeof value === "string" ? value : "";
+};
+
+const isUserAlreadyExistsError = (data: unknown) => {
+  const response = normalizePlainObject(data);
+  const error = normalizePlainObject(response.error);
   const message = [
-    data?.message,
-    data?.error?.message,
-    data?.error?.code,
+    response.message,
+    error.message,
+    error.code,
   ]
+    .map(getMessageValue)
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
@@ -43,13 +56,14 @@ const isUserAlreadyExistsError = (data: any) => {
   return message.includes("user already exists");
 };
 
-const extractAccessToken = (data: any) => {
-  return (
-    data?.data?.accessToken ||
-    data?.data?.token ||
-    data?.accessToken ||
-    data?.token ||
-    ""
+const extractAccessToken = (data: unknown) => {
+  const response = normalizePlainObject(data);
+  const responseData = normalizePlainObject(response.data);
+  return toStringValue(
+    responseData.accessToken ||
+      responseData.token ||
+      response.accessToken ||
+      response.token
   );
 };
 
@@ -63,39 +77,45 @@ const toStringValue = (value: unknown, fallback = "") => {
   return String(value);
 };
 
-const normalizeArray = (value: any) => {
+const normalizeArray = (value: unknown) => {
   return Array.isArray(value) ? value : [];
 };
 
-const normalizePlainObject = (value: any) => {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? value
-    : {};
+const normalizePlainObject = (value: unknown): PlainObject => {
+  return isPlainObject(value) ? value : {};
 };
 
-const normalizeDeliveryMode = (mode: any) => {
+const normalizeDeliveryMode = (mode: unknown) => {
   return mode === "ZONE" || mode === "POSTAL_CODE" ? mode : "RADIUS";
 };
 
-const normalizeDeliveryZones = (zones: any) => {
+const normalizeDeliveryZones = (zones: unknown) => {
   return normalizeArray(zones)
-    .map((zone: any) => ({
-      name: toStringValue(zone?.name).trim(),
-      deliveryFee: toNumber(zone?.deliveryFee, 0),
-      minOrderAmount: toNumber(zone?.minOrderAmount, 0),
-      freeDeliveryThreshold: toNumber(zone?.freeDeliveryThreshold, 0),
-      polygon: normalizeArray(zone?.polygon)
-        .map((point: any) => ({
+    .map((zoneValue) => {
+      const zone = normalizePlainObject(zoneValue);
+
+      return {
+        name: toStringValue(zone.name).trim(),
+        deliveryFee: toNumber(zone.deliveryFee, 0),
+        minOrderAmount: toNumber(zone.minOrderAmount, 0),
+        freeDeliveryThreshold: toNumber(zone.freeDeliveryThreshold, 0),
+        polygon: normalizeArray(zone.polygon)
+        .map((pointValue) => {
+          const point = normalizePlainObject(pointValue);
+
+          return {
           lat: toNumber(point?.lat, NaN),
           lng: toNumber(point?.lng, NaN),
-        }))
+          };
+        })
         .filter(
-          (point: any) =>
+          (point) =>
             Number.isFinite(point.lat) && Number.isFinite(point.lng)
         ),
-    }))
+      };
+    })
     .filter(
-      (zone: any) =>
+      (zone) =>
         zone.name ||
         zone.deliveryFee > 0 ||
         zone.minOrderAmount > 0 ||
@@ -104,17 +124,21 @@ const normalizeDeliveryZones = (zones: any) => {
     );
 };
 
-const normalizeZoneBands = (bands: any) => {
+const normalizeZoneBands = (bands: unknown) => {
   return normalizeArray(bands)
-    .map((band: any) => ({
-      fromKm: toNumber(band?.fromKm, 0),
-      toKm: toNumber(band?.toKm, 0),
-      deliveryFee: toNumber(band?.deliveryFee, 0),
-      minOrderAmount: toNumber(band?.minOrderAmount, 0),
-      freeDeliveryThreshold: toNumber(band?.freeDeliveryThreshold, 0),
-    }))
+    .map((bandValue) => {
+      const band = normalizePlainObject(bandValue);
+
+      return {
+        fromKm: toNumber(band.fromKm, 0),
+        toKm: toNumber(band.toKm, 0),
+        deliveryFee: toNumber(band.deliveryFee, 0),
+        minOrderAmount: toNumber(band.minOrderAmount, 0),
+        freeDeliveryThreshold: toNumber(band.freeDeliveryThreshold, 0),
+      };
+    })
     .filter(
-      (band: any) =>
+      (band) =>
         band.fromKm > 0 ||
         band.toKm > 0 ||
         band.deliveryFee > 0 ||
@@ -123,20 +147,25 @@ const normalizeZoneBands = (bands: any) => {
     );
 };
 
-const normalizePostalCodeRules = (rules: any) => {
+const normalizePostalCodeRules = (rules: unknown) => {
   return normalizeArray(rules)
-    .map((rule: any) => ({
-      postalCode: toStringValue(rule?.postalCode).trim(),
-      deliveryFee: toNumber(rule?.deliveryFee, 0),
-    }))
-    .filter((rule: any) => rule.postalCode || rule.deliveryFee > 0);
+    .map((ruleValue) => {
+      const rule = normalizePlainObject(ruleValue);
+
+      return {
+        postalCode: toStringValue(rule.postalCode).trim(),
+        deliveryFee: toNumber(rule.deliveryFee, 0),
+      };
+    })
+    .filter((rule) => rule.postalCode || rule.deliveryFee > 0);
 };
 
-const buildBranchSettingsPayload = (settings: any) => {
-  const deliveryConfig = normalizePlainObject(settings?.deliveryConfig);
-  const automation = normalizePlainObject(settings?.automation);
-  const taxation = normalizePlainObject(settings?.taxation);
-  const contact = normalizePlainObject(settings?.contact);
+const buildBranchSettingsPayload = (settingsValue: unknown) => {
+  const settings = normalizePlainObject(settingsValue);
+  const deliveryConfig = normalizePlainObject(settings.deliveryConfig);
+  const automation = normalizePlainObject(settings.automation);
+  const taxation = normalizePlainObject(settings.taxation);
+  const contact = normalizePlainObject(settings.contact);
 
   const allowedOrderTypes = normalizeArray(settings?.allowedOrderTypes).length
     ? normalizeArray(settings.allowedOrderTypes)
@@ -190,10 +219,10 @@ const buildBranchSettingsPayload = (settings: any) => {
   };
 };
 
-export default function BusinessOnboarding() {
+export function BusinessOnboarding() {
   const tRegister = useTranslations("register");
   const [activeStep, setActiveStep] = useState<number>(1);
-  const [publishedData, setPublishedData] = useState<any>(null);
+  const [publishedData, setPublishedData] = useState<unknown>(null);
 
   /* ================= OTP STATES ================= */
 
@@ -339,11 +368,11 @@ export default function BusinessOnboarding() {
 
   /* ================= UPDATE HELPER ================= */
 
-  const updateFormData = (section: string, data: any) => {
+  const updateFormData = (section: string, data: Record<string, unknown>) => {
     setFormData((prev) => ({
       ...prev,
       [section]: {
-        ...prev[section as keyof typeof prev],
+        ...normalizePlainObject(prev[section as keyof typeof prev]),
         ...data,
       },
     }));
@@ -461,7 +490,9 @@ export default function BusinessOnboarding() {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      const data: unknown = await response.json();
+      const responseData = normalizePlainObject(data);
+      const nestedResponseData = normalizePlainObject(responseData.data);
 
       if (!response.ok) {
         if (isUserAlreadyExistsError(data)) {
@@ -477,14 +508,17 @@ export default function BusinessOnboarding() {
           return;
         }
 
-        toast.error(data?.message || tRegister("toasts.registrationFailed"));
+        toast.error(
+          getMessageValue(responseData.message) ||
+            tRegister("toasts.registrationFailed")
+        );
         return;
       }
 
       const token = extractAccessToken(data);
 
       const { accessToken: _accessToken, token: _token, ...rest } =
-        data?.data || {};
+        nestedResponseData;
 
       setPublishedData(rest);
 
@@ -500,8 +534,12 @@ export default function BusinessOnboarding() {
       });
 
       toast.success(tRegister("toasts.registrationSuccessful"));
-    } catch (error: any) {
-      toast.error(error?.message || tRegister("toasts.genericError"));
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : tRegister("toasts.genericError")
+      );
     } finally {
       setLoading(false);
     }
@@ -541,12 +579,14 @@ export default function BusinessOnboarding() {
         }),
       });
 
-      const data = await res.json();
+      const data: unknown = await res.json();
+      const responseData = normalizePlainObject(data);
+      const responseError = normalizePlainObject(responseData.error);
 
       if (!res.ok) {
         throw new Error(
-            data?.message ||
-            data?.error?.message ||
+            getMessageValue(responseData.message) ||
+            getMessageValue(responseError.message) ||
             tRegister("otp.verificationFailed")
         );
       }
@@ -561,8 +601,12 @@ export default function BusinessOnboarding() {
       setAccessToken("");
 
       setActiveStep(5);
-    } catch (error: any) {
-      toast.error(error?.message || tRegister("otp.verificationFailed"));
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : tRegister("otp.verificationFailed")
+      );
     } finally {
       setOtpLoading(false);
     }

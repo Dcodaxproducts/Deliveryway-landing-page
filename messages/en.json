@@ -672,6 +672,121 @@
     "branding": {
       "title": "Branding"
     },
+    "branch": {
+      "basic": {
+        "title": "Branch Info"
+      },
+      "fields": {
+        "name": {
+          "requiredLabel": "Branch Name*",
+          "placeholder": "F-6 Super Market"
+        },
+        "description": {
+          "requiredLabel": "Description*",
+          "placeholder": "Our flagship branch in Islamabad."
+        }
+      },
+      "coverImage": {
+        "label": "Cover Image",
+        "previewAlt": "Cover preview",
+        "clickToUpload": "Click to upload",
+        "dragDrop": "or drag and drop",
+        "helper": "JPG, JPEG, PNG less than 2MB"
+      },
+      "admin": {
+        "title": "Branch Admin Account",
+        "description": "Create the branch-level administrator who will manage this branch after registration.",
+        "fields": {
+          "firstName": {
+            "label": "First Name",
+            "placeholder": "Branch admin first name"
+          },
+          "lastName": {
+            "label": "Last Name",
+            "placeholder": "Branch admin last name"
+          },
+          "email": {
+            "label": "Email",
+            "placeholder": "branch.admin@example.com"
+          },
+          "phone": {
+            "label": "Phone",
+            "placeholder": "+92 300 0000000"
+          },
+          "password": {
+            "label": "Password",
+            "placeholder": "Set branch admin password"
+          }
+        }
+      },
+      "address": {
+        "title": "Address",
+        "fields": {
+          "street": {
+            "requiredLabel": "Street*",
+            "placeholder": "Shop 12, Block A"
+          },
+          "area": {
+            "requiredLabel": "Area*",
+            "placeholder": "F-6 Super Market"
+          },
+          "city": {
+            "requiredLabel": "City*",
+            "placeholder": "Islamabad"
+          },
+          "state": {
+            "requiredLabel": "State*",
+            "placeholder": "ICT"
+          },
+          "country": {
+            "requiredLabel": "Country*",
+            "placeholder": "Germany"
+          },
+          "latitude": {
+            "requiredLabel": "Latitude*",
+            "placeholder": "33.7297"
+          },
+          "longitude": {
+            "requiredLabel": "Longitude*",
+            "placeholder": "73.0745"
+          }
+        }
+      },
+      "map": {
+        "addressFromGoogle": "Address from Google Maps*",
+        "searchPlaceholder": "Search restaurant address",
+        "searchButton": "Search Map",
+        "helper": "Select a suggestion, search the address, click the map, or drag the marker to set the branch location.",
+        "coordinatesNotSelected": "Coordinates not selected",
+        "loading": "Loading Google Map",
+        "previewUnavailable": "Google Map preview unavailable",
+        "enableMapHelp": "Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in env to enable map search and preview.",
+        "selectedAddress": "Selected: {address}",
+        "markerTitle": "Branch location",
+        "selectValidAddress": "Please select a valid Google Maps address.",
+        "missingApiKey": "Google Maps API key is missing. Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in env.",
+        "loadFailed": "Failed to load Google Maps. Please verify the API key.",
+        "selectSuggestion": "Please select an address from Google Maps suggestions.",
+        "enterAddress": "Please enter an address to search.",
+        "notReady": "Google Maps is not ready yet.",
+        "noMatch": "No matching address found. Try a more specific address.",
+        "coordinatesSavedOnly": "Google Maps is not ready yet. Coordinates were saved only.",
+        "addressNotResolved": "Location found, but address could not be resolved."
+      },
+      "location": {
+        "title": "Location",
+        "getLocation": "Get Location",
+        "useCurrent": "Use Current Location",
+        "fetching": "Fetching Location...",
+        "unsupported": "Geolocation is not supported in this browser.",
+        "blocked": "Location access is blocked. Please enable it in browser settings.",
+        "permissionDenied": "Please allow location access in your browser.",
+        "unavailable": "Location unavailable.",
+        "timeout": "Request timed out.",
+        "fetchFailed": "Unable to fetch location.",
+        "permissionCheckFailed": "Permission check failed."
+      }
+    },
     "fields": {
       "firstName": {
         "requiredLabel": "First Name*"
@@ -810,7 +925,8 @@
       "validEmail": "Please enter a valid email address",
       "profilePhotoMaxSize": "Profile photo must be less than {size}MB.",
       "tenantLogoMaxSize": "Tenant logo must be less than {size}MB.",
-      "restaurantLogoMaxSize": "Restaurant logo must be less than {size}MB."
+      "restaurantLogoMaxSize": "Restaurant logo must be less than {size}MB.",
+      "branchCoverImageMaxSize": "Cover image must be less than {size}MB."
     }
   },
   "errors": {

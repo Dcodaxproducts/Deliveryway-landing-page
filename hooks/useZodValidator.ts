@@ -2,7 +2,7 @@ import { ZodSchema } from "zod";
 
 export function validateZod<T>(
   schema: ZodSchema<T>,
-  data: T,
+  data: unknown,
   prefix?: string
 ) {
   const result = schema.safeParse(data);
