@@ -785,6 +785,145 @@
         "timeout": "Request timed out.",
         "fetchFailed": "Unable to fetch location.",
         "permissionCheckFailed": "Permission check failed."
+      },
+      "delivery": {
+        "title": "Order & Delivery Area Settings",
+        "description": "Configure customer-facing delivery charges, radius, polygon zones, radius bands, or postal-code based delivery rules.",
+        "modeLabel": "Delivery area calculation mode",
+        "modes": {
+          "radius": {
+            "label": "Radius",
+            "description": "Use straight-line distance from the branch location."
+          },
+          "zone": {
+            "label": "Polygon zones",
+            "description": "Draw multiple delivery areas directly on Google Maps."
+          },
+          "postalCode": {
+            "label": "Postal codes",
+            "description": "Charge delivery by one or more postal-code rules."
+          }
+        },
+        "fields": {
+          "baseDeliveryFee": {
+            "label": "Base Delivery Fee",
+            "placeholder": "Enter Base Delivery Fee"
+          },
+          "radiusKm": {
+            "label": "Radius (km)",
+            "placeholder": "Enter radius, e.g. 7.5"
+          },
+          "minOrderAmount": {
+            "label": "Minimum Order Amount",
+            "placeholder": "Minimum order amount"
+          },
+          "freeDeliveryThreshold": {
+            "label": "Free Delivery Threshold",
+            "placeholder": "Enter free delivery threshold"
+          },
+          "enableFreeDelivery": "Enable Free Delivery",
+          "fromKm": {
+            "label": "From Km"
+          },
+          "toKm": {
+            "label": "To Km"
+          },
+          "deliveryFee": {
+            "label": "Delivery Fee",
+            "placeholder": "Delivery fee"
+          },
+          "minOrder": {
+            "label": "Min Order",
+            "placeholder": "Min order"
+          },
+          "freeDeliveryFrom": {
+            "label": "Free Delivery From",
+            "placeholder": "Threshold"
+          },
+          "zoneName": {
+            "label": "Zone Name",
+            "placeholder": "Enter zone name"
+          },
+          "zoneDeliveryFee": {
+            "label": "Zone Delivery Fee",
+            "placeholder": "Zone delivery fee"
+          },
+          "zoneMinOrder": {
+            "label": "Zone Min Order"
+          },
+          "zoneFreeDeliveryFrom": {
+            "label": "Zone Free Delivery From"
+          },
+          "postalCode": {
+            "label": "Postal Code",
+            "placeholder": "Postal code"
+          }
+        },
+        "actions": {
+          "duplicate": "Duplicate",
+          "remove": "Remove"
+        },
+        "map": {
+          "radiusTitle": "Radius map preview",
+          "zoneTitle": "Polygon zone builder",
+          "radiusDescription": "Preview the straight-line delivery radius from branch latitude/longitude.",
+          "zoneDescription": "Search an area first, generate a starter zone, then fine-tune points by dragging markers.",
+          "searchPlaceholder": "Search area, street, city, or landmark",
+          "searchButton": "Search Map",
+          "generateStarterZone": "Generate Starter Zone",
+          "addCenterPoint": "Add Center Point",
+          "undoLastPoint": "Undo Last Point",
+          "fitActiveZone": "Fit Active Zone",
+          "clearActiveZone": "Clear Active Zone",
+          "selectedMapArea": "Selected map area: {area}",
+          "pointCount": "{count} point(s) selected",
+          "clickDragHelp": "Click map to add · drag markers to adjust",
+          "enableMapHelp": "Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in env to enable map selection.",
+          "radiusFooter": "Branch location comes from the address latitude/longitude above.",
+          "zoneFooter": "For faster setup: search area → generate starter zone → drag points if needed.",
+          "branchCoordinatesNotSelected": "Branch coordinates not selected",
+          "searchedAreaMarker": "Searched area center",
+          "invalidSelectedCoordinates": "Selected map result does not include coordinates.",
+          "enterSearch": "Please enter an area, city, street, or landmark to search.",
+          "noMatchingArea": "No matching area found. Try a more specific search.",
+          "selectSuggestion": "Please select an area from Google Maps suggestions."
+        },
+        "radiusBands": {
+          "title": "Radius Fee Bands",
+          "description": "Optional distance bands for radius-based delivery. Use decimal values like 2.5 or 7.5 km.",
+          "addBand": "Add Band",
+          "empty": "No radius fee band configured. The base delivery fee will be used for the configured radius.",
+          "bandLabel": "Band {number}"
+        },
+        "zones": {
+          "title": "Polygon Delivery Zones",
+          "description": "Add multiple zones. Search the area and use starter-zone generation for faster point selection.",
+          "add": "Add Zone",
+          "empty": "No delivery zone configured yet. Search an area and generate a starter zone, or click the map to start drawing one.",
+          "zoneLabel": "Zone {number}",
+          "defaultName": "Delivery Zone {number}",
+          "activePointCount": "{count} point(s) · Active on map",
+          "clickToEdit": "Click to edit on map",
+          "polygonPoints": "Polygon points",
+          "addEmptyPoint": "Add Empty Point",
+          "noPoints": "No points yet. Select this zone and click on the map, add center point, or generate a starter zone.",
+          "pointLabel": "Point {number}",
+          "removePoint": "Remove point"
+        },
+        "postalRules": {
+          "title": "Postal Code Rules",
+          "description": "Add one or more postal codes with separate delivery fees.",
+          "add": "Add Postal Code",
+          "remove": "Remove postal-code rule",
+          "empty": "No postal code rule configured yet."
+        },
+        "automation": {
+          "title": "Automation",
+          "autoAcceptLabel": "Auto Accept Orders",
+          "autoAcceptDescription": "Automatically accept incoming orders",
+          "estimatedPrepTimeLabel": "Estimated Preparation Time (Minutes)",
+          "estimatedPrepTimePlaceholder": "Preparation time"
+        }
       }
     },
     "fields": {

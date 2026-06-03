@@ -7,7 +7,7 @@ import FormInput from "./form/FormInput";
 import { validateZod } from "@/hooks/useZodValidator";
 import { branchSchema } from "@/lib/RegisterSchemas";
 import { useFileUpload } from "@/hooks/useFileUpload";
-import BranchDeliveryAreaSettings from "./BranchDeliveryAreaSettings";
+import { BranchDeliveryAreaSettings } from "./BranchDeliveryAreaSettings";
 import { BranchAddressFields } from "./branch/BranchAddressFields";
 import { BranchAdminInfo } from "./branch/BranchAdminInfo";
 import { BranchBasicInfo } from "./branch/BranchBasicInfo";
@@ -63,7 +63,7 @@ const toFiniteNumber = (value: unknown) => {
 };
 
 const getGoogleMaps = () => {
-  return window.google?.maps as GoogleMapsNamespace | undefined;
+  return (window.google as { maps?: GoogleMapsNamespace } | undefined)?.maps;
 };
 
 export function BranchStep({

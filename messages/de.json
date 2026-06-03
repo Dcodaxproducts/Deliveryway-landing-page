@@ -785,6 +785,145 @@
         "timeout": "Anfrage abgelaufen.",
         "fetchFailed": "Standort konnte nicht abgerufen werden.",
         "permissionCheckFailed": "Berechtigungsprüfung fehlgeschlagen."
+      },
+      "delivery": {
+        "title": "Bestell- & Liefergebietseinstellungen",
+        "description": "Konfigurieren Sie kundenseitige Liefergebühren, Radius, Polygonzonen, Radiusbänder oder lieferregeln nach Postleitzahl.",
+        "modeLabel": "Berechnungsmodus für Liefergebiet",
+        "modes": {
+          "radius": {
+            "label": "Radius",
+            "description": "Verwendet die Luftlinie vom Filialstandort."
+          },
+          "zone": {
+            "label": "Polygonzonen",
+            "description": "Zeichnen Sie mehrere Liefergebiete direkt in Google Maps."
+          },
+          "postalCode": {
+            "label": "Postleitzahlen",
+            "description": "Berechnet Lieferung nach einer oder mehreren Postleitzahlregeln."
+          }
+        },
+        "fields": {
+          "baseDeliveryFee": {
+            "label": "Basis-Liefergebühr",
+            "placeholder": "Basis-Liefergebühr eingeben"
+          },
+          "radiusKm": {
+            "label": "Radius (km)",
+            "placeholder": "Radius eingeben, z. B. 7.5"
+          },
+          "minOrderAmount": {
+            "label": "Mindestbestellwert",
+            "placeholder": "Mindestbestellwert"
+          },
+          "freeDeliveryThreshold": {
+            "label": "Schwelle für kostenlose Lieferung",
+            "placeholder": "Schwelle für kostenlose Lieferung eingeben"
+          },
+          "enableFreeDelivery": "Kostenlose Lieferung aktivieren",
+          "fromKm": {
+            "label": "Von km"
+          },
+          "toKm": {
+            "label": "Bis km"
+          },
+          "deliveryFee": {
+            "label": "Liefergebühr",
+            "placeholder": "Liefergebühr"
+          },
+          "minOrder": {
+            "label": "Mindestbestellung",
+            "placeholder": "Mindestbestellung"
+          },
+          "freeDeliveryFrom": {
+            "label": "Kostenlose Lieferung ab",
+            "placeholder": "Schwelle"
+          },
+          "zoneName": {
+            "label": "Zonenname",
+            "placeholder": "Zonennamen eingeben"
+          },
+          "zoneDeliveryFee": {
+            "label": "Zonen-Liefergebühr",
+            "placeholder": "Zonen-Liefergebühr"
+          },
+          "zoneMinOrder": {
+            "label": "Zonen-Mindestbestellung"
+          },
+          "zoneFreeDeliveryFrom": {
+            "label": "Zone kostenlos ab"
+          },
+          "postalCode": {
+            "label": "Postleitzahl",
+            "placeholder": "Postleitzahl"
+          }
+        },
+        "actions": {
+          "duplicate": "Duplizieren",
+          "remove": "Entfernen"
+        },
+        "map": {
+          "radiusTitle": "Radius-Kartenvorschau",
+          "zoneTitle": "Polygonzonen-Builder",
+          "radiusDescription": "Zeigt den Luftlinien-Lieferradius ab Breiten- und Längengrad der Filiale.",
+          "zoneDescription": "Suchen Sie zuerst ein Gebiet, erzeugen Sie eine Startzone und passen Sie Punkte anschließend durch Ziehen der Marker an.",
+          "searchPlaceholder": "Gebiet, Straße, Stadt oder Orientierungspunkt suchen",
+          "searchButton": "Karte suchen",
+          "generateStarterZone": "Startzone erzeugen",
+          "addCenterPoint": "Mittelpunkt hinzufügen",
+          "undoLastPoint": "Letzten Punkt rückgängig",
+          "fitActiveZone": "Aktive Zone einpassen",
+          "clearActiveZone": "Aktive Zone leeren",
+          "selectedMapArea": "Ausgewähltes Kartengebiet: {area}",
+          "pointCount": "{count} Punkt(e) ausgewählt",
+          "clickDragHelp": "Klicken Sie auf die Karte zum Hinzufügen · ziehen Sie Marker zum Anpassen",
+          "enableMapHelp": "Fügen Sie NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in der Umgebung hinzu, um die Kartenauswahl zu aktivieren.",
+          "radiusFooter": "Der Filialstandort kommt aus dem oben eingegebenen Breiten- und Längengrad.",
+          "zoneFooter": "Für schnellere Einrichtung: Gebiet suchen → Startzone erzeugen → Punkte bei Bedarf ziehen.",
+          "branchCoordinatesNotSelected": "Filialkoordinaten nicht ausgewählt",
+          "searchedAreaMarker": "Zentrum des gesuchten Gebiets",
+          "invalidSelectedCoordinates": "Das ausgewählte Kartenergebnis enthält keine Koordinaten.",
+          "enterSearch": "Bitte geben Sie ein Gebiet, eine Stadt, Straße oder einen Orientierungspunkt für die Suche ein.",
+          "noMatchingArea": "Kein passendes Gebiet gefunden. Versuchen Sie eine genauere Suche.",
+          "selectSuggestion": "Bitte wählen Sie ein Gebiet aus den Google-Maps-Vorschlägen aus."
+        },
+        "radiusBands": {
+          "title": "Radius-Gebührenbänder",
+          "description": "Optionale Distanzbänder für radiusbasierte Lieferung. Verwenden Sie Dezimalwerte wie 2.5 oder 7.5 km.",
+          "addBand": "Band hinzufügen",
+          "empty": "Kein Radius-Gebührenband konfiguriert. Die Basis-Liefergebühr wird für den konfigurierten Radius verwendet.",
+          "bandLabel": "Band {number}"
+        },
+        "zones": {
+          "title": "Polygon-Lieferzonen",
+          "description": "Fügen Sie mehrere Zonen hinzu. Suchen Sie das Gebiet und verwenden Sie die Startzonen-Erzeugung für schnellere Punktauswahl.",
+          "add": "Zone hinzufügen",
+          "empty": "Noch keine Lieferzone konfiguriert. Suchen Sie ein Gebiet und erzeugen Sie eine Startzone oder klicken Sie auf die Karte, um eine zu zeichnen.",
+          "zoneLabel": "Zone {number}",
+          "defaultName": "Lieferzone {number}",
+          "activePointCount": "{count} Punkt(e) · Aktiv auf der Karte",
+          "clickToEdit": "Zum Bearbeiten auf der Karte klicken",
+          "polygonPoints": "Polygonpunkte",
+          "addEmptyPoint": "Leeren Punkt hinzufügen",
+          "noPoints": "Noch keine Punkte. Wählen Sie diese Zone und klicken Sie auf die Karte, fügen Sie einen Mittelpunkt hinzu oder erzeugen Sie eine Startzone.",
+          "pointLabel": "Punkt {number}",
+          "removePoint": "Punkt entfernen"
+        },
+        "postalRules": {
+          "title": "Postleitzahlregeln",
+          "description": "Fügen Sie eine oder mehrere Postleitzahlen mit separaten Liefergebühren hinzu.",
+          "add": "Postleitzahl hinzufügen",
+          "remove": "Postleitzahlregel entfernen",
+          "empty": "Noch keine Postleitzahlregel konfiguriert."
+        },
+        "automation": {
+          "title": "Automatisierung",
+          "autoAcceptLabel": "Bestellungen automatisch annehmen",
+          "autoAcceptDescription": "Eingehende Bestellungen automatisch annehmen",
+          "estimatedPrepTimeLabel": "Geschätzte Zubereitungszeit (Minuten)",
+          "estimatedPrepTimePlaceholder": "Zubereitungszeit"
+        }
       }
     },
     "fields": {

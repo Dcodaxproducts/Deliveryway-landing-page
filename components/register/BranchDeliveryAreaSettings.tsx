@@ -1,72 +1,53 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  AlertCircle,
-  Copy,
-  Crosshair,
-  Loader2,
-  MapPin,
-  Maximize2,
-  Plus,
-  Search,
-  Trash2,
-  Undo2,
-} from "lucide-react";
 import FormInput from "./form/FormInput";
-
-declare global {
-  interface Window {
-    google?: any;
-  }
-}
-
-type DeliveryMode = "RADIUS" | "ZONE" | "POSTAL_CODE";
-type LatLngKey = "lat" | "lng";
-
-type LatLngPoint = {
-  lat: string | number;
-  lng: string | number;
-};
+import { DeliveryMap } from "./delivery/DeliveryMap";
+import { DeliveryModeSelector } from "./delivery/DeliveryModeSelector";
+import { PostalCodeRules } from "./delivery/PostalCodeRules";
+import { RadiusDeliverySettings } from "./delivery/RadiusDeliverySettings";
+import { ZoneList } from "./delivery/ZoneList";
+import {
+  DEFAULT_DELIVERY_MAP_CENTER,
+  createDefaultPostalCodeRule,
+  createDefaultZone,
+  createDefaultZoneBand,
+  createPolygonAroundCenter,
+  getValidPoint,
+  sanitizeDecimalInput,
+  toFiniteNumber,
+  toInputNumber,
+  toNumber,
+} from "@/lib/delivery-area";
+import type {
+  BranchDeliveryAddress,
+  BranchDeliverySettings,
+  DeliveryConfig,
+  DeliveryMode,
+  DeliveryZone,
+  DeliveryZoneBand,
+  GoogleDeliveryMapsNamespace,
+  GoogleMapCircle,
+  GoogleMapInstance,
+  GoogleMapMarker,
+  GoogleMapPolygon,
+  LatLngKey,
+  LatLngPoint,
+  PostalCodeRule,
+} from "@/types/delivery";
+import type { GoogleAutocomplete, GoogleGeocoderResult } from "@/types/register";
+import { useTranslations } from "next-intl";
 
 type Props = {
-  branchAddress?: any;
-  settings?: any;
-  onChange: (nextSettings: any) => void;
+  branchAddress?: BranchDeliveryAddress;
+  settings?: BranchDeliverySettings;
+  onChange: (nextSettings: BranchDeliverySettings) => void;
 };
 
 const GOOGLE_MAPS_SCRIPT_ID = "google-maps-places-script";
 const GOOGLE_MAPS_API_KEY =
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_GOOGLE_MAPS_API_KEY";
-
-const DEFAULT_MAP_CENTER = {
-  lat: 33.6844,
-  lng: 73.0479,
-};
-
-const DELIVERY_MODES: {
-  value: DeliveryMode;
-  label: string;
-  description: string;
-}[] = [
-  {
-    value: "RADIUS",
-    label: "Radius",
-    description: "Use straight-line distance from the branch location.",
-  },
-  {
-    value: "ZONE",
-    label: "Polygon zones",
-    description: "Draw multiple delivery areas directly on Google Maps.",
-  },
-  {
-    value: "POSTAL_CODE",
-    label: "Postal codes",
-    description: "Charge delivery by one or more postal-code rules.",
-  },
-];
 
 const isGoogleMapsKeyConfigured = () => {
   return (
@@ -75,88 +56,21 @@ const isGoogleMapsKeyConfigured = () => {
   );
 };
 
-const formatLabel = (value: string) => {
-  return value
-    .toLowerCase()
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+const getGoogleMaps = () => {
+  return (window.google as { maps?: GoogleDeliveryMapsNamespace } | undefined)
+    ?.maps;
 };
 
-const toInputNumber = (value: unknown) => {
-  if (value === undefined || value === null || Number.isNaN(Number(value))) {
-    return "";
-  }
+const isMapPoint = (
+  point: { lat: number; lng: number } | null
+): point is { lat: number; lng: number } => point !== null;
 
-  return String(value);
-};
-
-const sanitizeDecimalInput = (value: string) => {
-  return value
-    .replace(/[^0-9.]/g, "")
-    .replace(/(\..*)\./g, "$1");
-};
-
-const toNumber = (value: unknown, fallback = 0) => {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
-};
-
-const toFiniteNumber = (value: unknown) => {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-};
-
-const getValidPoint = (point: any) => {
-  const lat = toFiniteNumber(point?.lat);
-  const lng = toFiniteNumber(point?.lng);
-
-  if (lat === null || lng === null) return null;
-
-  return { lat, lng };
-};
-
-const createPolygonAroundCenter = (center: LatLngPoint, radiusKm = 1) => {
-  const lat = toNumber(center.lat, DEFAULT_MAP_CENTER.lat);
-  const lng = toNumber(center.lng, DEFAULT_MAP_CENTER.lng);
-  const safeRadiusKm = Math.max(0.3, Math.min(8, radiusKm));
-  const latOffset = safeRadiusKm / 111;
-  const lngOffset =
-    safeRadiusKm / (111 * Math.max(0.2, Math.cos((lat * Math.PI) / 180)));
-
-  return [
-    { lat: (lat - latOffset).toFixed(6), lng: (lng - lngOffset).toFixed(6) },
-    { lat: (lat + latOffset).toFixed(6), lng: (lng - lngOffset).toFixed(6) },
-    { lat: (lat + latOffset).toFixed(6), lng: (lng + lngOffset).toFixed(6) },
-    { lat: (lat - latOffset).toFixed(6), lng: (lng + lngOffset).toFixed(6) },
-  ];
-};
-
-const createDefaultZone = (deliveryFee = 0, center?: LatLngPoint | null) => ({
-  name: "",
-  deliveryFee,
-  minOrderAmount: 0,
-  freeDeliveryThreshold: 0,
-  polygon: center ? createPolygonAroundCenter(center) : [],
-});
-
-const createDefaultZoneBand = () => ({
-  fromKm: 0,
-  toKm: 0,
-  deliveryFee: 0,
-  minOrderAmount: 0,
-  freeDeliveryThreshold: 0,
-});
-
-const createDefaultPostalCodeRule = (deliveryFee = 0) => ({
-  postalCode: "",
-  deliveryFee,
-});
-
-export default function BranchDeliveryAreaSettings({
+export function BranchDeliveryAreaSettings({
   branchAddress,
   settings = {},
   onChange,
 }: Props) {
+  const tRegister = useTranslations("register");
   const [mapsReady, setMapsReady] = useState(false);
   const [mapsLoading, setMapsLoading] = useState(false);
   const [mapsError, setMapsError] = useState("");
@@ -171,13 +85,13 @@ export default function BranchDeliveryAreaSettings({
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
-  const autocompleteInstanceRef = useRef<any>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const branchMarkerRef = useRef<any>(null);
-  const searchMarkerRef = useRef<any>(null);
-  const circleRef = useRef<any>(null);
-  const polygonRef = useRef<any>(null);
-  const polygonMarkersRef = useRef<any[]>([]);
+  const autocompleteInstanceRef = useRef<GoogleAutocomplete | null>(null);
+  const mapInstanceRef = useRef<GoogleMapInstance | null>(null);
+  const branchMarkerRef = useRef<GoogleMapMarker | null>(null);
+  const searchMarkerRef = useRef<GoogleMapMarker | null>(null);
+  const circleRef = useRef<GoogleMapCircle | null>(null);
+  const polygonRef = useRef<GoogleMapPolygon | null>(null);
+  const polygonMarkersRef = useRef<GoogleMapMarker[]>([]);
 
   const deliveryConfig = settings?.deliveryConfig || {};
   const deliveryMode: DeliveryMode =
@@ -202,9 +116,9 @@ export default function BranchDeliveryAreaSettings({
       : [],
   };
 
-  const zones = delivery.zones;
-  const zoneBands = delivery.zoneBands;
-  const postalCodeRules = delivery.postalCodeRules;
+  const zones: DeliveryZone[] = delivery.zones;
+  const zoneBands: DeliveryZoneBand[] = delivery.zoneBands;
+  const postalCodeRules: PostalCodeRule[] = delivery.postalCodeRules;
 
   const branchCoordinates = useMemo(() => {
     const lat = toFiniteNumber(branchAddress?.lat);
@@ -215,14 +129,18 @@ export default function BranchDeliveryAreaSettings({
     return { lat, lng };
   }, [branchAddress?.lat, branchAddress?.lng]);
 
-  const fallbackCenter = selectedMapCenter || branchCoordinates || DEFAULT_MAP_CENTER;
+  const fallbackCenter =
+    selectedMapCenter || branchCoordinates || DEFAULT_DELIVERY_MAP_CENTER;
   const shouldShowMap = deliveryMode === "RADIUS" || deliveryMode === "ZONE";
 
-  const emitSettings = (nextSettings: any) => {
+  const emitSettings = (nextSettings: BranchDeliverySettings) => {
     onChange(nextSettings);
   };
 
-  const updateDeliveryConfig = (key: string, value: any) => {
+  const updateDeliveryConfig = <Key extends keyof DeliveryConfig>(
+    key: Key,
+    value: DeliveryConfig[Key]
+  ) => {
     const nextDeliveryConfig = {
       ...deliveryConfig,
       mode: deliveryMode,
@@ -232,31 +150,45 @@ export default function BranchDeliveryAreaSettings({
       [key]: value,
     };
 
-    const nextSettings: any = {
+    const nextSettings: BranchDeliverySettings = {
       ...settings,
       deliveryConfig: nextDeliveryConfig,
     };
 
     // Backward compatibility for existing registration schema/older payloads.
-    if (key === "radiusKm") nextSettings.radiusKm = value;
-    if (key === "minOrderAmount") nextSettings.minOrderAmount = value;
+    if (
+      key === "radiusKm" &&
+      (typeof value === "string" || typeof value === "number")
+    ) {
+      nextSettings.radiusKm = value;
+    }
+
+    if (
+      key === "minOrderAmount" &&
+      (typeof value === "string" || typeof value === "number")
+    ) {
+      nextSettings.minOrderAmount = value;
+    }
 
     emitSettings(nextSettings);
   };
 
 
-  const updateAutomation = (key: string, value: any) => {
+  const updateAutomation = (
+    key: "autoAcceptOrders" | "estimatedPrepTime",
+    value: boolean | number
+  ) => {
     const nextAutomation = {
       ...(settings?.automation || {}),
       [key]: value,
     };
 
-    const nextSettings: any = {
+    const nextSettings: BranchDeliverySettings = {
       ...settings,
       automation: nextAutomation,
     };
 
-    if (key === "estimatedPrepTime") {
+    if (key === "estimatedPrepTime" && typeof value === "number") {
       nextSettings.estimatedPrepTime = value;
     }
 
@@ -264,8 +196,12 @@ export default function BranchDeliveryAreaSettings({
   };
 
 
-  const updateZone = (index: number, key: string, value: any) => {
-    const nextZones = zones.map((zone: any, zoneIndex: number) =>
+  const updateZone = (
+    index: number,
+    key: keyof DeliveryZone,
+    value: number | string | LatLngPoint[]
+  ) => {
+    const nextZones = zones.map((zone, zoneIndex) =>
       zoneIndex === index
         ? {
             ...zone,
@@ -295,7 +231,7 @@ export default function BranchDeliveryAreaSettings({
       ...source,
       name: source?.name ? `${source.name} Copy` : "Zone Copy",
       polygon: Array.isArray(source?.polygon)
-        ? source.polygon.map((point: any) => ({ ...point }))
+        ? source.polygon.map((point) => ({ ...point }))
         : [],
     };
 
@@ -306,7 +242,7 @@ export default function BranchDeliveryAreaSettings({
   };
 
   const removeZone = (index: number) => {
-    const nextZones = zones.filter((_: any, zoneIndex: number) => zoneIndex !== index);
+    const nextZones = zones.filter((_, zoneIndex) => zoneIndex !== index);
 
     updateDeliveryConfig("zones", nextZones);
     setActiveZoneIndex((prev) => Math.max(0, Math.min(prev, nextZones.length - 1)));
@@ -318,14 +254,14 @@ export default function BranchDeliveryAreaSettings({
     key: LatLngKey,
     value: string | number
   ) => {
-    const nextZones = zones.map((zone: any, currentZoneIndex: number) => {
+    const nextZones = zones.map((zone, currentZoneIndex) => {
       if (currentZoneIndex !== zoneIndex) return zone;
 
       const polygon = Array.isArray(zone?.polygon) ? zone.polygon : [];
 
       return {
         ...zone,
-        polygon: polygon.map((point: any, currentPointIndex: number) =>
+        polygon: polygon.map((point, currentPointIndex) =>
           currentPointIndex === pointIndex
             ? {
                 ...point,
@@ -345,14 +281,14 @@ export default function BranchDeliveryAreaSettings({
     lat: string | number,
     lng: string | number
   ) => {
-    const nextZones = zones.map((zone: any, currentZoneIndex: number) => {
+    const nextZones = zones.map((zone, currentZoneIndex) => {
       if (currentZoneIndex !== zoneIndex) return zone;
 
       const polygon = Array.isArray(zone?.polygon) ? zone.polygon : [];
 
       return {
         ...zone,
-        polygon: polygon.map((point: any, currentPointIndex: number) =>
+        polygon: polygon.map((point, currentPointIndex) =>
           currentPointIndex === pointIndex
             ? {
                 ...point,
@@ -368,7 +304,7 @@ export default function BranchDeliveryAreaSettings({
   };
 
   const addZonePoint = (zoneIndex: number, point?: LatLngPoint | null) => {
-    const nextZones = zones.map((zone: any, currentZoneIndex: number) => {
+    const nextZones = zones.map((zone, currentZoneIndex) => {
       if (currentZoneIndex !== zoneIndex) return zone;
 
       const polygon = Array.isArray(zone?.polygon) ? zone.polygon : [];
@@ -392,7 +328,7 @@ export default function BranchDeliveryAreaSettings({
   };
 
   const removeZonePoint = (zoneIndex: number, pointIndex: number) => {
-    const nextZones = zones.map((zone: any, currentZoneIndex: number) => {
+    const nextZones = zones.map((zone, currentZoneIndex) => {
       if (currentZoneIndex !== zoneIndex) return zone;
 
       const polygon = Array.isArray(zone?.polygon) ? zone.polygon : [];
@@ -400,7 +336,7 @@ export default function BranchDeliveryAreaSettings({
       return {
         ...zone,
         polygon: polygon.filter(
-          (_: any, currentPointIndex: number) => currentPointIndex !== pointIndex
+          (_, currentPointIndex) => currentPointIndex !== pointIndex
         ),
       };
     });
@@ -409,7 +345,7 @@ export default function BranchDeliveryAreaSettings({
   };
 
   const clearZonePoints = (zoneIndex: number) => {
-    const nextZones = zones.map((zone: any, currentZoneIndex: number) => {
+    const nextZones = zones.map((zone, currentZoneIndex) => {
       if (currentZoneIndex !== zoneIndex) return zone;
 
       return {
@@ -430,8 +366,12 @@ export default function BranchDeliveryAreaSettings({
   };
 
 
-  const updateZoneBand = (index: number, key: string, value: any) => {
-    const nextBands = zoneBands.map((band: any, bandIndex: number) =>
+  const updateZoneBand = (
+    index: number,
+    key: keyof DeliveryZoneBand,
+    value: number | string
+  ) => {
+    const nextBands = zoneBands.map((band, bandIndex) =>
       bandIndex === index
         ? {
             ...band,
@@ -472,12 +412,16 @@ export default function BranchDeliveryAreaSettings({
   const removeZoneBand = (index: number) => {
     updateDeliveryConfig(
       "zoneBands",
-      zoneBands.filter((_: any, bandIndex: number) => bandIndex !== index)
+      zoneBands.filter((_, bandIndex) => bandIndex !== index)
     );
   };
 
-  const updatePostalRule = (index: number, key: string, value: any) => {
-    const nextRules = postalCodeRules.map((rule: any, ruleIndex: number) =>
+  const updatePostalRule = (
+    index: number,
+    key: keyof PostalCodeRule,
+    value: number | string
+  ) => {
+    const nextRules = postalCodeRules.map((rule, ruleIndex) =>
       ruleIndex === index
         ? {
             ...rule,
@@ -512,7 +456,7 @@ export default function BranchDeliveryAreaSettings({
   const removePostalRule = (index: number) => {
     updateDeliveryConfig(
       "postalCodeRules",
-      postalCodeRules.filter((_: any, ruleIndex: number) => ruleIndex !== index)
+      postalCodeRules.filter((_, ruleIndex) => ruleIndex !== index)
     );
   };
 
@@ -592,7 +536,9 @@ export default function BranchDeliveryAreaSettings({
   };
 
   const renderBranchMarker = () => {
-    if (!window.google?.maps || !mapInstanceRef.current || !branchCoordinates) {
+    const maps = getGoogleMaps();
+
+    if (!maps?.Marker || !maps.SymbolPath || !mapInstanceRef.current || !branchCoordinates) {
       if (branchMarkerRef.current) {
         branchMarkerRef.current.setMap(null);
         branchMarkerRef.current = null;
@@ -606,12 +552,12 @@ export default function BranchDeliveryAreaSettings({
     };
 
     if (!branchMarkerRef.current) {
-      branchMarkerRef.current = new window.google.maps.Marker({
+      branchMarkerRef.current = new maps.Marker({
         position,
         map: mapInstanceRef.current,
-        title: "Branch location",
+        title: tRegister("branch.map.markerTitle"),
         icon: {
-          path: window.google.maps.SymbolPath.CIRCLE,
+          path: maps.SymbolPath.CIRCLE,
           scale: 8,
           fillColor: "#111827",
           fillOpacity: 1,
@@ -626,7 +572,9 @@ export default function BranchDeliveryAreaSettings({
   };
 
   const renderSearchMarker = () => {
-    if (!window.google?.maps || !mapInstanceRef.current || !selectedMapCenter) {
+    const maps = getGoogleMaps();
+
+    if (!maps?.Marker || !maps.SymbolPath || !mapInstanceRef.current || !selectedMapCenter) {
       if (searchMarkerRef.current) {
         searchMarkerRef.current.setMap(null);
         searchMarkerRef.current = null;
@@ -635,12 +583,12 @@ export default function BranchDeliveryAreaSettings({
     }
 
     if (!searchMarkerRef.current) {
-      searchMarkerRef.current = new window.google.maps.Marker({
+      searchMarkerRef.current = new maps.Marker({
         position: selectedMapCenter,
         map: mapInstanceRef.current,
-        title: "Searched area center",
+        title: tRegister("branch.delivery.map.searchedAreaMarker"),
         icon: {
-          path: window.google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+          path: maps.SymbolPath.BACKWARD_CLOSED_ARROW,
           scale: 5,
           fillColor: "#2563eb",
           fillOpacity: 1,
@@ -655,12 +603,14 @@ export default function BranchDeliveryAreaSettings({
   };
 
   const renderRadiusOverlay = () => {
-    if (!window.google?.maps || !mapInstanceRef.current) return;
+    const maps = getGoogleMaps();
+    if (!maps?.Circle || !mapInstanceRef.current) return;
 
-    const center = branchCoordinates || selectedMapCenter || DEFAULT_MAP_CENTER;
+    const center =
+      branchCoordinates || selectedMapCenter || DEFAULT_DELIVERY_MAP_CENTER;
     const radiusMeters = Math.max(0.1, toNumber(delivery.radiusKm, 1)) * 1000;
 
-    circleRef.current = new window.google.maps.Circle({
+    circleRef.current = new maps.Circle({
       map: mapInstanceRef.current,
       center,
       radius: radiusMeters,
@@ -678,49 +628,60 @@ export default function BranchDeliveryAreaSettings({
   };
 
   const fitActiveZone = () => {
-    if (!window.google?.maps || !mapInstanceRef.current) return;
+    const maps = getGoogleMaps();
+    if (!maps?.LatLngBounds || !mapInstanceRef.current) return;
 
     const zone = zones[activeZoneIndex];
     const points = Array.isArray(zone?.polygon)
-      ? zone.polygon.map(getValidPoint).filter(Boolean)
+      ? zone.polygon.map(getValidPoint).filter(isMapPoint)
       : [];
 
     if (!points.length) {
-      mapInstanceRef.current.panTo(selectedMapCenter || branchCoordinates || DEFAULT_MAP_CENTER);
+      mapInstanceRef.current.panTo(
+        selectedMapCenter || branchCoordinates || DEFAULT_DELIVERY_MAP_CENTER
+      );
       mapInstanceRef.current.setZoom(branchCoordinates || selectedMapCenter ? 14 : 12);
       return;
     }
 
-    const bounds = new window.google.maps.LatLngBounds();
-    points.forEach((point: any) => bounds.extend(point));
+    const bounds = new maps.LatLngBounds();
+    points.forEach((point) => bounds.extend(point));
     mapInstanceRef.current.fitBounds(bounds);
   };
 
   const renderZoneOverlay = () => {
-    if (!window.google?.maps || !mapInstanceRef.current) return;
+    const maps = getGoogleMaps();
+    if (!maps?.LatLngBounds || !maps.Marker || !mapInstanceRef.current) return;
+
+    const Marker = maps.Marker;
+    const map = mapInstanceRef.current;
 
     const zone = zones[activeZoneIndex];
     const points = Array.isArray(zone?.polygon)
-      ? zone.polygon.map(getValidPoint).filter(Boolean)
+      ? zone.polygon.map(getValidPoint).filter(isMapPoint)
       : [];
 
     if (!points.length) {
-      mapInstanceRef.current.panTo(selectedMapCenter || branchCoordinates || DEFAULT_MAP_CENTER);
-      mapInstanceRef.current.setZoom(branchCoordinates || selectedMapCenter ? 14 : 12);
+      map.panTo(
+        selectedMapCenter || branchCoordinates || DEFAULT_DELIVERY_MAP_CENTER
+      );
+      map.setZoom(branchCoordinates || selectedMapCenter ? 14 : 12);
       return;
     }
 
-    const bounds = new window.google.maps.LatLngBounds();
+    const bounds = new maps.LatLngBounds();
 
-    points.forEach((point: any, pointIndex: number) => {
+    points.forEach((point, pointIndex) => {
       bounds.extend(point);
 
-      const marker = new window.google.maps.Marker({
+      const marker = new Marker({
         position: point,
-        map: mapInstanceRef.current,
+        map,
         draggable: true,
         label: String(pointIndex + 1),
-        title: `Point ${pointIndex + 1}`,
+        title: tRegister("branch.delivery.zones.pointLabel", {
+          number: pointIndex + 1,
+        }),
       });
 
       marker.addListener("dragend", () => {
@@ -741,8 +702,8 @@ export default function BranchDeliveryAreaSettings({
       polygonMarkersRef.current.push(marker);
     });
 
-    if (points.length >= 3) {
-      polygonRef.current = new window.google.maps.Polygon({
+    if (points.length >= 3 && maps.Polygon) {
+      polygonRef.current = new maps.Polygon({
         paths: points,
         map: mapInstanceRef.current,
         fillColor: "#2563eb",
@@ -753,15 +714,15 @@ export default function BranchDeliveryAreaSettings({
       });
     }
 
-    mapInstanceRef.current.fitBounds(bounds);
+    map.fitBounds(bounds);
   };
 
-  const applyMapSearchResult = (result: any) => {
+  const applyMapSearchResult = (result: GoogleGeocoderResult) => {
     const lat = result?.geometry?.location?.lat?.();
     const lng = result?.geometry?.location?.lng?.();
 
     if (!Number.isFinite(Number(lat)) || !Number.isFinite(Number(lng))) {
-      setMapsError("Selected map result does not include coordinates.");
+      setMapsError(tRegister("branch.delivery.map.invalidSelectedCoordinates"));
       return;
     }
 
@@ -785,25 +746,27 @@ export default function BranchDeliveryAreaSettings({
     const query = mapSearch.trim();
 
     if (!query) {
-      setMapsError("Please enter an area, city, street, or landmark to search.");
+      setMapsError(tRegister("branch.delivery.map.enterSearch"));
       return;
     }
 
-    if (!window.google?.maps?.Geocoder) {
-      setMapsError("Google Maps is not ready yet.");
+    const maps = getGoogleMaps();
+
+    if (!maps?.Geocoder) {
+      setMapsError(tRegister("branch.map.notReady"));
       return;
     }
 
     setMapSearching(true);
     setMapsError("");
 
-    const geocoder = new window.google.maps.Geocoder();
+    const geocoder = new maps.Geocoder();
 
-    geocoder.geocode({ address: query }, (results: any, status: string) => {
+    geocoder.geocode({ address: query }, (results, status) => {
       if (status === "OK" && results?.[0]) {
         applyMapSearchResult(results[0]);
       } else {
-        setMapsError("No matching area found. Try a more specific search.");
+        setMapsError(tRegister("branch.delivery.map.noMatchingArea"));
       }
 
       setMapSearching(false);
@@ -822,7 +785,7 @@ export default function BranchDeliveryAreaSettings({
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    if (window.google?.maps?.places) {
+    if (getGoogleMaps()?.places) {
       setMapsReady(true);
       setMapsLoading(false);
       setMapsError("");
@@ -833,7 +796,7 @@ export default function BranchDeliveryAreaSettings({
       setMapsReady(false);
       setMapsLoading(false);
       setMapsError(
-        "Google Maps API key is missing. Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in env."
+        tRegister("branch.map.missingApiKey")
       );
       return;
     }
@@ -851,7 +814,7 @@ export default function BranchDeliveryAreaSettings({
     const handleError = () => {
       setMapsReady(false);
       setMapsLoading(false);
-      setMapsError("Failed to load Google Maps. Please verify the API key.");
+      setMapsError(tRegister("branch.map.loadFailed"));
     };
 
     setMapsLoading(true);
@@ -860,7 +823,7 @@ export default function BranchDeliveryAreaSettings({
       existingScript.addEventListener("load", handleLoad);
       existingScript.addEventListener("error", handleError);
 
-      if (window.google?.maps?.places) {
+      if (getGoogleMaps()?.places) {
         handleLoad();
       }
 
@@ -887,16 +850,18 @@ export default function BranchDeliveryAreaSettings({
       script.removeEventListener("load", handleLoad);
       script.removeEventListener("error", handleError);
     };
-  }, []);
+  }, [tRegister]);
 
   /* ---------------- AUTOCOMPLETE ---------------- */
 
   useEffect(() => {
+    const maps = getGoogleMaps();
+
     if (!mapsReady || !searchInputRef.current) return;
-    if (!window.google?.maps?.places?.Autocomplete) return;
+    if (!maps?.places?.Autocomplete) return;
     if (autocompleteInstanceRef.current) return;
 
-    autocompleteInstanceRef.current = new window.google.maps.places.Autocomplete(
+    const autocomplete = new maps.places.Autocomplete(
       searchInputRef.current,
       {
         fields: ["formatted_address", "geometry", "name", "place_id"],
@@ -904,20 +869,24 @@ export default function BranchDeliveryAreaSettings({
       }
     );
 
-    autocompleteInstanceRef.current.addListener("place_changed", () => {
+    autocomplete.addListener("place_changed", () => {
       const place = autocompleteInstanceRef.current?.getPlace?.();
 
       if (!place?.geometry) {
-        setMapsError("Please select an area from Google Maps suggestions.");
+        setMapsError(tRegister("branch.delivery.map.selectSuggestion"));
         return;
       }
 
       applyMapSearchResult(place);
     });
 
+    autocompleteInstanceRef.current = autocomplete;
+
     return () => {
-      if (window.google?.maps?.event && autocompleteInstanceRef.current) {
-        window.google.maps.event.clearInstanceListeners(
+      const currentMaps = getGoogleMaps();
+
+      if (currentMaps?.event && autocompleteInstanceRef.current) {
+        currentMaps.event.clearInstanceListeners(
           autocompleteInstanceRef.current
         );
       }
@@ -925,7 +894,7 @@ export default function BranchDeliveryAreaSettings({
       autocompleteInstanceRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapsReady]);
+  }, [mapsReady, tRegister]);
 
   /* ---------------- GOOGLE MAP INIT ---------------- */
 
@@ -936,11 +905,13 @@ export default function BranchDeliveryAreaSettings({
       return;
     }
 
+    const maps = getGoogleMaps();
+
     if (!mapsReady || !mapContainerRef.current) return;
-    if (!window.google?.maps?.Map) return;
+    if (!maps?.Map || !maps.event) return;
 
     if (!mapInstanceRef.current) {
-      mapInstanceRef.current = new window.google.maps.Map(mapContainerRef.current, {
+      mapInstanceRef.current = new maps.Map(mapContainerRef.current, {
         center: fallbackCenter,
         zoom: branchCoordinates || selectedMapCenter ? 14 : 12,
         mapTypeControl: false,
@@ -951,14 +922,15 @@ export default function BranchDeliveryAreaSettings({
       });
     }
 
-    window.google.maps.event.trigger(mapInstanceRef.current, "resize");
+    maps.event.trigger(mapInstanceRef.current, "resize");
   }, [mapsReady, shouldShowMap, deliveryMode, fallbackCenter, branchCoordinates, selectedMapCenter]);
 
   /* ---------------- GOOGLE MAP OVERLAYS ---------------- */
 
   useEffect(() => {
     if (!mapsReady || !shouldShowMap || !mapInstanceRef.current) return;
-    if (!window.google?.maps) return;
+    const maps = getGoogleMaps();
+    if (!maps?.event) return;
 
     clearMapOverlays();
     renderBranchMarker();
@@ -968,7 +940,7 @@ export default function BranchDeliveryAreaSettings({
       draggableCursor: deliveryMode === "ZONE" ? "crosshair" : undefined,
     });
 
-    window.google.maps.event.clearListeners(mapInstanceRef.current, "click");
+    maps.event.clearListeners(mapInstanceRef.current, "click");
 
     if (deliveryMode === "RADIUS") {
       renderRadiusOverlay();
@@ -977,7 +949,7 @@ export default function BranchDeliveryAreaSettings({
 
     renderZoneOverlay();
 
-    mapInstanceRef.current.addListener("click", (event: any) => {
+    mapInstanceRef.current.addListener("click", (event) => {
       const lat = event?.latLng?.lat?.();
       const lng = event?.latLng?.lng?.();
 
@@ -986,7 +958,9 @@ export default function BranchDeliveryAreaSettings({
       if (!zones.length) {
         updateDeliveryConfig("zones", [
           {
-            name: "Delivery Zone 1",
+            name: tRegister("branch.delivery.zones.defaultName", {
+              number: 1,
+            }),
             deliveryFee: toNumber(delivery.deliveryFee, 0),
             minOrderAmount: toNumber(delivery.minOrderAmount, 0),
             freeDeliveryThreshold: toNumber(delivery.freeDeliveryThreshold, 0),
@@ -1010,8 +984,10 @@ export default function BranchDeliveryAreaSettings({
     });
 
     return () => {
-      if (window.google?.maps?.event && mapInstanceRef.current) {
-        window.google.maps.event.clearListeners(mapInstanceRef.current, "click");
+      const currentMaps = getGoogleMaps();
+
+      if (currentMaps?.event && mapInstanceRef.current) {
+        currentMaps.event.clearListeners(mapInstanceRef.current, "click");
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1024,6 +1000,7 @@ export default function BranchDeliveryAreaSettings({
     zones,
     branchCoordinates,
     selectedMapCenter,
+    tRegister,
   ]);
 
   useEffect(() => {
@@ -1036,247 +1013,30 @@ export default function BranchDeliveryAreaSettings({
     ? activeZone.polygon
     : [];
 
-  const renderDeliveryMap = () => {
-    if (!shouldShowMap) return null;
-
-    return (
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
-        <div className="border-b border-gray-200 bg-white p-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-gray-900">
-                {deliveryMode === "RADIUS" ? "Radius map preview" : "Polygon zone builder"}
-              </p>
-              <p className="mt-1 text-xs text-gray-500">
-                {deliveryMode === "RADIUS"
-                  ? "Preview the straight-line delivery radius from branch latitude/longitude."
-                  : "Search an area first, generate a starter zone, then fine-tune points by dragging markers."}
-              </p>
-            </div>
-
-            {deliveryMode === "ZONE" && zones.length > 0 ? (
-              <select
-                value={activeZoneIndex}
-                onChange={(event) => setActiveZoneIndex(Number(event.target.value))}
-                className="h-10 rounded-full border border-gray-200 bg-white px-4 text-sm outline-none focus:border-primary"
-              >
-                {zones.map((zone: any, index: number) => (
-                  <option key={`zone-select-${index}`} value={index}>
-                    {zone?.name || `Zone ${index + 1}`}
-                  </option>
-                ))}
-              </select>
-            ) : null}
-          </div>
-
-          {deliveryMode === "ZONE" ? (
-            <div className="mt-4 space-y-3">
-              <div className="flex flex-col gap-3 lg:flex-row">
-                <div className="relative flex-1">
-                  <Search
-                    size={17}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
-                  <input
-                    ref={searchInputRef}
-                    value={mapSearch}
-                    onChange={(event) => {
-                      setMapSearch(event.target.value);
-                      setSelectedSearchLabel("");
-                    }}
-                    onKeyDown={handleMapSearchKeyDown}
-                    placeholder="Search area, street, city, or landmark"
-                    className="h-11 w-full rounded-full border border-gray-200 bg-white pl-11 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
-                  />
-                </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleMapSearch}
-                  disabled={!mapsReady || mapSearching || mapsLoading}
-                  className="h-11 rounded-full border-primary px-5 text-primary disabled:opacity-50"
-                >
-                  {mapSearching ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : (
-                    <Search size={16} />
-                  )}
-                  Search Map
-                </Button>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={generateStarterZone}
-                  className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-3 text-xs font-semibold text-white hover:bg-primary/90"
-                >
-                  <Crosshair size={14} />
-                  Generate Starter Zone
-                </button>
-
-                <button
-                  type="button"
-                  onClick={addCenterPoint}
-                  className="inline-flex h-9 items-center gap-2 rounded-full border border-gray-200 px-3 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  <MapPin size={14} />
-                  Add Center Point
-                </button>
-
-                <button
-                  type="button"
-                  onClick={undoLastPoint}
-                  disabled={!activeZonePoints.length}
-                  className="inline-flex h-9 items-center gap-2 rounded-full border border-gray-200 px-3 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <Undo2 size={14} />
-                  Undo Last Point
-                </button>
-
-                <button
-                  type="button"
-                  onClick={fitActiveZone}
-                  className="inline-flex h-9 items-center gap-2 rounded-full border border-gray-200 px-3 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  <Maximize2 size={14} />
-                  Fit Active Zone
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => clearZonePoints(activeZoneIndex)}
-                  disabled={!zones.length}
-                  className="inline-flex h-9 items-center gap-2 rounded-full border border-red-100 bg-red-50 px-3 text-xs font-medium text-red-600 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <Trash2 size={14} />
-                  Clear Active Zone
-                </button>
-              </div>
-
-              {selectedSearchLabel ? (
-                <p className="text-xs text-gray-500">
-                  Selected map area: {selectedSearchLabel}
-                </p>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
-
-        {mapsReady ? (
-          <div className="relative">
-            <div ref={mapContainerRef} className="h-[440px] w-full" />
-
-            {deliveryMode === "ZONE" ? (
-              <div className="pointer-events-none absolute left-4 top-4 rounded-2xl bg-white/95 px-4 py-3 text-xs shadow-md ring-1 ring-gray-100">
-                <p className="font-semibold text-gray-900">
-                  {activeZone?.name || `Zone ${activeZoneIndex + 1}`}
-                </p>
-                <p className="mt-1 text-gray-500">
-                  {activeZonePoints.length} point{activeZonePoints.length === 1 ? "" : "s"} selected
-                </p>
-                <p className="mt-1 text-gray-400">
-                  Click map to add · drag markers to adjust
-                </p>
-              </div>
-            ) : null}
-          </div>
-        ) : (
-          <div className="flex min-h-[280px] flex-col items-center justify-center px-5 text-center">
-            {mapsLoading ? (
-              <>
-                <Loader2 className="mb-3 animate-spin text-primary" size={28} />
-                <p className="text-sm font-medium text-gray-700">Loading Google Map</p>
-              </>
-            ) : (
-              <>
-                <MapPin className="mb-3 text-gray-400" size={30} />
-                <p className="text-sm font-medium text-gray-700">
-                  Google Map preview unavailable
-                </p>
-                <p className="mt-1 text-xs text-gray-400">
-                  Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in env to enable map selection.
-                </p>
-              </>
-            )}
-          </div>
-        )}
-
-        <div className="flex flex-col gap-2 border-t border-gray-200 bg-white px-4 py-3 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between">
-          <span>
-            {deliveryMode === "RADIUS"
-              ? "Branch location comes from the address latitude/longitude above."
-              : "For faster setup: search area → generate starter zone → drag points if needed."}
-          </span>
-
-          <span className="shrink-0 font-medium text-gray-700">
-            {branchCoordinates
-              ? `${branchCoordinates.lat}, ${branchCoordinates.lng}`
-              : "Branch coordinates not selected"}
-          </span>
-        </div>
-
-        {mapsError ? (
-          <div className="flex items-start gap-2 border-t border-amber-100 bg-amber-50 px-4 py-3 text-xs text-amber-700">
-            <AlertCircle size={15} className="mt-0.5 shrink-0" />
-            <span>{mapsError}</span>
-          </div>
-        ) : null}
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-8">
       <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="mb-5">
           <h2 className="text-[20px] font-semibold text-gray-900">
-            Order & Delivery Area Settings
+            {tRegister("branch.delivery.title")}
           </h2>
           <p className="mt-1 text-sm text-gray-500">
-            Configure customer-facing delivery charges, radius, polygon zones, radius bands, or postal-code based delivery rules.
+            {tRegister("branch.delivery.description")}
           </p>
         </div>
 
         <div className="space-y-6">
-
-          <div>
-            <p className="mb-3 text-sm font-medium text-gray-900">
-              Delivery area calculation mode
-            </p>
-
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-              {DELIVERY_MODES.map((mode) => {
-                const active = deliveryMode === mode.value;
-
-                return (
-                  <button
-                    key={mode.value}
-                    type="button"
-                    onClick={() => updateDeliveryConfig("mode", mode.value)}
-                    className={`rounded-2xl border p-4 text-left transition ${
-                      active
-                        ? "border-primary bg-primary/5 text-primary ring-1 ring-primary/20"
-                        : "border-gray-200 bg-white text-gray-700 hover:border-primary/40"
-                    }`}
-                  >
-                    <span className="block text-sm font-semibold">
-                      {mode.label}
-                    </span>
-                    <span className="mt-1 block text-xs leading-relaxed text-gray-500">
-                      {mode.description}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <DeliveryModeSelector
+            deliveryMode={deliveryMode}
+            onModeChange={(mode) => updateDeliveryConfig("mode", mode)}
+          />
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <FormInput
-              label="Base Delivery Fee"
-              placeholder="Enter Base Delivery Fee"
+              label={tRegister("branch.delivery.fields.baseDeliveryFee.label")}
+              placeholder={tRegister(
+                "branch.delivery.fields.baseDeliveryFee.placeholder"
+              )}
               value={toInputNumber(delivery.deliveryFee)}
               onChange={(val) =>
                 updateDeliveryConfig("deliveryFee", val ? Number(val) : 0)
@@ -1284,9 +1044,11 @@ export default function BranchDeliveryAreaSettings({
             />
 
             <FormInput
-              label="Radius (km)"
+              label={tRegister("branch.delivery.fields.radiusKm.label")}
               value={toInputNumber(delivery.radiusKm)}
-              placeholder="Enter radius, e.g. 7.5"
+              placeholder={tRegister(
+                "branch.delivery.fields.radiusKm.placeholder"
+              )}
               onChange={(val) => {
                 const sanitized = sanitizeDecimalInput(val);
                 updateDeliveryConfig("radiusKm", sanitized);
@@ -1294,8 +1056,10 @@ export default function BranchDeliveryAreaSettings({
             />
 
             <FormInput
-              label="Minimum Order Amount"
-              placeholder="Min order amount"
+              label={tRegister("branch.delivery.fields.minOrderAmount.label")}
+              placeholder={tRegister(
+                "branch.delivery.fields.minOrderAmount.placeholder"
+              )}
               value={toInputNumber(delivery.minOrderAmount)}
               onChange={(val) =>
                 updateDeliveryConfig("minOrderAmount", val ? Number(val) : 0)
@@ -1303,8 +1067,12 @@ export default function BranchDeliveryAreaSettings({
             />
 
             <FormInput
-              label="Free Delivery Threshold"
-              placeholder="Enter free delivery threshold"
+              label={tRegister(
+                "branch.delivery.fields.freeDeliveryThreshold.label"
+              )}
+              placeholder={tRegister(
+                "branch.delivery.fields.freeDeliveryThreshold.placeholder"
+              )}
               value={toInputNumber(delivery.freeDeliveryThreshold)}
               onChange={(val) =>
                 updateDeliveryConfig(
@@ -1322,469 +1090,129 @@ export default function BranchDeliveryAreaSettings({
                 updateDeliveryConfig("isFreeDelivery", val === true)
               }
             />
-            <span className="text-sm">Enable Free Delivery</span>
+            <span className="text-sm">
+              {tRegister("branch.delivery.fields.enableFreeDelivery")}
+            </span>
           </label>
 
-          {renderDeliveryMap()}
+          {shouldShowMap ? (
+            <DeliveryMap
+              activeZone={activeZone}
+              activeZoneIndex={activeZoneIndex}
+              activeZonePointsCount={activeZonePoints.length}
+              branchCoordinates={branchCoordinates}
+              deliveryMode={deliveryMode}
+              fitActiveZone={fitActiveZone}
+              generateStarterZone={generateStarterZone}
+              mapContainerRef={mapContainerRef}
+              mapSearch={mapSearch}
+              mapSearching={mapSearching}
+              mapsError={mapsError}
+              mapsLoading={mapsLoading}
+              mapsReady={mapsReady}
+              mapsReadyForSearch={mapsReady}
+              onAddCenterPoint={addCenterPoint}
+              onClearActiveZone={() => clearZonePoints(activeZoneIndex)}
+              onMapSearch={handleMapSearch}
+              onMapSearchChange={(value) => {
+                setMapSearch(value);
+                setSelectedSearchLabel("");
+              }}
+              onMapSearchKeyDown={handleMapSearchKeyDown}
+              onUndoLastPoint={undoLastPoint}
+              searchInputRef={searchInputRef}
+              selectedSearchLabel={selectedSearchLabel}
+              setActiveZoneIndex={setActiveZoneIndex}
+              zones={zones}
+            />
+          ) : null}
 
           {deliveryMode === "RADIUS" ? (
-            <div className="space-y-4 rounded-2xl border border-gray-100 bg-gray-50 p-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">
-                    Radius Fee Bands
-                  </p>
-                  <p className="mt-1 text-xs text-gray-500">
-                    Optional distance bands for radius-based delivery. Use decimal values like 2.5 or 7.5 km.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={addZoneBand}
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
-                >
-                  <Plus size={15} />
-                  Add Band
-                </button>
-              </div>
-
-              {zoneBands.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-5 text-center text-sm text-gray-500">
-                  No radius fee band configured. The base delivery fee will be used for the configured radius.
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {zoneBands.map((band: any, index: number) => (
-                    <div
-                      key={`zone-band-${index}`}
-                      className="rounded-2xl border border-gray-200 bg-white p-4"
-                    >
-                      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900">
-                            Band {index + 1}
-                          </p>
-                          <p className="mt-0.5 text-xs text-gray-500">
-                            {toInputNumber(band?.fromKm) || "0"} km → {toInputNumber(band?.toKm) || "0"} km
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => duplicateZoneBand(index)}
-                            className="inline-flex h-9 items-center gap-2 rounded-full border border-gray-200 px-3 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                          >
-                            <Copy size={13} />
-                            Duplicate
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => removeZoneBand(index)}
-                            className="inline-flex h-9 items-center gap-2 rounded-full border border-red-100 bg-red-50 px-3 text-xs font-medium text-red-600 hover:bg-red-100"
-                          >
-                            <Trash2 size={13} />
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
-                        <FormInput
-                          label="From Km"
-                          placeholder="0"
-                          value={toInputNumber(band?.fromKm)}
-                          onChange={(val) =>
-                            updateZoneBand(index, "fromKm", sanitizeDecimalInput(val))
-                          }
-                        />
-
-                        <FormInput
-                          label="To Km"
-                          placeholder="7.5"
-                          value={toInputNumber(band?.toKm)}
-                          onChange={(val) =>
-                            updateZoneBand(index, "toKm", sanitizeDecimalInput(val))
-                          }
-                        />
-
-                        <FormInput
-                          label="Delivery Fee"
-                          placeholder="Fee"
-                          value={toInputNumber(band?.deliveryFee)}
-                          onChange={(val) =>
-                            updateZoneBand(index, "deliveryFee", val ? Number(val) : 0)
-                          }
-                        />
-
-                        <FormInput
-                          label="Min Order"
-                          placeholder="Min order"
-                          value={toInputNumber(band?.minOrderAmount)}
-                          onChange={(val) =>
-                            updateZoneBand(index, "minOrderAmount", val ? Number(val) : 0)
-                          }
-                        />
-
-                        <FormInput
-                          label="Free Delivery From"
-                          placeholder="Threshold"
-                          value={toInputNumber(band?.freeDeliveryThreshold)}
-                          onChange={(val) =>
-                            updateZoneBand(
-                              index,
-                              "freeDeliveryThreshold",
-                              val ? Number(val) : 0
-                            )
-                          }
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <RadiusDeliverySettings
+              onAddBand={addZoneBand}
+              onDuplicateBand={duplicateZoneBand}
+              onRemoveBand={removeZoneBand}
+              onUpdateBand={updateZoneBand}
+              sanitizeDecimalInput={sanitizeDecimalInput}
+              zoneBands={zoneBands}
+            />
           ) : null}
 
 
           {deliveryMode === "ZONE" ? (
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">
-                    Polygon Delivery Zones
-                  </p>
-                  <p className="mt-1 text-xs text-gray-500">
-                    Add multiple zones. Search the area and use starter-zone generation for faster point selection.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={addZone}
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
-                >
-                  <Plus size={15} />
-                  Add Zone
-                </button>
-              </div>
-
-              {zones.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-5 text-center text-sm text-gray-500">
-                  No delivery zone configured yet. Search an area and generate a starter zone, or click the map to start drawing one.
-                </div>
-              ) : (
-                zones.map((zone: any, zoneIndex: number) => {
-                  const polygon = Array.isArray(zone?.polygon)
-                    ? zone.polygon
-                    : [];
-
-                  return (
-                    <div
-                      key={`delivery-zone-${zoneIndex}`}
-                      className={`rounded-2xl border bg-white p-4 transition ${
-                        zoneIndex === activeZoneIndex
-                          ? "border-primary/40 ring-1 ring-primary/20"
-                          : "border-gray-200"
-                      }`}
-                    >
-                      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setActiveZoneIndex(zoneIndex)}
-                          className="text-left"
-                        >
-                          <p className="text-sm font-semibold text-gray-900">
-                            Zone {zoneIndex + 1}
-                          </p>
-                          <p className="mt-0.5 text-xs text-gray-500">
-                            {zoneIndex === activeZoneIndex
-                              ? `${polygon.length} point${polygon.length === 1 ? "" : "s"} · Active on map`
-                              : "Click to edit on map"}
-                          </p>
-                        </button>
-
-                        <div className="flex flex-wrap items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => duplicateZone(zoneIndex)}
-                            className="inline-flex h-9 items-center gap-2 rounded-full border border-gray-200 px-3 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                          >
-                            <Copy size={13} />
-                            Duplicate
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => removeZone(zoneIndex)}
-                            className="inline-flex h-9 items-center gap-2 rounded-full border border-red-100 bg-red-50 px-3 text-xs font-medium text-red-600 hover:bg-red-100"
-                          >
-                            <Trash2 size={13} />
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                        <FormInput
-                          label="Zone Name"
-                          placeholder="Enter zone name"
-                          value={zone?.name || ""}
-                          onChange={(val) => updateZone(zoneIndex, "name", val)}
-                        />
-
-                        <FormInput
-                          label="Zone Delivery Fee"
-                          placeholder="Zone delivery fee"
-                          value={toInputNumber(zone?.deliveryFee)}
-                          onChange={(val) =>
-                            updateZone(
-                              zoneIndex,
-                              "deliveryFee",
-                              val ? Number(val) : 0
-                            )
-                          }
-                        />
-
-                        <FormInput
-                          label="Zone Min Order"
-                          placeholder="Minimum order amount"
-                          value={toInputNumber(zone?.minOrderAmount)}
-                          onChange={(val) =>
-                            updateZone(
-                              zoneIndex,
-                              "minOrderAmount",
-                              val ? Number(val) : 0
-                            )
-                          }
-                        />
-
-                        <FormInput
-                          label="Zone Free Delivery From"
-                          placeholder="Free delivery threshold"
-                          value={toInputNumber(zone?.freeDeliveryThreshold)}
-                          onChange={(val) =>
-                            updateZone(
-                              zoneIndex,
-                              "freeDeliveryThreshold",
-                              val ? Number(val) : 0
-                            )
-                          }
-                        />
-                      </div>
-
-                      <div className="mt-4">
-                        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            Polygon points
-                          </p>
-
-                          <button
-                            type="button"
-                            onClick={() => addZonePoint(zoneIndex)}
-                            className="inline-flex items-center gap-1 rounded-full border border-primary/20 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/5"
-                          >
-                            <Plus size={13} />
-                            Add Empty Point
-                          </button>
-                        </div>
-
-                        <div className="space-y-2">
-                          {polygon.length === 0 ? (
-                            <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-500">
-                              No points yet. Select this zone and click on the map, add center point, or generate a starter zone.
-                            </div>
-                          ) : (
-                            polygon.map((point: any, pointIndex: number) => (
-                              <div
-                                key={`zone-${zoneIndex}-point-${pointIndex}`}
-                                className="grid grid-cols-1 gap-2 rounded-xl bg-gray-50 p-3 sm:grid-cols-[80px_1fr_1fr_auto]"
-                              >
-                                <div className="flex items-center text-xs font-medium text-gray-500">
-                                  Point {pointIndex + 1}
-                                </div>
-
-                                <input
-                                  type="text"
-                                  inputMode="decimal"
-                                  value={point?.lat ?? ""}
-                                  onChange={(event) =>
-                                    updateZonePoint(
-                                      zoneIndex,
-                                      pointIndex,
-                                      "lat",
-                                      event.target.value
-                                    )
-                                  }
-                                  placeholder="Latitude"
-                                  className="h-10 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-primary"
-                                />
-
-                                <input
-                                  type="text"
-                                  inputMode="decimal"
-                                  value={point?.lng ?? ""}
-                                  onChange={(event) =>
-                                    updateZonePoint(
-                                      zoneIndex,
-                                      pointIndex,
-                                      "lng",
-                                      event.target.value
-                                    )
-                                  }
-                                  placeholder="Longitude"
-                                  className="h-10 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-primary"
-                                />
-
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    removeZonePoint(zoneIndex, pointIndex)
-                                  }
-                                  disabled={polygon.length <= 3}
-                                  className="inline-flex h-10 items-center justify-center rounded-lg border border-red-100 bg-red-50 px-3 text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
+            <ZoneList
+              activeZoneIndex={activeZoneIndex}
+              onActiveZoneChange={setActiveZoneIndex}
+              onAddPoint={addZonePoint}
+              onAddZone={addZone}
+              onDuplicateZone={duplicateZone}
+              onRemovePoint={removeZonePoint}
+              onRemoveZone={removeZone}
+              onUpdatePoint={updateZonePoint}
+              onUpdateZone={updateZone}
+              zones={zones}
+            />
           ) : null}
 
           {deliveryMode === "POSTAL_CODE" ? (
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">
-                    Postal Code Rules
-                  </p>
-                  <p className="mt-1 text-xs text-gray-500">
-                    Add one or more postal codes with separate delivery fees.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={addPostalRule}
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
-                >
-                  <Plus size={15} />
-                  Add Postal Code
-                </button>
-              </div>
-
-              {postalCodeRules.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-5 text-center text-sm text-gray-500">
-                  No postal code rule configured yet.
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {postalCodeRules.map((rule: any, index: number) => (
-                    <div
-                      key={`postal-rule-${index}`}
-                      className="grid grid-cols-1 gap-3 rounded-2xl border border-gray-200 bg-white p-4 lg:grid-cols-[1fr_1fr_auto]"
-                    >
-                      <FormInput
-                        label="Postal Code"
-                        placeholder="Postal code"
-                        value={rule?.postalCode || ""}
-                        onChange={(val) =>
-                          updatePostalRule(index, "postalCode", val)
-                        }
-                      />
-
-                      <FormInput
-                        label="Delivery Fee"
-                        placeholder="Delivery fee"
-                        value={toInputNumber(rule?.deliveryFee)}
-                        onChange={(val) =>
-                          updatePostalRule(
-                            index,
-                            "deliveryFee",
-                            val ? Number(val) : 0
-                          )
-                        }
-                      />
-
-                      <div className="flex items-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => duplicatePostalRule(index)}
-                          className="inline-flex h-11 items-center gap-2 rounded-full border border-gray-200 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                        >
-                          <Copy size={14} />
-                          Duplicate
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => removePostalRule(index)}
-                          className="inline-flex h-11 items-center justify-center rounded-full border border-red-100 bg-red-50 px-4 text-red-600 hover:bg-red-100"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <PostalCodeRules
+              onAddRule={addPostalRule}
+              onDuplicateRule={duplicatePostalRule}
+              onRemoveRule={removePostalRule}
+              onUpdateRule={updatePostalRule}
+              postalCodeRules={postalCodeRules}
+            />
           ) : null}
         </div>
       </section>
 
-    <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-  <h2 className="mb-5 text-[20px] font-semibold text-gray-900">
-    Automation
-  </h2>
+      <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <h2 className="mb-5 text-[20px] font-semibold text-gray-900">
+          {tRegister("branch.delivery.automation.title")}
+        </h2>
 
-  <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-start">
-    <div>
-      <label className="mb-2 block text-[16px] font-medium text-gray-900">
-        Auto Accept Orders
-      </label>
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-start">
+          <div>
+            <label className="mb-2 block text-[16px] font-medium text-gray-900">
+              {tRegister("branch.delivery.automation.autoAcceptLabel")}
+            </label>
 
-      <label className="flex h-[52px] cursor-pointer items-center justify-between rounded-[10px] border border-[#bbbbbb] bg-white px-4 transition hover:border-primary/40">
-        <span className="text-sm text-gray-700">
-          Automatically accept incoming orders
-        </span>
+            <label className="flex h-[52px] cursor-pointer items-center justify-between rounded-[10px] border border-[#bbbbbb] bg-white px-4 transition hover:border-primary/40">
+              <span className="text-sm text-gray-700">
+                {tRegister("branch.delivery.automation.autoAcceptDescription")}
+              </span>
 
-        <Checkbox
-          checked={Boolean(settings.automation?.autoAcceptOrders)}
-          onCheckedChange={(val) =>
-            updateAutomation("autoAcceptOrders", val === true)
-          }
-        />
-      </label>
-    </div>
+              <Checkbox
+                checked={Boolean(settings.automation?.autoAcceptOrders)}
+                onCheckedChange={(val) =>
+                  updateAutomation("autoAcceptOrders", val === true)
+                }
+              />
+            </label>
+          </div>
 
-    <div>
-      <FormInput
-        label="Estimated Preparation Time (Minutes)"
-        placeholder="Preparation time"
-        value={toInputNumber(
-          settings.automation?.estimatedPrepTime ??
-            settings.estimatedPrepTime
-        )}
-        onChange={(val) =>
-          updateAutomation(
-            "estimatedPrepTime",
-            val === "" ? 0 : Number(val)
-          )
-        }
-      />
-    </div>
-  </div>
-</section>
+          <div>
+            <FormInput
+              label={tRegister(
+                "branch.delivery.automation.estimatedPrepTimeLabel"
+              )}
+              placeholder={tRegister(
+                "branch.delivery.automation.estimatedPrepTimePlaceholder"
+              )}
+              value={toInputNumber(
+                settings.automation?.estimatedPrepTime ??
+                  settings.estimatedPrepTime
+              )}
+              onChange={(val) =>
+                updateAutomation(
+                  "estimatedPrepTime",
+                  val === "" ? 0 : Number(val)
+                )
+              }
+            />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

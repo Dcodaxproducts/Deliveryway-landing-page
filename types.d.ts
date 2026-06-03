@@ -9,3 +9,7 @@ interface MenuItem {
     icon: LucideIcon;
     href: string;
 }
+
+interface Window {
+    google?: unknown;
+}
