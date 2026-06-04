@@ -1,10 +1,20 @@
-import { ZodSchema } from "zod";
+import type { ZodSchema } from "zod";
+
+type ValidationResult =
+  | {
+      errors: Record<string, string>;
+      success: false;
+    }
+  | {
+      errors: Record<string, never>;
+      success: true;
+    };
 
 export function validateZod<T>(
   schema: ZodSchema<T>,
   data: unknown,
   prefix?: string
-) {
+): ValidationResult {
   const result = schema.safeParse(data);
 
   if (result.success) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -8,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { ReactNode } from "react";
 
 interface FormSelectOption {
   label: string;
@@ -15,13 +17,15 @@ interface FormSelectOption {
 }
 
 interface FormSelectProps {
-  label?: string;
-  placeholder: string;
-  options: string[] | FormSelectOption[];
-  value?: string;
-  onChange?: (val: string) => void;
-  open?: boolean;
+  error?: boolean;
+  errorText?: ReactNode;
+  label?: ReactNode;
+  onChange?: (value: string) => void;
   onOpenChange?: (open: boolean) => void;
+  open?: boolean;
+  options: string[] | FormSelectOption[];
+  placeholder: string;
+  value?: string;
 }
 
 const resolveOption = (option: string | FormSelectOption): FormSelectOption => {
@@ -35,14 +39,16 @@ const resolveOption = (option: string | FormSelectOption): FormSelectOption => {
   return option;
 };
 
-export default function FormSelect({
+export function FormSelect({
+  error,
+  errorText,
   label,
-  placeholder,
-  options,
-  value,
   onChange,
-  open,
   onOpenChange,
+  open,
+  options,
+  placeholder,
+  value,
 }: FormSelectProps) {
   return (
     <div className="space-y-1">
@@ -54,7 +60,12 @@ export default function FormSelect({
         open={open}
         onOpenChange={onOpenChange}
       >
-        <SelectTrigger className="border-[#BBBBBB] focus:ring-1 focus:ring-primary focus:border-primary h-[53px] rounded-[10px] px-3 text-sm">
+        <SelectTrigger
+          className={cn(
+            "border-[#BBBBBB] focus:ring-1 focus:ring-primary focus:border-primary h-[53px] rounded-[10px] px-3 text-sm",
+            error && "border-primary bg-primary/5"
+          )}
+        >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
 
@@ -63,13 +74,17 @@ export default function FormSelect({
             const resolvedOption = resolveOption(option);
 
             return (
-            <SelectItem key={resolvedOption.value} value={resolvedOption.value}>
-              {resolvedOption.label}
-            </SelectItem>
+              <SelectItem key={resolvedOption.value} value={resolvedOption.value}>
+                {resolvedOption.label}
+              </SelectItem>
             );
           })}
         </SelectContent>
       </Select>
+
+      {error && errorText && (
+        <p className="text-xs text-primary mt-1">{errorText}</p>
+      )}
     </div>
   );
 }

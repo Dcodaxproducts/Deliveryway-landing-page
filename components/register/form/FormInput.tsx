@@ -2,22 +2,28 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
-import { useState, forwardRef, type ComponentPropsWithoutRef } from "react";
+import {
+  forwardRef,
+  useState,
+  type ComponentPropsWithoutRef,
+  type ReactNode,
+} from "react";
 
 interface FormInputProps
   extends Omit<ComponentPropsWithoutRef<typeof Input>, "onChange" | "value"> {
-  label: string;
-  placeholder: string;
-  value?: string;
-  onChange?: (val: string) => void;
-  required?: boolean;
   error?: boolean;
-  errorText?: string;
+  errorText?: ReactNode;
+  label: ReactNode;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  value?: string;
+  required?: boolean;
   showPasswordToggle?: boolean;
 }
 
-const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
+export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   (
     {
       label,
@@ -51,16 +57,11 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             onChange={(e) => onChange?.(e.target.value)}
             onBlur={onBlur}
             placeholder={placeholder}
-            className={`
-              border-[#BBBBBB]
-              placeholder-[#BBBBBB]
-              focus:border-primary
-              focus:ring-1
-              focus:ring-primary
-              pr-10
-              ${error ? "border-primary bg-primary/5" : ""}
-              ${className || ""}
-            `}
+            className={cn(
+              "border-[#BBBBBB] placeholder-[#BBBBBB] focus:border-primary focus:ring-1 focus:ring-primary pr-10",
+              error && "border-primary bg-primary/5",
+              className
+            )}
             {...inputProps}
           />
 
@@ -84,5 +85,3 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
 );
 
 FormInput.displayName = "FormInput";
-
-export default FormInput;

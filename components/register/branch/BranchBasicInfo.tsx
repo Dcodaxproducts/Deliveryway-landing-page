@@ -1,6 +1,6 @@
 "use client";
 
-import FormInput from "@/components/register/form/FormInput";
+import { FormInput } from "@/components/register/form/FormInput";
 import type { BranchBasicField, BranchValue } from "@/types/register";
 import { Image as ImageIcon, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";

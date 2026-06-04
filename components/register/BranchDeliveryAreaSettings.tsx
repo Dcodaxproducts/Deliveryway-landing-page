@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import FormInput from "./form/FormInput";
+import { FormInput } from "./form/FormInput";
 import { DeliveryMap } from "./delivery/DeliveryMap";
 import { DeliveryModeSelector } from "./delivery/DeliveryModeSelector";
 import { PostalCodeRules } from "./delivery/PostalCodeRules";

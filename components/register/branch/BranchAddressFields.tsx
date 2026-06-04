@@ -1,6 +1,6 @@
 "use client";
 
-import FormInput from "@/components/register/form/FormInput";
+import { FormInput } from "@/components/register/form/FormInput";
 import type { BranchAddressField, BranchAddressValue } from "@/types/register";
 import { useTranslations } from "next-intl";
 

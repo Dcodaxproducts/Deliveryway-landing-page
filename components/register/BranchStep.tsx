@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, MapPin } from "lucide-react";
-import FormInput from "./form/FormInput";
+import { FormInput } from "./form/FormInput";
 import { validateZod } from "@/hooks/useZodValidator";
-import { branchSchema } from "@/lib/RegisterSchemas";
+import {
+  createBranchSchema,
+  createRegisterValidationMessages,
+} from "@/lib/RegisterSchemas";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { BranchDeliveryAreaSettings } from "./BranchDeliveryAreaSettings";
 import { BranchAddressFields } from "./branch/BranchAddressFields";
@@ -75,6 +78,12 @@ export function BranchStep({
   const tCommon = useTranslations("common");
   const tRegister = useTranslations("register");
   const tValidation = useTranslations("validation");
+  const validationMessages = useMemo(() => {
+    return createRegisterValidationMessages(tValidation);
+  }, [tValidation]);
+  const translatedBranchSchema = useMemo(() => {
+    return createBranchSchema(validationMessages);
+  }, [validationMessages]);
   const branch: BranchValue = formData.branch || {};
   const branchAdmin = formData.branchAdmin || {};
   const branchAddress: BranchAddressValue = branch.address || {};
@@ -803,7 +812,7 @@ export function BranchStep({
 
   const handleNext = () => {
     const { success, errors } = validateZod(
-      branchSchema,
+      translatedBranchSchema,
       formData.branch,
       "branch"
     );

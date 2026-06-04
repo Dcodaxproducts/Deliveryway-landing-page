@@ -2,17 +2,33 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import FormInput from "./FormInput";
+import { FormInput } from "./FormInput";
 import { Upload } from "lucide-react";
 import { validateZod } from "@/hooks/useZodValidator";
-import { userSchema } from "@/lib/RegisterSchemas";
+import {
+  createRegisterValidationMessages,
+  createUserSchema,
+} from "@/lib/RegisterSchemas";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { API_BASE_URL } from "@/lib/constants";
 import { useTranslations } from "next-intl";
 
+type UserFormSection = {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  password?: string;
+  phone?: string;
+  profileFile?: File | null;
+  profilePreviewUrl?: string;
+  profileUrl?: string;
+};
+
 interface Props {
-  formData: any;
-  updateFormData: (section: string, data: any) => void;
+  formData: {
+    user?: UserFormSection;
+  };
+  updateFormData: (section: string, data: Record<string, unknown>) => void;
   next: () => void;
 }
 
@@ -50,10 +66,16 @@ const isValidEmailFormat = (email: string) => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
-export default function UserInfoStep({ formData, updateFormData, next }: Props) {
+export function UserInfoStep({ formData, updateFormData, next }: Props) {
   const tCommon = useTranslations("common");
   const tRegister = useTranslations("register");
   const tValidation = useTranslations("validation");
+  const validationMessages = useMemo(() => {
+    return createRegisterValidationMessages(tValidation);
+  }, [tValidation]);
+  const translatedUserSchema = useMemo(() => {
+    return createUserSchema(validationMessages);
+  }, [validationMessages]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -255,7 +277,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   /* ---------------- VALIDATE SINGLE FIELD (BLUR) ---------------- */
 
   const validateField = (field: string) => {
-    const result = userSchema.safeParse(formData.user);
+    const result = translatedUserSchema.safeParse(formData.user);
 
     if (!result.success) {
       const fieldError = result.error.issues.find(
@@ -301,7 +323,10 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   /* ---------------- VALIDATION (NEXT STEP) ---------------- */
 
   const handleNext = () => {
-    const { success, errors } = validateZod(userSchema, formData.user);
+    const { success, errors } = validateZod(
+      translatedUserSchema,
+      formData.user
+    );
 
     if (!success) {
       setErrors(errors);

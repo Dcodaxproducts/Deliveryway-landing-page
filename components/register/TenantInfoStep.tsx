@@ -1,25 +1,59 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
-import FormInput from "./form/FormInput";
-import FormSelect from "./form/FormSelect";
+import { FormInput } from "./form/FormInput";
+import { FormSelect } from "./form/FormSelect";
 import { validateZod } from "@/hooks/useZodValidator";
-import { restaurantSchema, tenantSchema } from "@/lib/RegisterSchemas";
+import {
+  createRegisterValidationMessages,
+  createRestaurantSchema,
+  createTenantSchema,
+} from "@/lib/RegisterSchemas";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useTranslations } from "next-intl";
 import type { RefObject } from "react";
 import type { ZodTypeAny } from "zod";
 
+type TenantSection = {
+  bio?: string;
+  logoFile?: File | null;
+  logoPreviewUrl?: string;
+  logoUrl?: string;
+  name?: string;
+};
+
+type RestaurantSection = {
+  branding: {
+    fontFamily?: string;
+    primaryColor?: string;
+    secondaryColor?: string;
+  };
+  logoFile?: File | null;
+  logoPreviewUrl?: string;
+  logoUrl?: string;
+  name?: string;
+  slug?: string;
+  supportContact: {
+    email?: string;
+    phone?: string;
+    whatsapp?: string;
+  };
+  tagline?: string;
+};
+
 interface Props {
-  formData: any;
-  updateFormData: (section: string, data: any) => void;
+  formData: {
+    restaurant: RestaurantSection;
+    tenant: TenantSection;
+  };
+  updateFormData: (section: string, data: Record<string, unknown>) => void;
   next: () => void;
   back: () => void;
 }
 
-export default function TenantInfoStep({
+export function TenantInfoStep({
   formData,
   updateFormData,
   next,
@@ -28,6 +62,15 @@ export default function TenantInfoStep({
   const tCommon = useTranslations("common");
   const tRegister = useTranslations("register");
   const tValidation = useTranslations("validation");
+  const validationMessages = useMemo(() => {
+    return createRegisterValidationMessages(tValidation);
+  }, [tValidation]);
+  const translatedTenantSchema = useMemo(() => {
+    return createTenantSchema(validationMessages);
+  }, [validationMessages]);
+  const translatedRestaurantSchema = useMemo(() => {
+    return createRestaurantSchema(validationMessages);
+  }, [validationMessages]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 /* ---------------- SLUG GENERATOR ---------------- */
 const { uploadFile, uploading, progress } = useFileUpload();
@@ -195,9 +238,13 @@ const handleRestaurantLogoChange = async (
   /* ---------------- NEXT VALIDATION ---------------- */
 
   const handleNext = () => {
-    const tenant = validateZod(tenantSchema, formData.tenant, "tenant");
+    const tenant = validateZod(
+      translatedTenantSchema,
+      formData.tenant,
+      "tenant"
+    );
     const restaurant = validateZod(
-      restaurantSchema,
+      translatedRestaurantSchema,
       formData.restaurant,
       "restaurant"
     );
@@ -255,7 +302,9 @@ const handleRestaurantLogoChange = async (
               updateFormData("tenant", { name: val });
               clearError("tenant.name");
             }}
-            onBlur={() => validateField(tenantSchema, formData.tenant, "name")}
+            onBlur={() =>
+              validateField(translatedTenantSchema, formData.tenant, "name")
+            }
           />
           {errors["tenant.name"] && (
             <p className="text-red-500 text-xs mt-1">
@@ -332,7 +381,9 @@ const handleRestaurantLogoChange = async (
               updateFormData("tenant", { bio: val });
               clearError("tenant.bio");
             }}
-            onBlur={() => validateField(tenantSchema, formData.tenant, "bio")}
+            onBlur={() =>
+              validateField(translatedTenantSchema, formData.tenant, "bio")
+            }
           />
           {errors["tenant.bio"] && (
             <p className="text-red-500 text-xs mt-1">
@@ -366,7 +417,11 @@ const handleRestaurantLogoChange = async (
   clearError("restaurant.slug");
 }}
             onBlur={() =>
-              validateField(restaurantSchema, formData.restaurant, "name")
+              validateField(
+                translatedRestaurantSchema,
+                formData.restaurant,
+                "name"
+              )
             }
           />
           {errors["restaurant.name"] && (
@@ -460,7 +515,11 @@ const handleRestaurantLogoChange = async (
               clearError("restaurant.tagline");
             }}
             onBlur={() =>
-              validateField(restaurantSchema, formData.restaurant, "tagline")
+              validateField(
+                translatedRestaurantSchema,
+                formData.restaurant,
+                "tagline"
+              )
             }
           />
           {errors["restaurant.tagline"] && (

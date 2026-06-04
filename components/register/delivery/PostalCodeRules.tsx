@@ -1,6 +1,6 @@
 "use client";
 
-import FormInput from "@/components/register/form/FormInput";
+import { FormInput } from "@/components/register/form/FormInput";
 import { toInputNumber } from "@/lib/delivery-area";
 import type { PostalCodeRule } from "@/types/delivery";
 import { Copy, Plus, Trash2 } from "lucide-react";

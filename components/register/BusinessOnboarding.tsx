@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { StorePublished } from "./StorePublished";
-import UserInfoStep from "./form/UserInfoStep";
-import TenantInfoStep from "./TenantInfoStep";
+import { UserInfoStep } from "./form/UserInfoStep";
+import { TenantInfoStep } from "./TenantInfoStep";
 import { BranchStep } from "./BranchStep";
 import { SettingsStep } from "./SettingsStep";
 import { API_BASE_URL } from "@/lib/constants";

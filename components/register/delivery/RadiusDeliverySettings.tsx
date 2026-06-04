@@ -1,6 +1,6 @@
 "use client";
 
-import FormInput from "@/components/register/form/FormInput";
+import { FormInput } from "@/components/register/form/FormInput";
 import { Button } from "@/components/ui/button";
 import { toInputNumber } from "@/lib/delivery-area";
 import type { DeliveryZoneBand } from "@/types/delivery";
