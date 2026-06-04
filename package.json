@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck && npm run build"
+    "check:i18n": "node scripts/check-i18n-messages.mjs",
+    "check": "npm run lint && npm run typecheck && npm run check:i18n && npm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

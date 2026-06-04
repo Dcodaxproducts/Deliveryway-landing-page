@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
@@ -11,27 +11,46 @@ import {
   UtensilsCrossed,
   Check,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-export default function OrdersPublishStep() {
-  const [activeTab, setActiveTab] = useState<"orders" | "publish">("orders");
+type OrdersPublishTab = "orders" | "publish";
+
+const ORDER_TYPES = [
+  {
+    labelKey: "settings.orderTypes.takeaway.label",
+    descriptionKey: "settings.orderTypes.takeaway.description",
+    icon: <ShoppingBag className="text-primary" size={28} />,
+    enabled: true,
+  },
+  {
+    labelKey: "settings.orderTypes.delivery.label",
+    descriptionKey: "settings.orderTypes.delivery.description",
+    icon: <Bike className="text-primary" size={28} />,
+  },
+  {
+    labelKey: "settings.orderTypes.dineIn.label",
+    descriptionKey: "settings.orderTypes.dineIn.description",
+    icon: <UtensilsCrossed className="text-primary" size={28} />,
+  },
+];
+
+export function OrdersPublishStep() {
+  const tCommon = useTranslations("common");
+  const tRegister = useTranslations("register");
+  const [activeTab, setActiveTab] = useState<OrdersPublishTab>("orders");
 
   return (
     <div className="max-w-6xl mx-auto bg-white rounded-xl p-8">
       {/* ================= TABS ================= */}
       <div className="flex justify-center gap-12 mb-12 relative">
-        {["orders", "publish"].map((tab) => (
-          <button
+        {(["orders", "publish"] as OrdersPublishTab[]).map((tab) => (
+          <TabButton
             key={tab}
-            onClick={() => setActiveTab(tab as "orders" | "publish")}
-            className={`text-sm font-medium pb-2 relative ${
-              activeTab === tab ? "text-black" : "text-gray-600"
-            }`}
-          >
-            {tab === "orders" ? "Orders" : "Publish"}
-            {activeTab === tab && (
-              <span className="absolute left-[-14px] right-[-14px] -bottom-1 h-[2px] bg-primary rounded-full" />
-            )}
-          </button>
+            active={activeTab === tab}
+            label={tRegister(`ordersPublish.tabs.${tab}`)}
+            tab={tab}
+            onSelect={setActiveTab}
+          />
         ))}
       </div>
 
@@ -41,36 +60,24 @@ export default function OrdersPublishStep() {
         <div className="px-20">
           {/* Order Types */}
           <h2 className="text-lg font-semibold mb-6">
-            Order Types Supported
+            {tRegister("settings.title")}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Takeaway */}
-            <OrderTypeCard
-              icon={<ShoppingBag className="text-primary" size={28} />}
-              title="Takeaway"
-              description="Customers collect orders from you"
-              enabled
-            />
-
-            {/* Delivery */}
-            <OrderTypeCard
-              icon={<Bike className="text-primary" size={28} />}
-              title="Delivery"
-              description="Delivered to customer's location"
-            />
-
-            {/* Dine In */}
-            <OrderTypeCard
-              icon={<UtensilsCrossed className="text-primary" size={28} />}
-              title="Dine-in / QR"
-              description="Table service with QR code ordering"
-            />
+            {ORDER_TYPES.map((type) => (
+              <OrderTypeCard
+                key={type.labelKey}
+                icon={type.icon}
+                title={tRegister(type.labelKey)}
+                description={tRegister(type.descriptionKey)}
+                enabled={type.enabled}
+              />
+            ))}
           </div>
 
           {/* Order Processing */}
           <h2 className="text-lg font-semibold mt-12 mb-4">
-            Order Processing
+            {tRegister("ordersPublish.orderProcessing")}
           </h2>
 
           <div className="flex items-center justify-between bg-[#F5F5F5] rounded-xl px-6 py-5">
@@ -78,7 +85,9 @@ export default function OrdersPublishStep() {
               <span className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
                 <Check className="text-white" size={14} />
               </span>
-              <span className="font-medium">Auto-Accept Orders</span>
+              <span className="font-medium">
+                {tRegister("branch.delivery.automation.autoAcceptLabel")}
+              </span>
             </div>
 
             <Switch />
@@ -87,7 +96,7 @@ export default function OrdersPublishStep() {
           {/* Footer */}
           <div className="flex justify-end mt-12">
             <Button className="bg-primary hover:bg-red-800 px-16 py-3 rounded-[14px]">
-              Save & Continue
+              {tCommon("actions.saveContinue")}
             </Button>
           </div>
           </div>
@@ -99,15 +108,17 @@ export default function OrdersPublishStep() {
         <>
           <div className="max-w-xl mx-auto">
             <h2 className="text-lg font-semibold mb-6">
-              Store Username
+              {tRegister("publish.storeUsername")}
             </h2>
 
             {/* Store Name */}
             <div className="mb-6">
-              <Label className="mb-2 block">Name*</Label>
+              <Label className="mb-2 block">
+                {tRegister("publish.nameLabel")}
+              </Label>
               <div className="flex items-center gap-2">
                 <Input
-                  placeholder="Unique URL"
+                  placeholder={tRegister("publish.uniqueUrl")}
                   className="border-[#BBBBBB]"
                 />
                 <span className="text-sm text-gray-600">
@@ -115,13 +126,15 @@ export default function OrdersPublishStep() {
                 </span>
               </div>
               <p className="text-xs text-gray-600 mt-2">
-                Choose a unique username for your store URL
+                {tRegister("publish.chooseUniqueUsername")}
               </p>
             </div>
 
             {/* Suggestions */}
             <div className="mb-6">
-              <p className="text-sm font-medium mb-2">Suggestions</p>
+              <p className="text-sm font-medium mb-2">
+                {tRegister("publish.suggestions")}
+              </p>
               <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-600">
                 <span>example</span>
                 <span>example</span>
@@ -133,7 +146,7 @@ export default function OrdersPublishStep() {
             {/* Preview URL */}
             <div className="bg-[#F8F8F8] rounded-xl p-4 mb-8">
               <p className="text-sm text-primary font-medium">
-                Preview URL Link
+                {tRegister("publish.previewUrl")}
               </p>
               <p className="text-xs text-gray-600 mt-1">
                 https://food.com
@@ -143,7 +156,7 @@ export default function OrdersPublishStep() {
             {/* Publish Button */}
             <div className="flex justify-end">
               <Button className="bg-primary hover:bg-red-800 px-20 py-3 rounded-[14px]">
-                Publish Store
+                {tRegister("publish.publishStore")}
               </Button>
             </div>
           </div>
@@ -154,6 +167,36 @@ export default function OrdersPublishStep() {
 }
 
 /* ================= REUSABLE CARD ================= */
+
+function TabButton({
+  active,
+  label,
+  onSelect,
+  tab,
+}: {
+  active: boolean;
+  label: string;
+  onSelect: (tab: OrdersPublishTab) => void;
+  tab: OrdersPublishTab;
+}) {
+  const handleClick = useCallback(() => {
+    onSelect(tab);
+  }, [onSelect, tab]);
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`text-sm font-medium pb-2 relative ${
+        active ? "text-black" : "text-gray-600"
+      }`}
+    >
+      {label}
+      {active && (
+        <span className="absolute left-[-14px] right-[-14px] -bottom-1 h-[2px] bg-primary rounded-full" />
+      )}
+    </button>
+  );
+}
 
 function OrderTypeCard({
   icon,

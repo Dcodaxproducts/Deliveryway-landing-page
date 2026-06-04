@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import QRCode from "react-qr-code";
 import { toPng } from "html-to-image";
 import { Button } from "@/components/ui/button";
@@ -18,12 +18,39 @@ import {
   Store,
   UserRound,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 interface Props {
-  formData: any;
-  publishedData: any;
+  formData: OnboardingPublishedFormData;
+  publishedData: PublishedResponseData | null;
 }
+
+type OnboardingPublishedFormData = {
+  branch?: {
+    name?: string;
+  };
+  restaurant?: {
+    name?: string;
+  };
+  tenant?: {
+    name?: string;
+  };
+  user?: {
+    email?: string;
+  };
+};
+
+type PublishedResponseData = {
+  branchId?: unknown;
+  ownerId?: unknown;
+  restaurant?: {
+    id?: unknown;
+    restaurantId?: unknown;
+  };
+  restaurantId?: unknown;
+  tenantId?: unknown;
+};
 
 const normalizeBaseUrl = (url: string) => {
   return url.replace(/\/+$/, "");
@@ -37,9 +64,14 @@ const sanitizeFileName = (value?: string) => {
     .replace(/^-+|-+$/g, "");
 };
 
-const getValue = (value: any, fallback = "Not available") => {
+const getOptionalString = (value: unknown) => {
+  if (value === null || value === undefined || value === "") return "";
+  return String(value);
+};
+
+const getValue = (value: unknown, fallback: string) => {
   if (value === null || value === undefined || value === "") return fallback;
-  return value;
+  return String(value);
 };
 
 function InfoCard({
@@ -71,38 +103,45 @@ function InfoCard({
   );
 }
 
-function IdRow({ label, value }: { label: string; value: any }) {
+function IdRow({
+  fallback,
+  label,
+  value,
+}: {
+  fallback: string;
+  label: string;
+  value: unknown;
+}) {
   return (
     <div className="flex flex-col gap-1 rounded-xl bg-gray-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
       <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
         {label}
       </span>
       <span className="text-sm font-semibold text-gray-800 break-all">
-        {getValue(value)}
+        {getValue(value, fallback)}
       </span>
     </div>
   );
 }
 
-export default function StorePublished({ formData, publishedData }: Props) {
+export function StorePublished({ formData, publishedData }: Props) {
+  const tRegister = useTranslations("register");
   const qrRef = useRef<HTMLDivElement>(null);
   const [copying, setCopying] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
-  const baseUrl = useMemo(() => {
-    return normalizeBaseUrl(
-      process.env.NEXT_PUBLIC_ADMIN_URL ||
-        "https://saas-restaurant-admin-dashboard.vercel.app"
-    );
-  }, []);
+  const baseUrl = normalizeBaseUrl(
+    process.env.NEXT_PUBLIC_ADMIN_URL ||
+      "https://saas-restaurant-admin-dashboard.vercel.app"
+  );
 
-  const restaurantId =
+  const restaurantId = getOptionalString(
     publishedData?.restaurantId ||
-    publishedData?.restaurant?.id ||
-    publishedData?.restaurant?.restaurantId ||
-    "";
+      publishedData?.restaurant?.id ||
+      publishedData?.restaurant?.restaurantId
+  );
 
-  const loginUrl = useMemo(() => {
+  const loginUrl = (() => {
     const params = new URLSearchParams();
 
     if (formData?.user?.email) {
@@ -114,12 +153,22 @@ export default function StorePublished({ formData, publishedData }: Props) {
     }
 
     return `${baseUrl}/login${params.toString() ? `?${params.toString()}` : ""}`;
-  }, [baseUrl, formData?.user?.email, restaurantId]);
+  })();
 
-  const restaurantName = getValue(formData?.restaurant?.name, "Your Restaurant");
-  const branchName = getValue(formData?.branch?.name, "Main Branch");
-  const ownerEmail = getValue(formData?.user?.email);
-  const tenantName = getValue(formData?.tenant?.name, "Business Account");
+  const notAvailable = tRegister("published.fallbacks.notAvailable");
+  const restaurantName = getValue(
+    formData?.restaurant?.name,
+    tRegister("published.fallbacks.yourRestaurant")
+  );
+  const branchName = getValue(
+    formData?.branch?.name,
+    tRegister("published.fallbacks.mainBranch")
+  );
+  const ownerEmail = getValue(formData?.user?.email, notAvailable);
+  const tenantName = getValue(
+    formData?.tenant?.name,
+    tRegister("published.fallbacks.businessAccount")
+  );
 
   const openDashboard = () => {
     window.open(loginUrl, "_blank", "noopener,noreferrer");
@@ -129,9 +178,9 @@ export default function StorePublished({ formData, publishedData }: Props) {
     try {
       setCopying(true);
       await navigator.clipboard.writeText(loginUrl);
-      toast.success("Dashboard link copied");
+      toast.success(tRegister("published.toasts.dashboardLinkCopied"));
     } catch {
-      toast.error("Unable to copy dashboard link");
+      toast.error(tRegister("published.toasts.dashboardLinkCopyFailed"));
     } finally {
       setCopying(false);
     }
@@ -154,9 +203,9 @@ export default function StorePublished({ formData, publishedData }: Props) {
       link.href = dataUrl;
       link.click();
 
-      toast.success("QR code downloaded");
+      toast.success(tRegister("published.toasts.qrDownloaded"));
     } catch {
-      toast.error("Unable to download QR code");
+      toast.error(tRegister("published.toasts.qrDownloadFailed"));
     } finally {
       setDownloading(false);
     }
@@ -174,17 +223,15 @@ export default function StorePublished({ formData, publishedData }: Props) {
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-white/90 backdrop-blur">
                 <CheckCircle2 size={18} className="text-green-300" />
-                Store setup completed successfully
+                {tRegister("published.successBadge")}
               </div>
 
               <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                Your store is now live
+                {tRegister("published.title")}
               </h1>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70 sm:text-base">
-                Your business account, restaurant profile, branch setup, and
-                dashboard access are ready. Use the secure login link or scan
-                the QR code to access the admin dashboard.
+                {tRegister("published.description")}
               </p>
             </div>
 
@@ -193,7 +240,7 @@ export default function StorePublished({ formData, publishedData }: Props) {
                 onClick={openDashboard}
                 className="h-12 rounded-xl bg-white px-6 text-gray-950 hover:bg-gray-100"
               >
-                Open Dashboard
+                {tRegister("published.actions.openDashboard")}
                 <ArrowRight size={18} className="ml-2" />
               </Button>
 
@@ -205,7 +252,9 @@ export default function StorePublished({ formData, publishedData }: Props) {
                 className="h-12 rounded-xl border-white/20 bg-white/10 px-6 text-white hover:bg-white/20 hover:text-white"
               >
                 <Copy size={17} className="mr-2" />
-                {copying ? "Copying..." : "Copy Link"}
+                {copying
+                  ? tRegister("published.actions.copying")
+                  : tRegister("published.actions.copyLink")}
               </Button>
             </div>
           </div>
@@ -220,40 +269,40 @@ export default function StorePublished({ formData, publishedData }: Props) {
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    Business Summary
+                    {tRegister("published.summary.title")}
                   </h2>
                   <p className="mt-1 text-sm text-gray-500">
-                    Review the details created during onboarding.
+                    {tRegister("published.summary.description")}
                   </p>
                 </div>
 
                 <span className="w-fit rounded-full bg-green-50 px-4 py-2 text-xs font-semibold text-green-700">
-                  Active
+                  {tRegister("published.summary.active")}
                 </span>
               </div>
 
               <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <InfoCard
                   icon={<Store size={20} />}
-                  label="Restaurant"
+                  label={tRegister("published.labels.restaurant")}
                   value={restaurantName}
                 />
 
                 <InfoCard
                   icon={<Building2 size={20} />}
-                  label="Tenant"
+                  label={tRegister("published.labels.tenant")}
                   value={tenantName}
                 />
 
                 <InfoCard
                   icon={<MapPin size={20} />}
-                  label="Branch"
+                  label={tRegister("published.labels.branch")}
                   value={branchName}
                 />
 
                 <InfoCard
                   icon={<Mail size={20} />}
-                  label="Owner Email"
+                  label={tRegister("published.labels.ownerEmail")}
                   value={ownerEmail}
                 />
               </div>
@@ -268,19 +317,17 @@ export default function StorePublished({ formData, publishedData }: Props) {
 
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    Dashboard Access
+                    {tRegister("published.dashboardAccess.title")}
                   </h2>
                   <p className="mt-1 text-sm leading-6 text-gray-500">
-                    The owner can sign in using the registered email address.
-                    The dashboard link includes the restaurant context for a
-                    smoother login experience.
+                    {tRegister("published.dashboardAccess.description")}
                   </p>
                 </div>
               </div>
 
               <div className="mt-5 rounded-2xl border border-gray-100 bg-gray-50 p-4">
                 <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                  Login URL
+                  {tRegister("published.dashboardAccess.loginUrl")}
                 </p>
 
                 <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-center">
@@ -304,7 +351,7 @@ export default function StorePublished({ formData, publishedData }: Props) {
                       onClick={openDashboard}
                       className="rounded-xl p-2"
                     >
-                      Open
+                      {tRegister("published.actions.open")}
                       <ExternalLink size={16}  />
                     </Button>
                   </div>
@@ -321,20 +368,35 @@ export default function StorePublished({ formData, publishedData }: Props) {
 
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    System References
+                    {tRegister("published.systemReferences.title")}
                   </h2>
                   <p className="mt-1 text-sm text-gray-500">
-                    Internal IDs generated by the platform after successful
-                    onboarding.
+                    {tRegister("published.systemReferences.description")}
                   </p>
                 </div>
               </div>
 
               <div className="mt-5 grid grid-cols-1 gap-3">
-                <IdRow label="Owner ID" value={publishedData?.ownerId} />
-                <IdRow label="Tenant ID" value={publishedData?.tenantId} />
-                <IdRow label="Restaurant ID" value={restaurantId} />
-                <IdRow label="Branch ID" value={publishedData?.branchId} />
+                <IdRow
+                  fallback={notAvailable}
+                  label={tRegister("published.labels.ownerId")}
+                  value={publishedData?.ownerId}
+                />
+                <IdRow
+                  fallback={notAvailable}
+                  label={tRegister("published.labels.tenantId")}
+                  value={publishedData?.tenantId}
+                />
+                <IdRow
+                  fallback={notAvailable}
+                  label={tRegister("published.labels.restaurantId")}
+                  value={restaurantId}
+                />
+                <IdRow
+                  fallback={notAvailable}
+                  label={tRegister("published.labels.branchId")}
+                  value={publishedData?.branchId}
+                />
               </div>
             </div>
           </div>
@@ -347,12 +409,11 @@ export default function StorePublished({ formData, publishedData }: Props) {
               </div>
 
               <h2 className="text-lg font-semibold text-gray-900">
-                Quick Login QR
+                {tRegister("published.qr.title")}
               </h2>
 
               <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-gray-500">
-                Scan this QR code to open the admin dashboard login page
-                directly.
+                {tRegister("published.qr.description")}
               </p>
 
               <div className="mt-6 rounded-3xl bg-gray-50 p-5">
@@ -365,7 +426,7 @@ export default function StorePublished({ formData, publishedData }: Props) {
 
                 <div className="mt-5 rounded-2xl bg-white px-4 py-3 text-left">
                   <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                    Linked Email
+                    {tRegister("published.qr.linkedEmail")}
                   </p>
                   <p className="mt-1 break-all text-sm font-semibold text-gray-900">
                     {ownerEmail}
@@ -379,7 +440,7 @@ export default function StorePublished({ formData, publishedData }: Props) {
                   onClick={openDashboard}
                   className="h-12 rounded-xl"
                 >
-                  Visit Dashboard
+                  {tRegister("published.actions.visitDashboard")}
                   <ExternalLink size={17} className="ml-2" />
                 </Button>
 
@@ -391,14 +452,14 @@ export default function StorePublished({ formData, publishedData }: Props) {
                   className="h-12 rounded-xl"
                 >
                   <Download size={17} className="mr-2" />
-                  {downloading ? "Downloading..." : "Download QR Code"}
+                  {downloading
+                    ? tRegister("published.actions.downloading")
+                    : tRegister("published.actions.downloadQr")}
                 </Button>
               </div>
 
               <p className="mt-5 text-xs leading-5 text-gray-400">
-                Share this QR only with authorized business users. Anyone with
-                the link can open the login page, but authentication is still
-                required.
+                {tRegister("published.qr.securityNote")}
               </p>
             </div>
           </div>

@@ -2,16 +2,27 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import StorePublished from "./StorePublished";
+import { StorePublished } from "./StorePublished";
 import UserInfoStep from "./form/UserInfoStep";
 import TenantInfoStep from "./TenantInfoStep";
 import { BranchStep } from "./BranchStep";
-import SettingsStep from "./SettingsStep";
+import { SettingsStep } from "./SettingsStep";
 import { API_BASE_URL } from "@/lib/constants";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+
+type PublishedResponseData = {
+  branchId?: unknown;
+  ownerId?: unknown;
+  restaurant?: {
+    id?: unknown;
+    restaurantId?: unknown;
+  };
+  restaurantId?: unknown;
+  tenantId?: unknown;
+};
 
 type OnboardingStepConfig = {
   id: number;
@@ -83,6 +94,13 @@ const normalizeArray = (value: unknown) => {
 
 const normalizePlainObject = (value: unknown): PlainObject => {
   return isPlainObject(value) ? value : {};
+};
+
+const omitAuthTokens = (value: PlainObject): PublishedResponseData => {
+  const { accessToken, token, ...rest } = value;
+  void accessToken;
+  void token;
+  return rest;
 };
 
 const normalizeDeliveryMode = (mode: unknown) => {
@@ -222,7 +240,7 @@ const buildBranchSettingsPayload = (settingsValue: unknown) => {
 export function BusinessOnboarding() {
   const tRegister = useTranslations("register");
   const [activeStep, setActiveStep] = useState<number>(1);
-  const [publishedData, setPublishedData] = useState<unknown>(null);
+  const [publishedData, setPublishedData] = useState<PublishedResponseData | null>(null);
 
   /* ================= OTP STATES ================= */
 
@@ -517,10 +535,7 @@ export function BusinessOnboarding() {
 
       const token = extractAccessToken(data);
 
-      const { accessToken: _accessToken, token: _token, ...rest } =
-        nestedResponseData;
-
-      setPublishedData(rest);
+      setPublishedData(omitAuthTokens(nestedResponseData));
 
       if (!token) {
         toast.error(tRegister("toasts.accessTokenMissing"));

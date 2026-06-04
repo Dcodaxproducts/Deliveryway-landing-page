@@ -2,141 +2,117 @@
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import FormInput from "./form/FormInput";
-import { ShoppingBag, Bike, UtensilsCrossed } from "lucide-react";
+import { Bike, ShoppingBag, UtensilsCrossed } from "lucide-react";
+import { useTranslations } from "next-intl";
+import type { BranchSettingsValue, RegisterFormData } from "@/types/register";
 
 interface Props {
-  formData: any;
-  updateFormData: (section: string, data: any) => void;
+  formData: RegisterFormData;
+  updateFormData: (section: string, data: Record<string, unknown>) => void;
   next: () => void;
   back: () => void;
   isLoading: boolean;
 }
 
-export default function SettingsStep({ formData, updateFormData, next, back, isLoading }: Props) {
-  const settings = formData.branch.settings;
-  const orderTypes = [
+type OrderTypeValue = "TAKEAWAY" | "DELIVERY" | "DINE_IN";
+
+const ORDER_TYPES: {
+  descriptionKey: string;
+  icon: React.ReactNode;
+  labelKey: string;
+  value: OrderTypeValue;
+}[] = [
   {
-    label: "Takeaway",
+    labelKey: "settings.orderTypes.takeaway.label",
     value: "TAKEAWAY",
-    description: "Customers collect orders from you",
+    descriptionKey: "settings.orderTypes.takeaway.description",
     icon: <ShoppingBag className="text-primary" size={28} />,
   },
   {
-    label: "Delivery",
+    labelKey: "settings.orderTypes.delivery.label",
     value: "DELIVERY",
-    description: "Delivered to customer's location",
+    descriptionKey: "settings.orderTypes.delivery.description",
     icon: <Bike className="text-primary" size={28} />,
   },
   {
-    label: "Dine-in / QR",
+    labelKey: "settings.orderTypes.dineIn.label",
     value: "DINE_IN",
-    description: "Table service with QR code ordering",
+    descriptionKey: "settings.orderTypes.dineIn.description",
     icon: <UtensilsCrossed className="text-primary" size={28} />,
   },
 ];
-const paymentMethods = [
-  { label: "Cash on Delivery", value: "COD" },
-  { label: "Stripe", value: "STRIPE" },
-  { label: "JazzCash", value: "JAZZCASH" },
-];
-  const toggleFreeDelivery = (value: boolean) => {
-    updateFormData("branch", { settings: { ...settings, isFreeDelivery: value } });
-  };
 
-  const toggleAutoAccept = (value: boolean) => {
-    updateFormData("branch", { settings: { ...settings, autoAcceptOrders: value } });
-  };
+const getStringArray = (value: unknown) => {
+  return Array.isArray(value) ? value.map(String) : [];
+};
 
-  const updateField = (field: keyof typeof settings, value: string) => {
+export function SettingsStep({
+  formData,
+  updateFormData,
+  next,
+  back,
+  isLoading,
+}: Props) {
+  const tCommon = useTranslations("common");
+  const tRegister = useTranslations("register");
+  const settings = formData.branch?.settings || {};
+  const allowedOrderTypes = getStringArray(settings.allowedOrderTypes);
+
+  const updateField = (field: keyof BranchSettingsValue, value: unknown) => {
     updateFormData("branch", { settings: { ...settings, [field]: value } });
   };
 
-  const toggleOrderType = (type: string) => {
-    const updated = settings.allowedOrderTypes.includes(type)
-      ? settings.allowedOrderTypes.filter((t: string) => t !== type)
-      : [...settings.allowedOrderTypes, type];
+  const toggleOrderType = (type: OrderTypeValue) => {
+    const updated = allowedOrderTypes.includes(type)
+      ? allowedOrderTypes.filter((item) => item !== type)
+      : [...allowedOrderTypes, type];
     updateField("allowedOrderTypes", updated);
-  };
-
-  const togglePaymentMethod = (method: string) => {
-    const updated = settings.allowedPaymentMethods.includes(method)
-      ? settings.allowedPaymentMethods.filter((m: string) => m !== method)
-      : [...settings.allowedPaymentMethods, method];
-    updateField("allowedPaymentMethods", updated);
   };
 
   return (
     <div className="max-w-5xl mx-auto bg-white rounded-xl p-8">
-
-   
-  
       {/* ORDER TYPES */}
       <h2 className="text-[20px] font-semibold text-gray-900 mb-6">
-        Order Types Supported
+        {tRegister("settings.title")}
       </h2>
 
-     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-  {orderTypes.map((type) => (
-    <OrderTypeCard
-      key={type.value}
-      icon={type.icon}
-      title={type.label}
-      description={type.description}
-      enabled={settings.allowedOrderTypes.includes(type.value)}
-      onToggle={() => toggleOrderType(type.value)}
-    />
-  ))}
-</div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {ORDER_TYPES.map((type) => (
+          <OrderTypeCard
+            key={type.value}
+            icon={type.icon}
+            title={tRegister(type.labelKey)}
+            description={tRegister(type.descriptionKey)}
+            enabled={allowedOrderTypes.includes(type.value)}
+            onToggle={() => toggleOrderType(type.value)}
+          />
+        ))}
+      </div>
 
-      {/* PAYMENT METHODS */}
-      {/* <h2 className="text-[20px] font-semibold text-gray-900 mb-6">
-        Payment Methods
-      </h2> */}
-
-      {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-        {paymentMethods.map((method) => (
-    <div
-      key={method.value}
-      className="flex items-center justify-between bg-[#F5F5F5] rounded-xl px-6 py-5"
-    >
-      <span className="font-medium">{method.label}</span>
-
-      <Switch
-        checked={settings.allowedPaymentMethods.includes(method.value)}
-        onCheckedChange={() => togglePaymentMethod(method.value)}
-      />
-    </div>
-  ))}
-      </div> */}
-
-      {/* ORDER PROCESSING */}
-    
       {/* FOOTER */}
       <div className="flex justify-between items-center">
         <Button
           onClick={back}
           className="px-6 py-2 rounded-full bg-[#F5F5F5] text-sm text-gray-500"
         >
-          Back
+          {tCommon("actions.back")}
         </Button>
 
-       <Button
-  onClick={next}
-  disabled={isLoading}
-  className="bg-primary hover:bg-red-800 px-16 py-2.5 rounded-[10px] flex items-center justify-center min-w-[180px]"
->
-  {isLoading ? (
-    <>
-      <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-      Publishing...
-    </>
-  ) : (
-    "Publish"
-  )}
-</Button>
+        <Button
+          onClick={next}
+          disabled={isLoading}
+          className="bg-primary hover:bg-red-800 px-16 py-2.5 rounded-[10px] flex items-center justify-center min-w-[180px]"
+        >
+          {isLoading ? (
+            <>
+              <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+              {tRegister("settings.actions.publishing")}
+            </>
+          ) : (
+            tRegister("settings.actions.publish")
+          )}
+        </Button>
       </div>
-
     </div>
   );
 }

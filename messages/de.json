@@ -1005,6 +1005,99 @@
       "accessTokenMissing": "Access Token nicht erhalten",
       "registrationSuccessful": "Registrierung erfolgreich! Bitte verifizieren Sie den OTP.",
       "genericError": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+    },
+    "settings": {
+      "title": "Unterstützte Bestellarten",
+      "orderTypes": {
+        "takeaway": {
+          "label": "Abholung",
+          "description": "Kunden holen Bestellungen bei Ihnen ab"
+        },
+        "delivery": {
+          "label": "Lieferung",
+          "description": "Lieferung an den Standort des Kunden"
+        },
+        "dineIn": {
+          "label": "Vor Ort / QR",
+          "description": "Tischservice mit QR-Code-Bestellung"
+        }
+      },
+      "actions": {
+        "publish": "Veröffentlichen",
+        "publishing": "Wird veröffentlicht..."
+      }
+    },
+    "ordersPublish": {
+      "tabs": {
+        "orders": "Bestellungen",
+        "publish": "Veröffentlichen"
+      },
+      "orderProcessing": "Bestellverarbeitung"
+    },
+    "publish": {
+      "storeUsername": "Store-Benutzername",
+      "nameLabel": "Name*",
+      "uniqueUrl": "Eindeutige URL",
+      "chooseUniqueUsername": "Wählen Sie einen eindeutigen Benutzernamen für Ihre Store-URL",
+      "suggestions": "Vorschläge",
+      "previewUrl": "Vorschau-URL-Link",
+      "publishStore": "Store veröffentlichen"
+    },
+    "published": {
+      "successBadge": "Store-Einrichtung erfolgreich abgeschlossen",
+      "title": "Ihr Store ist jetzt live",
+      "description": "Ihr Geschäftskonto, Restaurantprofil, Ihre Filiale und der Dashboard-Zugang sind bereit. Verwenden Sie den sicheren Login-Link oder scannen Sie den QR-Code, um auf das Admin-Dashboard zuzugreifen.",
+      "actions": {
+        "openDashboard": "Dashboard öffnen",
+        "copyLink": "Link kopieren",
+        "copying": "Wird kopiert...",
+        "open": "Öffnen",
+        "visitDashboard": "Dashboard besuchen",
+        "downloadQr": "QR herunterladen",
+        "downloading": "Wird heruntergeladen..."
+      },
+      "toasts": {
+        "dashboardLinkCopied": "Dashboard-Link kopiert",
+        "dashboardLinkCopyFailed": "Dashboard-Link konnte nicht kopiert werden",
+        "qrDownloaded": "QR-Code heruntergeladen",
+        "qrDownloadFailed": "QR-Code konnte nicht heruntergeladen werden"
+      },
+      "summary": {
+        "title": "Store-Zusammenfassung",
+        "description": "Prüfen Sie die während des Onboardings erstellten Details.",
+        "active": "Aktiv"
+      },
+      "dashboardAccess": {
+        "title": "Dashboard-Zugang",
+        "description": "Der Inhaber kann sich mit der registrierten E-Mail-Adresse anmelden. Der Dashboard-Link enthält den Restaurantkontext für eine reibungslosere Anmeldung.",
+        "loginUrl": "Login-URL"
+      },
+      "systemReferences": {
+        "title": "Systemreferenzen",
+        "description": "Interne IDs, die nach erfolgreichem Onboarding von der Plattform generiert wurden."
+      },
+      "qr": {
+        "title": "QR-Code",
+        "description": "Scannen Sie diesen QR-Code, um die Login-Seite des Admin-Dashboards direkt zu öffnen.",
+        "linkedEmail": "Verknüpfte E-Mail",
+        "securityNote": "Teilen Sie diesen QR-Code nur mit autorisierten Geschäftsnutzern. Jeder mit dem Link kann die Login-Seite öffnen, aber die Authentifizierung bleibt erforderlich."
+      },
+      "labels": {
+        "restaurant": "Restaurant",
+        "tenant": "Mandant",
+        "branch": "Filiale",
+        "ownerEmail": "Inhaber-E-Mail",
+        "ownerId": "Inhaber-ID",
+        "tenantId": "Mandanten-ID",
+        "restaurantId": "Restaurant-ID",
+        "branchId": "Filial-ID"
+      },
+      "fallbacks": {
+        "businessAccount": "Geschäftskonto",
+        "mainBranch": "Hauptfiliale",
+        "yourRestaurant": "Ihr Restaurant",
+        "notAvailable": "Nicht verfügbar"
+      }
     }
   },
   "forms": {
