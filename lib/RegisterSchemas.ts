@@ -323,13 +323,31 @@ export const createRestaurantSchema = (
   z.object({
     branding: z
       .object({
+        accentColor: z
+          .string()
+          .regex(/^#([0-9A-Fa-f]{3}){1,2}$/, messages.invalidHexColor)
+          .optional()
+          .or(z.literal("")),
+        backgroundColor: z
+          .string()
+          .regex(/^#([0-9A-Fa-f]{3}){1,2}$/, messages.invalidHexColor)
+          .optional()
+          .or(z.literal("")),
+        borderRadius: optionalString,
+        buttonStyle: optionalString,
         fontFamily: optionalString,
+        headingFontFamily: optionalString,
         primaryColor: z
           .string()
           .regex(/^#([0-9A-Fa-f]{3}){1,2}$/, messages.invalidHexColor)
           .optional()
           .or(z.literal("")),
         secondaryColor: z
+          .string()
+          .regex(/^#([0-9A-Fa-f]{3}){1,2}$/, messages.invalidHexColor)
+          .optional()
+          .or(z.literal("")),
+        textColor: z
           .string()
           .regex(/^#([0-9A-Fa-f]{3}){1,2}$/, messages.invalidHexColor)
           .optional()

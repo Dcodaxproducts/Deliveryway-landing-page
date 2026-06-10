@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Upload } from "lucide-react";
 import { FormInput } from "./form/FormInput";
-import { FormSelect } from "./form/FormSelect";
 import { validateZod } from "@/hooks/useZodValidator";
 import {
   createRegisterValidationMessages,
@@ -33,9 +33,15 @@ type UserSection = {
 
 type RestaurantSection = {
   branding: {
+    accentColor?: string;
+    backgroundColor?: string;
+    borderRadius?: string;
+    buttonStyle?: string;
     fontFamily?: string;
+    headingFontFamily?: string;
     primaryColor?: string;
     secondaryColor?: string;
+    textColor?: string;
   };
   logoFile?: File | null;
   logoPreviewUrl?: string;
@@ -81,20 +87,10 @@ export function TenantInfoStep({
   }, [validationMessages]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [tenantSameAsOwner, setTenantSameAsOwner] = useState(false);
-/* ---------------- SLUG GENERATOR ---------------- */
 const { uploadFile, uploading, progress } = useFileUpload();
 
 const MAX_LOGO_IMAGE_SIZE_MB = 2;
 const MAX_LOGO_IMAGE_SIZE_BYTES = MAX_LOGO_IMAGE_SIZE_MB * 1024 * 1024;
-
-const generateSlug = (name: string) => {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")   // remove special chars
-    .replace(/\s+/g, "-")           // spaces -> dash
-    .replace(/-+/g, "-");           // remove duplicate dashes
-};
 
 const scrollToInput = (input: HTMLInputElement | null) => {
   input?.scrollIntoView({
@@ -142,7 +138,6 @@ useEffect(() => {
     tenantBio: useRef<HTMLInputElement>(null),
 
     restaurantName: useRef<HTMLInputElement>(null),
-    slug: useRef<HTMLInputElement>(null),
     tagline: useRef<HTMLInputElement>(null),
 
     supportEmail: useRef<HTMLInputElement>(null),
@@ -151,6 +146,10 @@ useEffect(() => {
 
     primaryColor: useRef<HTMLInputElement>(null),
     secondaryColor: useRef<HTMLInputElement>(null),
+    accentColor: useRef<HTMLInputElement>(null),
+    backgroundColor: useRef<HTMLInputElement>(null),
+    textColor: useRef<HTMLInputElement>(null),
+    borderRadius: useRef<HTMLInputElement>(null),
   };
 
   /* ---------------- ERROR HELPERS ---------------- */
@@ -313,7 +312,6 @@ const handleRestaurantLogoChange = async (
         "tenant.bio": refs.tenantBio,
 
         "restaurant.name": refs.restaurantName,
-        "restaurant.slug": refs.slug,
         "restaurant.tagline": refs.tagline,
 
         "restaurant.supportContact.email": refs.supportEmail,
@@ -322,6 +320,10 @@ const handleRestaurantLogoChange = async (
 
         "restaurant.branding.primaryColor": refs.primaryColor,
         "restaurant.branding.secondaryColor": refs.secondaryColor,
+        "restaurant.branding.accentColor": refs.accentColor,
+        "restaurant.branding.backgroundColor": refs.backgroundColor,
+        "restaurant.branding.textColor": refs.textColor,
+        "restaurant.branding.borderRadius": refs.borderRadius,
       };
 
       scrollToInput(focusMap[firstError]?.current || null);
@@ -346,15 +348,16 @@ const handleRestaurantLogoChange = async (
           </p>
         </div>
 
-        <label className="flex cursor-pointer items-center gap-3 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800">
-          <input
-            type="checkbox"
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm sm:min-w-[280px]">
+          <span className="text-sm font-medium text-gray-800">
+            {tRegister("tenant.sameAsOwner.label")}
+          </span>
+          <Switch
             checked={tenantSameAsOwner}
-            onChange={(event) => setTenantSameAsOwner(event.target.checked)}
-            className="h-4 w-4 accent-primary"
+            onCheckedChange={setTenantSameAsOwner}
+            aria-label={tRegister("tenant.sameAsOwner.label")}
           />
-          {tRegister("tenant.sameAsOwner.label")}
-        </label>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
@@ -473,16 +476,9 @@ const handleRestaurantLogoChange = async (
             placeholder="KFC Pakistan"
             value={formData.restaurant.name || ""}
           onChange={(val: string) => {
-  const slug = generateSlug(val);
-
-  updateFormData("restaurant", {
-    name: val,
-    slug: slug,
-  });
-
-  clearError("restaurant.name");
-  clearError("restaurant.slug");
-}}
+            updateFormData("restaurant", { name: val });
+            clearError("restaurant.name");
+          }}
             onBlur={() =>
               validateField(
                 translatedRestaurantSchema,
@@ -554,21 +550,6 @@ const handleRestaurantLogoChange = async (
     {errors["restaurant.logoFile"] || errors["restaurant.logoUrl"]}
   </p>
 )}
-        </div>
-
-        <div>
-         <FormInput
-  ref={refs.slug}
-  label={tRegister("fields.slug.optionalLabel")}
-  placeholder="kfc-pakistan"
-  value={formData.restaurant.slug || ""}
-  
-/>
-          {errors["restaurant.slug"] && (
-            <p className="text-red-500 text-xs mt-1">
-              {errors["restaurant.slug"]}
-            </p>
-          )}
         </div>
 
         <div>
@@ -674,14 +655,21 @@ const handleRestaurantLogoChange = async (
       </div>
 
       {/* Branding */}
-      <h2 className="text-[20px] font-semibold text-gray-900 mb-6">
-        {tRegister("branding.title")}
-      </h2>
+      <div className="mb-6 rounded-2xl border border-gray-100 bg-gray-50/70 p-5">
+        <div className="mb-5">
+          <h2 className="text-[20px] font-semibold text-gray-900">
+            {tRegister("branding.title")}
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Premium theme defaults from the admin panel. Customize only what you need.
+          </p>
+        </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
           <FormInput
             ref={refs.primaryColor}
+            type="color"
             label={tRegister("fields.primaryColor.optionalLabel")}
             placeholder="#e4002b"
             value={formData.restaurant.branding.primaryColor || ""}
@@ -705,6 +693,7 @@ const handleRestaurantLogoChange = async (
         <div>
           <FormInput
             ref={refs.secondaryColor}
+            type="color"
             label={tRegister("fields.secondaryColor.optionalLabel")}
             placeholder="#ffffff"
             value={formData.restaurant.branding.secondaryColor || ""}
@@ -726,20 +715,100 @@ const handleRestaurantLogoChange = async (
         </div>
 
         <div>
-          <FormSelect
-            placeholder={tRegister("fields.fontFamily.label")}
-            options={["Poppins", "Inter", "Roboto", "Open Sans"]}
-            value={formData.restaurant.branding.fontFamily || "Poppins"}
-            onChange={(val: string) =>
+          <FormInput
+            ref={refs.accentColor}
+            type="color"
+            label="Accent Color (Optional)"
+            placeholder="#F59E0B"
+            value={formData.restaurant.branding.accentColor || "#F59E0B"}
+            onChange={(val: string) => {
               updateFormData("restaurant", {
                 branding: {
                   ...formData.restaurant.branding,
-                  fontFamily: val,
+                  accentColor: val,
                 },
-              })
-            }
+              });
+              clearError("restaurant.branding.accentColor");
+            }}
           />
+          {errors["restaurant.branding.accentColor"] && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors["restaurant.branding.accentColor"]}
+            </p>
+          )}
         </div>
+
+        <div>
+          <FormInput
+            ref={refs.backgroundColor}
+            type="color"
+            label="Background Color (Optional)"
+            placeholder="#F5F5F5"
+            value={formData.restaurant.branding.backgroundColor || "#F5F5F5"}
+            onChange={(val: string) => {
+              updateFormData("restaurant", {
+                branding: {
+                  ...formData.restaurant.branding,
+                  backgroundColor: val,
+                },
+              });
+              clearError("restaurant.branding.backgroundColor");
+            }}
+          />
+          {errors["restaurant.branding.backgroundColor"] && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors["restaurant.branding.backgroundColor"]}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <FormInput
+            ref={refs.textColor}
+            type="color"
+            label="Text Color (Optional)"
+            placeholder="#030401"
+            value={formData.restaurant.branding.textColor || "#030401"}
+            onChange={(val: string) => {
+              updateFormData("restaurant", {
+                branding: {
+                  ...formData.restaurant.branding,
+                  textColor: val,
+                },
+              });
+              clearError("restaurant.branding.textColor");
+            }}
+          />
+          {errors["restaurant.branding.textColor"] && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors["restaurant.branding.textColor"]}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <FormInput
+            ref={refs.borderRadius}
+            label="Border Radius (Optional)"
+            placeholder="12px"
+            value={formData.restaurant.branding.borderRadius || "12px"}
+            onChange={(val: string) => {
+              updateFormData("restaurant", {
+                branding: {
+                  ...formData.restaurant.branding,
+                  borderRadius: val,
+                },
+              });
+              clearError("restaurant.branding.borderRadius");
+            }}
+          />
+          {errors["restaurant.branding.borderRadius"] && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors["restaurant.branding.borderRadius"]}
+            </p>
+          )}
+        </div>
+      </div>
       </div>
 
       {/* Footer */}

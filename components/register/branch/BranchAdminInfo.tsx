@@ -1,6 +1,7 @@
 "use client";
 
 import { FormInput } from "@/components/register/form/FormInput";
+import { Switch } from "@/components/ui/switch";
 import type { BranchAdminField, BranchAdminValue } from "@/types/register";
 import { useTranslations } from "next-intl";
 
@@ -33,15 +34,16 @@ export function BranchAdminInfo({
           </p>
         </div>
 
-        <label className="flex cursor-pointer items-center gap-3 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800">
-          <input
-            type="checkbox"
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm sm:min-w-[280px]">
+          <span className="text-sm font-medium text-gray-800">
+            {tRegister("branch.admin.sameAsOwner")}
+          </span>
+          <Switch
             checked={isSameAsOwner}
-            onChange={(event) => onSameAsOwnerChange(event.target.checked)}
-            className="h-4 w-4 accent-primary"
+            onCheckedChange={onSameAsOwnerChange}
+            aria-label={tRegister("branch.admin.sameAsOwner")}
           />
-          {tRegister("branch.admin.sameAsOwner")}
-        </label>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">

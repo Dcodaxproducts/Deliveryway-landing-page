@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { FormInput } from "./form/FormInput";
 import { DeliveryMap } from "./delivery/DeliveryMap";
 import { DeliveryModeSelector } from "./delivery/DeliveryModeSelector";
@@ -195,6 +196,39 @@ export function BranchDeliveryAreaSettings({
     }
 
     emitSettings(nextSettings);
+  };
+
+  const updateSetting = (
+    key: keyof BranchDeliverySettings,
+    value: boolean | number | string
+  ) => {
+    emitSettings({
+      ...settings,
+      [key]: value,
+    });
+  };
+
+  const updateServiceCharge = (
+    key: "isEnabled" | "type" | "value",
+    value: boolean | number | string
+  ) => {
+    emitSettings({
+      ...settings,
+      serviceCharge: {
+        ...(settings.serviceCharge || {}),
+        [key]: value,
+      },
+    });
+  };
+
+  const updateContact = (key: "phone" | "whatsapp", value: string) => {
+    emitSettings({
+      ...settings,
+      contact: {
+        ...(settings.contact || {}),
+        [key]: value,
+      },
+    });
   };
 
 
@@ -1036,18 +1070,8 @@ export function BranchDeliveryAreaSettings({
             onModeChange={(mode) => updateDeliveryConfig("mode", mode)}
           />
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <FormInput
-              label={tRegister("branch.delivery.fields.baseDeliveryFee.label")}
-              placeholder={tRegister(
-                "branch.delivery.fields.baseDeliveryFee.placeholder"
-              )}
-              value={toInputNumber(delivery.deliveryFee)}
-              onChange={(val) =>
-                updateDeliveryConfig("deliveryFee", val ? Number(val) : 0)
-              }
-            />
-
+          {deliveryMode === "RADIUS" || deliveryMode === "ZONE_BANDS" ? (
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <FormInput
               label={tRegister("branch.delivery.fields.radiusKm.label")}
               value={toInputNumber(delivery.radiusKm)}
@@ -1060,45 +1084,70 @@ export function BranchDeliveryAreaSettings({
               }}
             />
 
-            <FormInput
-              label={tRegister("branch.delivery.fields.minOrderAmount.label")}
-              placeholder={tRegister(
-                "branch.delivery.fields.minOrderAmount.placeholder"
-              )}
-              value={toInputNumber(delivery.minOrderAmount)}
-              onChange={(val) =>
-                updateDeliveryConfig("minOrderAmount", val ? Number(val) : 0)
-              }
-            />
+            {deliveryMode === "RADIUS" ? (
+              <>
+                <FormInput
+                  label={tRegister(
+                    "branch.delivery.fields.baseDeliveryFee.label"
+                  )}
+                  placeholder={tRegister(
+                    "branch.delivery.fields.baseDeliveryFee.placeholder"
+                  )}
+                  value={toInputNumber(delivery.deliveryFee)}
+                  onChange={(val) =>
+                    updateDeliveryConfig("deliveryFee", val ? Number(val) : 0)
+                  }
+                />
 
-            <FormInput
-              label={tRegister(
-                "branch.delivery.fields.freeDeliveryThreshold.label"
-              )}
-              placeholder={tRegister(
-                "branch.delivery.fields.freeDeliveryThreshold.placeholder"
-              )}
-              value={toInputNumber(delivery.freeDeliveryThreshold)}
-              onChange={(val) =>
-                updateDeliveryConfig(
-                  "freeDeliveryThreshold",
-                  val ? Number(val) : 0
-                )
-              }
-            />
+                <FormInput
+                  label={tRegister(
+                    "branch.delivery.fields.minOrderAmount.label"
+                  )}
+                  placeholder={tRegister(
+                    "branch.delivery.fields.minOrderAmount.placeholder"
+                  )}
+                  value={toInputNumber(delivery.minOrderAmount)}
+                  onChange={(val) =>
+                    updateDeliveryConfig(
+                      "minOrderAmount",
+                      val ? Number(val) : 0
+                    )
+                  }
+                />
+
+                <FormInput
+                  label={tRegister(
+                    "branch.delivery.fields.freeDeliveryThreshold.label"
+                  )}
+                  placeholder={tRegister(
+                    "branch.delivery.fields.freeDeliveryThreshold.placeholder"
+                  )}
+                  value={toInputNumber(delivery.freeDeliveryThreshold)}
+                  onChange={(val) =>
+                    updateDeliveryConfig(
+                      "freeDeliveryThreshold",
+                      val ? Number(val) : 0
+                    )
+                  }
+                />
+              </>
+            ) : null}
           </div>
+          ) : null}
 
-          <label className="flex w-fit cursor-pointer items-center gap-3 rounded-full border border-gray-200 bg-gray-50 px-4 py-2">
-            <Checkbox
-              checked={Boolean(delivery.isFreeDelivery)}
-              onCheckedChange={(val) =>
-                updateDeliveryConfig("isFreeDelivery", val === true)
-              }
-            />
-            <span className="text-sm">
-              {tRegister("branch.delivery.fields.enableFreeDelivery")}
-            </span>
-          </label>
+          {deliveryMode === "RADIUS" ? (
+            <label className="flex w-fit cursor-pointer items-center gap-3 rounded-full border border-gray-200 bg-gray-50 px-4 py-2">
+              <Checkbox
+                checked={Boolean(delivery.isFreeDelivery)}
+                onCheckedChange={(val) =>
+                  updateDeliveryConfig("isFreeDelivery", val === true)
+                }
+              />
+              <span className="text-sm">
+                {tRegister("branch.delivery.fields.enableFreeDelivery")}
+              </span>
+            </label>
+          ) : null}
 
           {shouldShowMap ? (
             <DeliveryMap
@@ -1187,7 +1236,7 @@ export function BranchDeliveryAreaSettings({
                 {tRegister("branch.delivery.automation.autoAcceptDescription")}
               </span>
 
-              <Checkbox
+              <Switch
                 checked={Boolean(settings.automation?.autoAcceptOrders)}
                 onCheckedChange={(val) =>
                   updateAutomation("autoAcceptOrders", val === true)
@@ -1216,6 +1265,129 @@ export function BranchDeliveryAreaSettings({
               }
             />
           </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div className="mb-5">
+          <h2 className="text-[20px] font-semibold text-gray-900">
+            Branch Experience Settings
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Optional operational settings shown now so the backend receives a complete branch settings object.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <FormInput
+            label="Delivery Time (minutes) (Optional)"
+            placeholder="45"
+            value={toInputNumber(settings.deliveryTime)}
+            onChange={(val) =>
+              updateSetting("deliveryTime", val === "" ? 0 : Number(val))
+            }
+          />
+
+          <FormInput
+            label="Table Count (Optional)"
+            placeholder="0"
+            value={toInputNumber(settings.tableCount)}
+            onChange={(val) =>
+              updateSetting("tableCount", val === "" ? 0 : Number(val))
+            }
+          />
+
+          <label className="flex min-h-[52px] cursor-pointer items-center justify-between gap-4 rounded-[10px] border border-[#bbbbbb] bg-white px-4 transition hover:border-primary/40">
+            <span>
+              <span className="block text-sm font-medium text-gray-900">
+                Table Reservations (Optional)
+              </span>
+              <span className="text-xs text-gray-500">
+                Allow customers to request table bookings.
+              </span>
+            </span>
+            <Switch
+              checked={Boolean(settings.tableReservationsEnabled)}
+              onCheckedChange={(val) =>
+                updateSetting("tableReservationsEnabled", val === true)
+              }
+            />
+          </label>
+
+          <label className="flex min-h-[52px] cursor-pointer items-center justify-between gap-4 rounded-[10px] border border-[#bbbbbb] bg-white px-4 transition hover:border-primary/40">
+            <span>
+              <span className="block text-sm font-medium text-gray-900">
+                Auto-accept Reservations (Optional)
+              </span>
+              <span className="text-xs text-gray-500">
+                Confirm reservations automatically when enabled.
+              </span>
+            </span>
+            <Switch
+              checked={Boolean(settings.tableReservationAutoAccept)}
+              onCheckedChange={(val) =>
+                updateSetting("tableReservationAutoAccept", val === true)
+              }
+            />
+          </label>
+
+          <label className="flex min-h-[52px] cursor-pointer items-center justify-between gap-4 rounded-[10px] border border-[#bbbbbb] bg-white px-4 transition hover:border-primary/40">
+            <span>
+              <span className="block text-sm font-medium text-gray-900">
+                Service Charge (Optional)
+              </span>
+              <span className="text-xs text-gray-500">
+                Add a percentage or fixed amount service charge.
+              </span>
+            </span>
+            <Switch
+              checked={Boolean(settings.serviceCharge?.isEnabled)}
+              onCheckedChange={(val) =>
+                updateServiceCharge("isEnabled", val === true)
+              }
+            />
+          </label>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[0.9fr_1.1fr]">
+            <label className="block">
+              <span className="mb-2 block text-[16px] font-medium text-gray-900">
+                Charge Type
+              </span>
+              <select
+                value={settings.serviceCharge?.type || "PERCENTAGE"}
+                onChange={(event) =>
+                  updateServiceCharge("type", event.target.value)
+                }
+                className="h-[42px] w-full rounded-[10px] border border-[#BBBBBB] bg-white px-3 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
+              >
+                <option value="PERCENTAGE">Percentage</option>
+                <option value="AMOUNT">Fixed Amount</option>
+              </select>
+            </label>
+
+            <FormInput
+              label="Charge Value"
+              placeholder="0"
+              value={toInputNumber(settings.serviceCharge?.value)}
+              onChange={(val) =>
+                updateServiceCharge("value", val === "" ? 0 : Number(val))
+              }
+            />
+          </div>
+
+          <FormInput
+            label="Branch Phone (Optional)"
+            placeholder="+923001234567"
+            value={settings.contact?.phone || ""}
+            onChange={(val) => updateContact("phone", val)}
+          />
+
+          <FormInput
+            label="Branch WhatsApp (Optional)"
+            placeholder="+923001234567"
+            value={settings.contact?.whatsapp || ""}
+            onChange={(val) => updateContact("whatsapp", val)}
+          />
         </div>
       </section>
     </div>

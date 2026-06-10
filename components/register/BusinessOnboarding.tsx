@@ -93,6 +93,18 @@ const toStringValue = (value: unknown, fallback = "") => {
   return String(value);
 };
 
+const createSlug = (value: string, fallback = "restaurant") => {
+  const slug = value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return slug || fallback;
+};
+
 const normalizeArray = (value: unknown) => {
   return Array.isArray(value) ? value : [];
 };
@@ -289,21 +301,21 @@ const buildBranchSettingsPayload = (settingsValue: unknown) => {
   const automation = normalizePlainObject(settings.automation);
   const taxation = normalizePlainObject(settings.taxation);
   const contact = normalizePlainObject(settings.contact);
+  const serviceCharge = normalizePlainObject(settings.serviceCharge);
 
   const allowedOrderTypes = normalizeArray(settings?.allowedOrderTypes).length
     ? normalizeArray(settings.allowedOrderTypes)
     : ["DELIVERY"];
 
-  const allowedPaymentMethods = normalizeArray(settings?.allowedPaymentMethods)
-    .length
-    ? normalizeArray(settings.allowedPaymentMethods)
-    : ["COD"];
-
   return {
     deliveryTime: toNumber(settings?.deliveryTime, 45),
     tableReservationsEnabled: Boolean(settings?.tableReservationsEnabled ?? false),
+    tableReservationAutoAccept: Boolean(
+      settings?.tableReservationAutoAccept ?? false
+    ),
+    tableCount: toNumber(settings?.tableCount, 0),
     allowedOrderTypes,
-    allowedPaymentMethods,
+    allowedPaymentMethods: ["COD", "PAYPAL"],
     deliveryConfig: {
       mode: normalizeDeliveryMode(deliveryConfig?.mode),
       radiusKm: toNumber(deliveryConfig?.radiusKm ?? settings?.radiusKm, 0),
@@ -334,6 +346,14 @@ const buildBranchSettingsPayload = (settingsValue: unknown) => {
     },
     taxation: {
       taxPercentage: toNumber(taxation?.taxPercentage ?? settings?.taxPercentage, 0),
+    },
+    serviceCharge: {
+      isEnabled: Boolean(serviceCharge?.isEnabled ?? false),
+      type:
+        serviceCharge?.type === "AMOUNT" || serviceCharge?.type === "PERCENTAGE"
+          ? serviceCharge.type
+          : "PERCENTAGE",
+      value: toNumber(serviceCharge?.value, 0),
     },
     contact: {
       whatsapp: toStringValue(contact?.whatsapp),
@@ -440,8 +460,10 @@ export function BusinessOnboarding() {
       settings: {
         deliveryTime: 45,
         tableReservationsEnabled: false,
+        tableReservationAutoAccept: false,
+        tableCount: 0,
         allowedOrderTypes: ["DELIVERY"],
-        allowedPaymentMethods: ["COD"],
+        allowedPaymentMethods: ["COD", "PAYPAL"],
         deliveryConfig: {
           mode: "RADIUS",
           radiusKm: 5,
@@ -463,6 +485,11 @@ export function BusinessOnboarding() {
         contact: {
           whatsapp: "",
           phone: "",
+        },
+        serviceCharge: {
+          isEnabled: false,
+          type: "PERCENTAGE",
+          value: 0,
         },
 
         // Legacy fields kept for backward compatibility with older step components.
@@ -551,6 +578,10 @@ export function BusinessOnboarding() {
     const branchSettingsPayload = buildBranchSettingsPayload(
       formData.branch.settings
     );
+    const tenantSlug = createSlug(
+      formData.tenant.slug || formData.tenant.name || formData.restaurant.name,
+      "tenant"
+    );
 
     const payload = {
       user: {
@@ -570,7 +601,7 @@ export function BusinessOnboarding() {
       },
       tenant: {
         name: formData.tenant.name,
-        slug: formData.tenant.slug || formData.restaurant.slug,
+        slug: tenantSlug,
         logoUrl: formData.tenant.logoUrl,
         bio: formData.tenant.bio,
         socialLinks: normalizePlainObject(formData.tenant.socialLinks),
@@ -578,7 +609,6 @@ export function BusinessOnboarding() {
       },
       restaurant: {
         name: formData.restaurant.name,
-        slug: formData.restaurant.slug,
         logoUrl: formData.restaurant.logoUrl,
         coverImage:
           formData.restaurant.coverImage || formData.branch.coverImage || "",

@@ -267,9 +267,8 @@ export function StorePublished({ formData, publishedData }: Props) {
     <div className="min-h-[80vh] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         {/* SUCCESS HEADER */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 px-6 py-8 text-white shadow-xl sm:px-10 sm:py-10">
-          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/30 blur-3xl" />
-          <div className="absolute -bottom-24 -left-20 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
+        <div className="relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#c1000a_0%,#d61f2a_46%,#f59e0b_130%)] px-6 py-8 text-white shadow-xl shadow-primary/20 sm:px-10 sm:py-10">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,4,1,0.18),rgba(3,4,1,0)_55%)]" />
 
           <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
