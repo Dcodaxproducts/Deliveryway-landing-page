@@ -1268,41 +1268,57 @@ export function BranchDeliveryAreaSettings({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-        <div className="mb-5">
-          <h2 className="text-[20px] font-semibold text-gray-900">
-            Branch Experience Settings
-          </h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Optional operational settings shown now so the backend receives a complete branch settings object.
-          </p>
+      <section className="overflow-hidden rounded-[26px] border border-gray-100 bg-gradient-to-br from-white via-[#fff8f8] to-white shadow-[0_22px_55px_rgba(15,23,42,0.07)]">
+        <div className="border-b border-white/80 p-5 lg:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                Optional branch controls
+              </p>
+              <h2 className="mt-2 text-[22px] font-semibold text-gray-950">
+                Branch Experience Settings
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                Prefilled operational defaults for launch. These stay optional
+                for the user, but the complete settings object still goes to the
+                backend.
+              </p>
+            </div>
+            <span className="rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+              Hidden: payment methods & tax
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          <FormInput
-            label="Delivery Time (minutes) (Optional)"
-            placeholder="45"
-            value={toInputNumber(settings.deliveryTime)}
-            onChange={(val) =>
-              updateSetting("deliveryTime", val === "" ? 0 : Number(val))
-            }
-          />
+        <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-2 lg:p-6">
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
+            <FormInput
+              label="Delivery Time (minutes) (Optional)"
+              placeholder="45"
+              value={toInputNumber(settings.deliveryTime)}
+              onChange={(val) =>
+                updateSetting("deliveryTime", val === "" ? 0 : Number(val))
+              }
+            />
+          </div>
 
-          <FormInput
-            label="Table Count (Optional)"
-            placeholder="0"
-            value={toInputNumber(settings.tableCount)}
-            onChange={(val) =>
-              updateSetting("tableCount", val === "" ? 0 : Number(val))
-            }
-          />
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
+            <FormInput
+              label="Table Count (Optional)"
+              placeholder="0"
+              value={toInputNumber(settings.tableCount)}
+              onChange={(val) =>
+                updateSetting("tableCount", val === "" ? 0 : Number(val))
+              }
+            />
+          </div>
 
-          <label className="flex min-h-[52px] cursor-pointer items-center justify-between gap-4 rounded-[10px] border border-[#bbbbbb] bg-white px-4 transition hover:border-primary/40">
+          <label className="flex min-h-[96px] cursor-pointer items-center justify-between gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.04)] transition hover:border-primary/30">
             <span>
-              <span className="block text-sm font-medium text-gray-900">
+              <span className="block text-sm font-semibold text-gray-950">
                 Table Reservations (Optional)
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="mt-1 block text-xs leading-5 text-gray-500">
                 Allow customers to request table bookings.
               </span>
             </span>
@@ -1314,12 +1330,12 @@ export function BranchDeliveryAreaSettings({
             />
           </label>
 
-          <label className="flex min-h-[52px] cursor-pointer items-center justify-between gap-4 rounded-[10px] border border-[#bbbbbb] bg-white px-4 transition hover:border-primary/40">
+          <label className="flex min-h-[96px] cursor-pointer items-center justify-between gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.04)] transition hover:border-primary/30">
             <span>
-              <span className="block text-sm font-medium text-gray-900">
+              <span className="block text-sm font-semibold text-gray-950">
                 Auto-accept Reservations (Optional)
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="mt-1 block text-xs leading-5 text-gray-500">
                 Confirm reservations automatically when enabled.
               </span>
             </span>
@@ -1331,63 +1347,76 @@ export function BranchDeliveryAreaSettings({
             />
           </label>
 
-          <label className="flex min-h-[52px] cursor-pointer items-center justify-between gap-4 rounded-[10px] border border-[#bbbbbb] bg-white px-4 transition hover:border-primary/40">
-            <span>
-              <span className="block text-sm font-medium text-gray-900">
-                Service Charge (Optional)
-              </span>
-              <span className="text-xs text-gray-500">
-                Add a percentage or fixed amount service charge.
-              </span>
-            </span>
-            <Switch
-              checked={Boolean(settings.serviceCharge?.isEnabled)}
-              onCheckedChange={(val) =>
-                updateServiceCharge("isEnabled", val === true)
-              }
-            />
-          </label>
+          <div className="lg:col-span-2">
+            <div className="rounded-[22px] border border-primary/10 bg-white p-4 shadow-[0_16px_40px_rgba(193,0,10,0.07)]">
+              <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <label className="flex cursor-pointer items-center gap-4">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                    %
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-gray-950">
+                      Service Charge (Optional)
+                    </span>
+                    <span className="mt-1 block text-xs leading-5 text-gray-500">
+                      Add a percentage or fixed amount service fee at checkout.
+                    </span>
+                  </span>
+                </label>
+                <Switch
+                  checked={Boolean(settings.serviceCharge?.isEnabled)}
+                  onCheckedChange={(val) =>
+                    updateServiceCharge("isEnabled", val === true)
+                  }
+                />
+              </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[0.9fr_1.1fr]">
-            <label className="block">
-              <span className="mb-2 block text-[16px] font-medium text-gray-900">
-                Charge Type
-              </span>
-              <select
-                value={settings.serviceCharge?.type || "PERCENTAGE"}
-                onChange={(event) =>
-                  updateServiceCharge("type", event.target.value)
-                }
-                className="h-[42px] w-full rounded-[10px] border border-[#BBBBBB] bg-white px-3 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
-              >
-                <option value="PERCENTAGE">Percentage</option>
-                <option value="AMOUNT">Fixed Amount</option>
-              </select>
-            </label>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className="mb-2 block text-[16px] font-medium text-gray-900">
+                    Charge Type
+                  </span>
+                  <select
+                    value={settings.serviceCharge?.type || "PERCENTAGE"}
+                    onChange={(event) =>
+                      updateServiceCharge("type", event.target.value)
+                    }
+                    className="h-[52px] w-full rounded-[10px] border border-[#BBBBBB] bg-white px-3 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="PERCENTAGE">Percentage</option>
+                    <option value="AMOUNT">Fixed Amount</option>
+                  </select>
+                </label>
 
+                <FormInput
+                  label="Charge Value"
+                  placeholder="0"
+                  value={toInputNumber(settings.serviceCharge?.value)}
+                  onChange={(val) =>
+                    updateServiceCharge("value", val === "" ? 0 : Number(val))
+                  }
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
             <FormInput
-              label="Charge Value"
-              placeholder="0"
-              value={toInputNumber(settings.serviceCharge?.value)}
-              onChange={(val) =>
-                updateServiceCharge("value", val === "" ? 0 : Number(val))
-              }
+              label="Branch Phone (Optional)"
+              placeholder="+923001234567"
+              value={settings.contact?.phone || ""}
+              onChange={(val) => updateContact("phone", val)}
             />
           </div>
 
-          <FormInput
-            label="Branch Phone (Optional)"
-            placeholder="+923001234567"
-            value={settings.contact?.phone || ""}
-            onChange={(val) => updateContact("phone", val)}
-          />
-
-          <FormInput
-            label="Branch WhatsApp (Optional)"
-            placeholder="+923001234567"
-            value={settings.contact?.whatsapp || ""}
-            onChange={(val) => updateContact("whatsapp", val)}
-          />
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
+            <FormInput
+              label="Branch WhatsApp (Optional)"
+              placeholder="+923001234567"
+              value={settings.contact?.whatsapp || ""}
+              onChange={(val) => updateContact("whatsapp", val)}
+            />
+          </div>
         </div>
       </section>
     </div>

@@ -209,6 +209,14 @@ const normalizePostalCodeRules = (rules: unknown) => {
 
 const createRestaurantBrandingPayload = (brandingValue: unknown) => {
   const branding = normalizePlainObject(brandingValue);
+  const darkInput = normalizePlainObject(branding.dark);
+  const themeInput = normalizePlainObject(branding.theme);
+  const themeDarkInput = normalizePlainObject(themeInput.dark);
+  const appInput = normalizePlainObject(branding.app);
+  const checkoutInput = normalizePlainObject(branding.checkout);
+  const assetsInput = normalizePlainObject(branding.assets);
+  const assetLogosInput = normalizePlainObject(assetsInput.logos);
+  const logoInput = normalizePlainObject(branding.logo);
   const primaryColor = toStringValue(branding.primaryColor, "#c1000a");
   const secondaryColor = toStringValue(branding.secondaryColor, "#030401");
   const accentColor = toStringValue(branding.accentColor, "#F59E0B");
@@ -222,12 +230,29 @@ const createRestaurantBrandingPayload = (brandingValue: unknown) => {
     branding.headingFontFamily,
     fontFamily
   );
+  const borderRadius = toStringValue(branding.borderRadius, "12px");
+  const buttonStyle = toStringValue(branding.buttonStyle, "rounded");
   const dark = {
-    primaryColor: "#FF4D57",
-    secondaryColor: "#F5F5F5",
-    accentColor: "#FBBF24",
-    backgroundColor: "#030401",
-    textColor: "#F5F5F5",
+    primaryColor: toStringValue(
+      darkInput.primaryColor ?? themeDarkInput.primaryColor,
+      "#FF4D57"
+    ),
+    secondaryColor: toStringValue(
+      darkInput.secondaryColor ?? themeDarkInput.secondaryColor,
+      "#F5F5F5"
+    ),
+    accentColor: toStringValue(
+      darkInput.accentColor ?? themeDarkInput.accentColor,
+      "#FBBF24"
+    ),
+    backgroundColor: toStringValue(
+      darkInput.backgroundColor ?? themeDarkInput.backgroundColor,
+      "#030401"
+    ),
+    textColor: toStringValue(
+      darkInput.textColor ?? themeDarkInput.textColor,
+      "#F5F5F5"
+    ),
   };
 
   return {
@@ -239,58 +264,61 @@ const createRestaurantBrandingPayload = (brandingValue: unknown) => {
     dark,
     fontFamily,
     headingFontFamily,
-    borderRadius: toStringValue(branding.borderRadius, "12px"),
-    buttonStyle: toStringValue(branding.buttonStyle, "rounded"),
+    borderRadius,
+    buttonStyle,
     theme: {
-      mode: "light",
-      primaryColor,
-      secondaryColor,
-      accentColor,
-      backgroundColor,
-      textColor,
+      mode: toStringValue(themeInput.mode, "light"),
+      primaryColor: toStringValue(themeInput.primaryColor, primaryColor),
+      secondaryColor: toStringValue(themeInput.secondaryColor, secondaryColor),
+      accentColor: toStringValue(themeInput.accentColor, accentColor),
+      backgroundColor: toStringValue(themeInput.backgroundColor, backgroundColor),
+      textColor: toStringValue(themeInput.textColor, textColor),
       dark,
-      fontFamily,
-      headingFontFamily,
-      borderRadius: toStringValue(branding.borderRadius, "12px"),
-      buttonStyle: toStringValue(branding.buttonStyle, "rounded"),
-      homeLayout: "hero",
-      menuCardStyle: "image-top",
-      showPopularItems: true,
-      showCategories: true,
+      fontFamily: toStringValue(themeInput.fontFamily, fontFamily),
+      headingFontFamily: toStringValue(themeInput.headingFontFamily, headingFontFamily),
+      borderRadius: toStringValue(themeInput.borderRadius, borderRadius),
+      buttonStyle: toStringValue(themeInput.buttonStyle, buttonStyle),
+      homeLayout: toStringValue(themeInput.homeLayout, "hero"),
+      menuCardStyle: toStringValue(themeInput.menuCardStyle, "image-top"),
+      showPopularItems: Boolean(themeInput.showPopularItems ?? true),
+      showCategories: Boolean(themeInput.showCategories ?? true),
     },
     app: {
-      homeLayout: "hero",
-      menuCardStyle: "image-top",
-      showTagline: true,
-      showHeroBanner: true,
-      splashColor: primaryColor,
-      statusBarColor: secondaryColor,
-      bottomNavColor: backgroundColor,
+      homeLayout: toStringValue(appInput.homeLayout, "hero"),
+      menuCardStyle: toStringValue(appInput.menuCardStyle, "image-top"),
+      showTagline: Boolean(appInput.showTagline ?? true),
+      showHeroBanner: Boolean(appInput.showHeroBanner ?? true),
+      splashColor: toStringValue(appInput.splashColor, primaryColor),
+      statusBarColor: toStringValue(appInput.statusBarColor, secondaryColor),
+      bottomNavColor: toStringValue(appInput.bottomNavColor, backgroundColor),
     },
     checkout: {
-      showLogo: true,
-      showSupportContact: true,
-      successMessage: "Thank you for ordering with us.",
-      highlightColor: primaryColor,
-      successColor: "#00A63E",
-      warningColor: accentColor,
-      errorColor: primaryColor,
+      showLogo: Boolean(checkoutInput.showLogo ?? true),
+      showSupportContact: Boolean(checkoutInput.showSupportContact ?? true),
+      successMessage: toStringValue(
+        checkoutInput.successMessage,
+        "Thank you for ordering with us."
+      ),
+      highlightColor: toStringValue(checkoutInput.highlightColor, primaryColor),
+      successColor: toStringValue(checkoutInput.successColor, "#00A63E"),
+      warningColor: toStringValue(checkoutInput.warningColor, accentColor),
+      errorColor: toStringValue(checkoutInput.errorColor, primaryColor),
     },
     assets: {
-      logoUrl: "",
-      coverImage: "",
-      heroBannerUrl: "",
-      placeholderImage: "",
-      faviconUrl: "",
+      logoUrl: toStringValue(assetsInput.logoUrl),
+      coverImage: toStringValue(assetsInput.coverImage),
+      heroBannerUrl: toStringValue(assetsInput.heroBannerUrl),
+      placeholderImage: toStringValue(assetsInput.placeholderImage),
+      faviconUrl: toStringValue(assetsInput.faviconUrl),
       logos: {
-        primaryLogoUrl: "",
-        compactLogoUrl: "",
-        faviconUrl: "",
+        primaryLogoUrl: toStringValue(assetLogosInput.primaryLogoUrl),
+        compactLogoUrl: toStringValue(assetLogosInput.compactLogoUrl),
+        faviconUrl: toStringValue(assetLogosInput.faviconUrl),
       },
     },
     logo: {
-      light: "",
-      dark: "",
+      light: toStringValue(logoInput.light),
+      dark: toStringValue(logoInput.dark),
     },
   };
 };
@@ -429,12 +457,78 @@ export function BusinessOnboarding() {
         accentColor: "#F59E0B",
         backgroundColor: "#F5F5F5",
         textColor: "#030401",
+        dark: {
+          primaryColor: "#FF4D57",
+          secondaryColor: "#F5F5F5",
+          accentColor: "#FBBF24",
+          backgroundColor: "#030401",
+          textColor: "#F5F5F5",
+        },
         fontFamily:
           "var(--font-onest), 'Onest', 'Onest Fallback', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
         headingFontFamily:
           "var(--font-onest), 'Onest', 'Onest Fallback', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
         borderRadius: "12px",
         buttonStyle: "rounded",
+        theme: {
+          mode: "light",
+          primaryColor: "#c1000a",
+          secondaryColor: "#030401",
+          accentColor: "#F59E0B",
+          backgroundColor: "#F5F5F5",
+          textColor: "#030401",
+          dark: {
+            primaryColor: "#FF4D57",
+            secondaryColor: "#F5F5F5",
+            accentColor: "#FBBF24",
+            backgroundColor: "#030401",
+            textColor: "#F5F5F5",
+          },
+          fontFamily:
+            "var(--font-onest), 'Onest', 'Onest Fallback', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          headingFontFamily:
+            "var(--font-onest), 'Onest', 'Onest Fallback', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          borderRadius: "12px",
+          buttonStyle: "rounded",
+          homeLayout: "hero",
+          menuCardStyle: "image-top",
+          showPopularItems: true,
+          showCategories: true,
+        },
+        app: {
+          homeLayout: "hero",
+          menuCardStyle: "image-top",
+          showTagline: true,
+          showHeroBanner: true,
+          splashColor: "#c1000a",
+          statusBarColor: "#030401",
+          bottomNavColor: "#F5F5F5",
+        },
+        checkout: {
+          showLogo: true,
+          showSupportContact: true,
+          successMessage: "Thank you for ordering with us.",
+          highlightColor: "#c1000a",
+          successColor: "#00A63E",
+          warningColor: "#F59E0B",
+          errorColor: "#c1000a",
+        },
+        assets: {
+          logoUrl: "",
+          coverImage: "",
+          heroBannerUrl: "",
+          placeholderImage: "",
+          faviconUrl: "",
+          logos: {
+            primaryLogoUrl: "",
+            compactLogoUrl: "",
+            faviconUrl: "",
+          },
+        },
+        logo: {
+          light: "",
+          dark: "",
+        },
       },
       socialMedia: {},
     },
