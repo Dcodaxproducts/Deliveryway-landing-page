@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   Copy,
   Download,
+  Eye,
+  EyeOff,
   ExternalLink,
   Mail,
   MapPin,
@@ -38,11 +40,17 @@ type OnboardingPublishedFormData = {
   };
   user?: {
     email?: string;
+    password?: string;
   };
 };
 
 type PublishedResponseData = {
+  branchAdminCredentials?: {
+    email?: unknown;
+    password?: unknown;
+  };
   branchId?: unknown;
+  email?: unknown;
   ownerId?: unknown;
   restaurant?: {
     id?: unknown;
@@ -124,6 +132,43 @@ function IdRow({
   );
 }
 
+function CredentialRow({
+  label,
+  value,
+  hidden = false,
+}: {
+  hidden?: boolean;
+  label: string;
+  value: string;
+}) {
+  const [visible, setVisible] = useState(!hidden);
+  const displayValue = hidden && !visible ? "••••••••••" : value;
+
+  return (
+    <div className="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+          {label}
+        </p>
+        <p className="mt-1 break-all text-sm font-semibold text-gray-900">
+          {displayValue}
+        </p>
+      </div>
+
+      {hidden ? (
+        <button
+          type="button"
+          onClick={() => setVisible((current) => !current)}
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition hover:border-primary/40 hover:text-primary"
+          aria-label={visible ? "Hide password" : "Show password"}
+        >
+          {visible ? <EyeOff size={17} /> : <Eye size={17} />}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 export function StorePublished({ formData, publishedData }: Props) {
   const tRegister = useTranslations("register");
   const qrRef = useRef<HTMLDivElement>(null);
@@ -165,6 +210,13 @@ export function StorePublished({ formData, publishedData }: Props) {
     tRegister("published.fallbacks.mainBranch")
   );
   const ownerEmail = getValue(formData?.user?.email, notAvailable);
+  const ownerPassword = getValue(formData?.user?.password, notAvailable);
+  const branchAdminEmail = getOptionalString(
+    publishedData?.branchAdminCredentials?.email
+  );
+  const branchAdminPassword = getOptionalString(
+    publishedData?.branchAdminCredentials?.password
+  );
   const tenantName = getValue(
     formData?.tenant?.name,
     tRegister("published.fallbacks.businessAccount")
@@ -305,6 +357,52 @@ export function StorePublished({ formData, publishedData }: Props) {
                   label={tRegister("published.labels.ownerEmail")}
                   value={ownerEmail}
                 />
+              </div>
+            </div>
+
+            {/* CREDENTIALS */}
+            <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+              <div className="flex items-start gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <ShieldCheck size={22} />
+                </div>
+
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {tRegister("published.credentials.title")}
+                  </h2>
+                  <p className="mt-1 text-sm leading-6 text-gray-500">
+                    {tRegister("published.credentials.description")}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-5 grid grid-cols-1 gap-3">
+                <CredentialRow
+                  label={tRegister("published.credentials.ownerEmail")}
+                  value={ownerEmail}
+                />
+                <CredentialRow
+                  hidden
+                  label={tRegister("published.credentials.ownerPassword")}
+                  value={ownerPassword}
+                />
+
+                {branchAdminEmail || branchAdminPassword ? (
+                  <>
+                    <CredentialRow
+                      label={tRegister("published.credentials.branchAdminEmail")}
+                      value={branchAdminEmail || notAvailable}
+                    />
+                    <CredentialRow
+                      hidden
+                      label={tRegister(
+                        "published.credentials.branchAdminPassword"
+                      )}
+                      value={branchAdminPassword || notAvailable}
+                    />
+                  </>
+                ) : null}
               </div>
             </div>
 

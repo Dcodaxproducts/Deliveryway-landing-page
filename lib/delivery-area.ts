@@ -23,6 +23,11 @@ export const DELIVERY_MODES: DeliveryModeConfig[] = [
     descriptionKey: "branch.delivery.modes.zone.description",
   },
   {
+    value: "ZONE_BANDS",
+    labelKey: "branch.delivery.modes.zoneBands.label",
+    descriptionKey: "branch.delivery.modes.zoneBands.description",
+  },
+  {
     value: "POSTAL_CODE",
     labelKey: "branch.delivery.modes.postalCode.label",
     descriptionKey: "branch.delivery.modes.postalCode.description",
@@ -103,4 +108,6 @@ export const createDefaultPostalCodeRule = (
 ): PostalCodeRule => ({
   postalCode: "",
   deliveryFee,
+  minOrderAmount: 0,
+  freeDeliveryThreshold: 0,
 });

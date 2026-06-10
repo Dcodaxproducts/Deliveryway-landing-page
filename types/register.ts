@@ -1,9 +1,10 @@
 export type BranchAddressField =
-  | "area"
   | "city"
   | "country"
+  | "houseNumber"
   | "lat"
   | "lng"
+  | "postalCode"
   | "state"
   | "street";
 
@@ -35,6 +36,26 @@ export type BranchValue = {
 export type RegisterFormData = {
   branch?: BranchValue;
   branchAdmin?: BranchAdminValue;
+  restaurant?: {
+    logoPreviewUrl?: string;
+    logoUrl?: string;
+    name?: string;
+  };
+  tenant?: {
+    bio?: string;
+    logoPreviewUrl?: string;
+    logoUrl?: string;
+    name?: string;
+  };
+  user?: {
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    password?: string;
+    phone?: string;
+    profilePreviewUrl?: string;
+    profileUrl?: string;
+  };
 };
 
 export type GoogleAddressComponent = {

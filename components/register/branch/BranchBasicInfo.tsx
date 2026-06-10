@@ -31,7 +31,7 @@ export function BranchBasicInfo({
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-        <div>
+        <div data-field="branch.name">
           <FormInput
             label={tRegister("branch.fields.name.requiredLabel")}
             placeholder={tRegister("branch.fields.name.placeholder")}
@@ -43,9 +43,9 @@ export function BranchBasicInfo({
           )}
         </div>
 
-        <div>
+        <div data-field="branch.description">
           <FormInput
-            label={tRegister("branch.fields.description.requiredLabel")}
+            label={tRegister("branch.fields.description.optionalLabel")}
             placeholder={tRegister("branch.fields.description.placeholder")}
             value={branch.description || ""}
             onChange={(val) => onFieldChange("description", val)}

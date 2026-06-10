@@ -58,7 +58,7 @@ export function PostalCodeRules({
           {postalCodeRules.map((rule, index) => (
             <div
               key={`postal-rule-${index}`}
-              className="grid grid-cols-1 gap-3 rounded-2xl border border-gray-200 bg-white p-4 lg:grid-cols-[1fr_1fr_auto]"
+              className="grid grid-cols-1 gap-3 rounded-2xl border border-gray-200 bg-white p-4 xl:grid-cols-[1fr_1fr_1fr_1fr_auto]"
             >
               <FormInput
                 label={tRegister("branch.delivery.fields.postalCode.label")}
@@ -77,6 +77,34 @@ export function PostalCodeRules({
                 value={toInputNumber(rule.deliveryFee)}
                 onChange={(val) =>
                   onUpdateRule(index, "deliveryFee", val ? Number(val) : 0)
+                }
+              />
+
+              <FormInput
+                label={tRegister("branch.delivery.fields.minOrder.label")}
+                placeholder={tRegister(
+                  "branch.delivery.fields.minOrder.placeholder"
+                )}
+                value={toInputNumber(rule.minOrderAmount)}
+                onChange={(val) =>
+                  onUpdateRule(index, "minOrderAmount", val ? Number(val) : 0)
+                }
+              />
+
+              <FormInput
+                label={tRegister(
+                  "branch.delivery.fields.freeDeliveryFrom.label"
+                )}
+                placeholder={tRegister(
+                  "branch.delivery.fields.freeDeliveryFrom.placeholder"
+                )}
+                value={toInputNumber(rule.freeDeliveryThreshold)}
+                onChange={(val) =>
+                  onUpdateRule(
+                    index,
+                    "freeDeliveryThreshold",
+                    val ? Number(val) : 0
+                  )
                 }
               />
 

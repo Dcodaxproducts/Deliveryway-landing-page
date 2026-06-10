@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { FormInput } from "./form/FormInput";
@@ -22,6 +22,13 @@ type TenantSection = {
   logoPreviewUrl?: string;
   logoUrl?: string;
   name?: string;
+};
+
+type UserSection = {
+  firstName?: string;
+  lastName?: string;
+  profilePreviewUrl?: string;
+  profileUrl?: string;
 };
 
 type RestaurantSection = {
@@ -47,6 +54,7 @@ interface Props {
   formData: {
     restaurant: RestaurantSection;
     tenant: TenantSection;
+    user?: UserSection;
   };
   updateFormData: (section: string, data: Record<string, unknown>) => void;
   next: () => void;
@@ -72,6 +80,7 @@ export function TenantInfoStep({
     return createRestaurantSchema(validationMessages);
   }, [validationMessages]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [tenantSameAsOwner, setTenantSameAsOwner] = useState(false);
 /* ---------------- SLUG GENERATOR ---------------- */
 const { uploadFile, uploading, progress } = useFileUpload();
 
@@ -86,6 +95,46 @@ const generateSlug = (name: string) => {
     .replace(/\s+/g, "-")           // spaces -> dash
     .replace(/-+/g, "-");           // remove duplicate dashes
 };
+
+const scrollToInput = (input: HTMLInputElement | null) => {
+  input?.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+  window.setTimeout(() => input?.focus(), 250);
+};
+
+const getOwnerDisplayName = () => {
+  return [formData.user?.firstName, formData.user?.lastName]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+};
+
+useEffect(() => {
+  if (!tenantSameAsOwner) return;
+
+  const ownerName = getOwnerDisplayName();
+
+  updateFormData("tenant", {
+    name: ownerName,
+    logoPreviewUrl: formData.user?.profilePreviewUrl || "",
+    logoUrl: formData.user?.profileUrl || "",
+  });
+  setErrors((prev) => {
+    const updated = { ...prev };
+    delete updated["tenant.name"];
+    return updated;
+  });
+  // updateFormData is provided by the parent form and intentionally omitted to avoid a copy loop.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [
+  tenantSameAsOwner,
+  formData.user?.firstName,
+  formData.user?.lastName,
+  formData.user?.profilePreviewUrl,
+  formData.user?.profileUrl,
+]);
   /* ---------------- REFS FOR UX ---------------- */
 
   const refs: Record<string, RefObject<HTMLInputElement | null>> = {
@@ -275,7 +324,7 @@ const handleRestaurantLogoChange = async (
         "restaurant.branding.secondaryColor": refs.secondaryColor,
       };
 
-      focusMap[firstError]?.current?.focus();
+      scrollToInput(focusMap[firstError]?.current || null);
 
       return;
     }
@@ -287,9 +336,26 @@ const handleRestaurantLogoChange = async (
   return (
     <div className="max-w-5xl mx-auto bg-white rounded-xl p-8">
       {/* Tenant Info */}
-      <h2 className="text-[20px] font-semibold text-gray-900 mb-6">
-        {tRegister("tenant.title")}
-      </h2>
+      <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50/70 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-[20px] font-semibold text-gray-900">
+            {tRegister("tenant.title")}
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            {tRegister("tenant.sameAsOwner.description")}
+          </p>
+        </div>
+
+        <label className="flex cursor-pointer items-center gap-3 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800">
+          <input
+            type="checkbox"
+            checked={tenantSameAsOwner}
+            onChange={(event) => setTenantSameAsOwner(event.target.checked)}
+            className="h-4 w-4 accent-primary"
+          />
+          {tRegister("tenant.sameAsOwner.label")}
+        </label>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
         <div>
@@ -299,6 +365,7 @@ const handleRestaurantLogoChange = async (
             placeholder="Indus Foods Group"
             value={formData.tenant.name || ""}
             onChange={(val: string) => {
+              setTenantSameAsOwner(false);
               updateFormData("tenant", { name: val });
               clearError("tenant.name");
             }}
@@ -374,7 +441,7 @@ const handleRestaurantLogoChange = async (
         <div className="sm:col-span-2">
           <FormInput
             ref={refs.tenantBio}
-            label={tRegister("fields.tenantBio.requiredLabel")}
+            label={tRegister("fields.tenantBio.optionalLabel")}
             placeholder="Leading hospitality group in South Asia."
             value={formData.tenant.bio || ""}
             onChange={(val: string) => {
@@ -492,7 +559,7 @@ const handleRestaurantLogoChange = async (
         <div>
          <FormInput
   ref={refs.slug}
-  label={tRegister("fields.slug.requiredLabel")}
+  label={tRegister("fields.slug.optionalLabel")}
   placeholder="kfc-pakistan"
   value={formData.restaurant.slug || ""}
   
@@ -507,7 +574,7 @@ const handleRestaurantLogoChange = async (
         <div>
           <FormInput
             ref={refs.tagline}
-            label={tRegister("fields.tagline.requiredLabel")}
+            label={tRegister("fields.tagline.optionalLabel")}
             placeholder="It's Finger Lickin' Good"
             value={formData.restaurant.tagline || ""}
             onChange={(val: string) => {
@@ -539,7 +606,7 @@ const handleRestaurantLogoChange = async (
         <div>
           <FormInput
             ref={refs.supportEmail}
-            label={tRegister("fields.supportEmail.requiredLabel")}
+            label={tRegister("fields.supportEmail.optionalLabel")}
             placeholder="support@kfc.com.pk"
             value={formData.restaurant.supportContact.email || ""}
             onChange={(val: string) => {
@@ -562,7 +629,7 @@ const handleRestaurantLogoChange = async (
         <div>
           <FormInput
             ref={refs.supportPhone}
-            label={tRegister("fields.supportPhone.requiredLabel")}
+            label={tRegister("fields.supportPhone.optionalLabel")}
             placeholder="111-532-532"
             value={formData.restaurant.supportContact.phone || ""}
             onChange={(val: string) => {
@@ -585,7 +652,7 @@ const handleRestaurantLogoChange = async (
         <div>
           <FormInput
             ref={refs.supportWhatsapp}
-            label={tRegister("fields.supportWhatsapp.requiredLabel")}
+            label={tRegister("fields.supportWhatsapp.optionalLabel")}
             placeholder="+923000000000"
             value={formData.restaurant.supportContact.whatsapp || ""}
             onChange={(val: string) => {
@@ -615,7 +682,7 @@ const handleRestaurantLogoChange = async (
         <div>
           <FormInput
             ref={refs.primaryColor}
-            label={tRegister("fields.primaryColor.requiredLabel")}
+            label={tRegister("fields.primaryColor.optionalLabel")}
             placeholder="#e4002b"
             value={formData.restaurant.branding.primaryColor || ""}
             onChange={(val: string) => {
@@ -638,7 +705,7 @@ const handleRestaurantLogoChange = async (
         <div>
           <FormInput
             ref={refs.secondaryColor}
-            label={tRegister("fields.secondaryColor.requiredLabel")}
+            label={tRegister("fields.secondaryColor.optionalLabel")}
             placeholder="#ffffff"
             value={formData.restaurant.branding.secondaryColor || ""}
             onChange={(val: string) => {

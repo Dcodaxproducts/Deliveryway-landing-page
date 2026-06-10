@@ -1,6 +1,6 @@
 import type { GoogleAutocomplete, GoogleGeocoderResult } from "@/types/register";
 
-export type DeliveryMode = "POSTAL_CODE" | "RADIUS" | "ZONE";
+export type DeliveryMode = "POSTAL_CODE" | "RADIUS" | "ZONE" | "ZONE_BANDS";
 
 export type LatLngKey = "lat" | "lng";
 
@@ -29,6 +29,8 @@ export type DeliveryZoneBand = {
 
 export type PostalCodeRule = {
   deliveryFee?: number | string;
+  freeDeliveryThreshold?: number | string;
+  minOrderAmount?: number | string;
   postalCode?: string;
 };
 

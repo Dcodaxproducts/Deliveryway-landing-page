@@ -14,7 +14,12 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 
 type PublishedResponseData = {
+  branchAdminCredentials?: {
+    email?: unknown;
+    password?: unknown;
+  };
   branchId?: unknown;
+  email?: unknown;
   ownerId?: unknown;
   restaurant?: {
     id?: unknown;
@@ -104,7 +109,11 @@ const omitAuthTokens = (value: PlainObject): PublishedResponseData => {
 };
 
 const normalizeDeliveryMode = (mode: unknown) => {
-  return mode === "ZONE" || mode === "POSTAL_CODE" ? mode : "RADIUS";
+  if (mode === "ZONE" || mode === "POSTAL_CODE" || mode === "ZONE_BANDS") {
+    return mode;
+  }
+
+  return "RADIUS";
 };
 
 const normalizeDeliveryZones = (zones: unknown) => {
@@ -173,9 +182,105 @@ const normalizePostalCodeRules = (rules: unknown) => {
       return {
         postalCode: toStringValue(rule.postalCode).trim(),
         deliveryFee: toNumber(rule.deliveryFee, 0),
+        minOrderAmount: toNumber(rule.minOrderAmount, 0),
+        freeDeliveryThreshold: toNumber(rule.freeDeliveryThreshold, 0),
       };
     })
-    .filter((rule) => rule.postalCode || rule.deliveryFee > 0);
+    .filter(
+      (rule) =>
+        rule.postalCode ||
+        rule.deliveryFee > 0 ||
+        rule.minOrderAmount > 0 ||
+        rule.freeDeliveryThreshold > 0
+    );
+};
+
+const createRestaurantBrandingPayload = (brandingValue: unknown) => {
+  const branding = normalizePlainObject(brandingValue);
+  const primaryColor = toStringValue(branding.primaryColor, "#c1000a");
+  const secondaryColor = toStringValue(branding.secondaryColor, "#030401");
+  const accentColor = toStringValue(branding.accentColor, "#F59E0B");
+  const backgroundColor = toStringValue(branding.backgroundColor, "#F5F5F5");
+  const textColor = toStringValue(branding.textColor, "#030401");
+  const fontFamily = toStringValue(
+    branding.fontFamily,
+    "var(--font-onest), 'Onest', 'Onest Fallback', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+  );
+  const headingFontFamily = toStringValue(
+    branding.headingFontFamily,
+    fontFamily
+  );
+  const dark = {
+    primaryColor: "#FF4D57",
+    secondaryColor: "#F5F5F5",
+    accentColor: "#FBBF24",
+    backgroundColor: "#030401",
+    textColor: "#F5F5F5",
+  };
+
+  return {
+    primaryColor,
+    secondaryColor,
+    accentColor,
+    backgroundColor,
+    textColor,
+    dark,
+    fontFamily,
+    headingFontFamily,
+    borderRadius: toStringValue(branding.borderRadius, "12px"),
+    buttonStyle: toStringValue(branding.buttonStyle, "rounded"),
+    theme: {
+      mode: "light",
+      primaryColor,
+      secondaryColor,
+      accentColor,
+      backgroundColor,
+      textColor,
+      dark,
+      fontFamily,
+      headingFontFamily,
+      borderRadius: toStringValue(branding.borderRadius, "12px"),
+      buttonStyle: toStringValue(branding.buttonStyle, "rounded"),
+      homeLayout: "hero",
+      menuCardStyle: "image-top",
+      showPopularItems: true,
+      showCategories: true,
+    },
+    app: {
+      homeLayout: "hero",
+      menuCardStyle: "image-top",
+      showTagline: true,
+      showHeroBanner: true,
+      splashColor: primaryColor,
+      statusBarColor: secondaryColor,
+      bottomNavColor: backgroundColor,
+    },
+    checkout: {
+      showLogo: true,
+      showSupportContact: true,
+      successMessage: "Thank you for ordering with us.",
+      highlightColor: primaryColor,
+      successColor: "#00A63E",
+      warningColor: accentColor,
+      errorColor: primaryColor,
+    },
+    assets: {
+      logoUrl: "",
+      coverImage: "",
+      heroBannerUrl: "",
+      placeholderImage: "",
+      faviconUrl: "",
+      logos: {
+        primaryLogoUrl: "",
+        compactLogoUrl: "",
+        faviconUrl: "",
+      },
+    },
+    logo: {
+      light: "",
+      dark: "",
+    },
+  };
 };
 
 const buildBranchSettingsPayload = (settingsValue: unknown) => {
@@ -299,9 +404,17 @@ export function BusinessOnboarding() {
         phone: "",
       },
       branding: {
-        primaryColor: "#e4002b",
-        secondaryColor: "#ffffff",
-        fontFamily: "Poppins",
+        primaryColor: "#c1000a",
+        secondaryColor: "#030401",
+        accentColor: "#F59E0B",
+        backgroundColor: "#F5F5F5",
+        textColor: "#030401",
+        fontFamily:
+          "var(--font-onest), 'Onest', 'Onest Fallback', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        headingFontFamily:
+          "var(--font-onest), 'Onest', 'Onest Fallback', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        borderRadius: "12px",
+        buttonStyle: "rounded",
       },
       socialMedia: {},
     },
@@ -314,8 +427,9 @@ export function BusinessOnboarding() {
       coverImageFile: undefined as File | undefined,
       description: "",
       address: {
+        houseNumber: "",
         street: "",
-        area: "",
+        postalCode: "",
         city: "",
         state: "",
         country: "Pakistan",
@@ -330,9 +444,9 @@ export function BusinessOnboarding() {
         allowedPaymentMethods: ["COD"],
         deliveryConfig: {
           mode: "RADIUS",
-          radiusKm: 0,
+          radiusKm: 5,
           minOrderAmount: 0,
-          deliveryFee: 0,
+          deliveryFee: 150,
           isFreeDelivery: false,
           freeDeliveryThreshold: 0,
           zones: [],
@@ -341,7 +455,7 @@ export function BusinessOnboarding() {
         },
         automation: {
           autoAcceptOrders: false,
-          estimatedPrepTime: 0,
+          estimatedPrepTime: 30,
         },
         taxation: {
           taxPercentage: 0,
@@ -355,11 +469,11 @@ export function BusinessOnboarding() {
         taxPercentage: 0,
         isFreeDelivery: false,
         freeDeliveryThreshold: 0,
-        deliveryFee: 0,
+        deliveryFee: 150,
         minOrderAmount: 0,
-        radiusKm: 0,
+        radiusKm: 5,
         autoAcceptOrders: false,
-        estimatedPrepTime: 0,
+        estimatedPrepTime: 30,
       },
     },
   });
@@ -472,7 +586,7 @@ export function BusinessOnboarding() {
         bio: formData.restaurant.bio || "",
         tagline: formData.restaurant.tagline,
         supportContact: normalizePlainObject(formData.restaurant.supportContact),
-        branding: normalizePlainObject(formData.restaurant.branding),
+        branding: createRestaurantBrandingPayload(formData.restaurant.branding),
         socialMedia: normalizePlainObject(formData.restaurant.socialMedia),
       },
       branch: {
@@ -485,8 +599,11 @@ export function BusinessOnboarding() {
         coverImage: formData.branch.coverImage,
         description: formData.branch.description,
         settings: branchSettingsPayload,
-        street: formData.branch.address.street,
-        area: formData.branch.address.area,
+        street: [formData.branch.address.houseNumber, formData.branch.address.street]
+          .filter(Boolean)
+          .join(" ")
+          .trim(),
+        area: formData.branch.address.postalCode || "",
         city: formData.branch.address.city,
         state: formData.branch.address.state,
         country: formData.branch.address.country,

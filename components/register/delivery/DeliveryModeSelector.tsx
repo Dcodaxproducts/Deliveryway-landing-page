@@ -21,7 +21,7 @@ export function DeliveryModeSelector({
         {tRegister("branch.delivery.modeLabel")}
       </p>
 
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
         {DELIVERY_MODES.map((mode) => {
           const active = deliveryMode === mode.value;
 

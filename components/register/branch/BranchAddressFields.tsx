@@ -21,6 +21,20 @@ export function BranchAddressFields({
     <>
       <div>
         <FormInput
+          label={tRegister("branch.address.fields.houseNumber.optionalLabel")}
+          placeholder={tRegister("branch.address.fields.houseNumber.placeholder")}
+          value={address.houseNumber || ""}
+          onChange={(val) => onFieldChange("houseNumber", val)}
+        />
+        {error("branch.address.houseNumber") && (
+          <p className="text-red-500 text-xs mt-1">
+            {error("branch.address.houseNumber")}
+          </p>
+        )}
+      </div>
+
+      <div data-field="branch.address.street">
+        <FormInput
           label={tRegister("branch.address.fields.street.requiredLabel")}
           placeholder={tRegister("branch.address.fields.street.placeholder")}
           value={address.street || ""}
@@ -35,19 +49,19 @@ export function BranchAddressFields({
 
       <div>
         <FormInput
-          label={tRegister("branch.address.fields.area.requiredLabel")}
-          placeholder={tRegister("branch.address.fields.area.placeholder")}
-          value={address.area || ""}
-          onChange={(val) => onFieldChange("area", val)}
+          label={tRegister("branch.address.fields.postalCode.optionalLabel")}
+          placeholder={tRegister("branch.address.fields.postalCode.placeholder")}
+          value={address.postalCode || ""}
+          onChange={(val) => onFieldChange("postalCode", val)}
         />
-        {error("branch.address.area") && (
+        {error("branch.address.postalCode") && (
           <p className="text-red-500 text-xs mt-1">
-            {error("branch.address.area")}
+            {error("branch.address.postalCode")}
           </p>
         )}
       </div>
 
-      <div>
+      <div data-field="branch.address.city">
         <FormInput
           label={tRegister("branch.address.fields.city.requiredLabel")}
           placeholder={tRegister("branch.address.fields.city.placeholder")}
@@ -61,7 +75,7 @@ export function BranchAddressFields({
         )}
       </div>
 
-      <div>
+      <div data-field="branch.address.state">
         <FormInput
           label={tRegister("branch.address.fields.state.requiredLabel")}
           placeholder={tRegister("branch.address.fields.state.placeholder")}
@@ -75,7 +89,7 @@ export function BranchAddressFields({
         )}
       </div>
 
-      <div>
+      <div data-field="branch.address.country">
         <FormInput
           label={tRegister("branch.address.fields.country.requiredLabel")}
           placeholder={tRegister("branch.address.fields.country.placeholder")}

@@ -656,6 +656,10 @@
     },
     "tenant": {
       "title": "Mandanteninformationen",
+      "sameAsOwner": {
+        "label": "Wie Restaurantinhaber",
+        "description": "Verwenden Sie den Namen und das Profilbild des Inhabers für das Mandantenprofil. Sie können dies jederzeit deaktivieren und anpassen."
+      },
       "logo": {
         "label": "Mandantenlogo"
       }
@@ -683,6 +687,7 @@
         },
         "description": {
           "requiredLabel": "Beschreibung*",
+          "optionalLabel": "Beschreibung (optional)",
           "placeholder": "Unsere Hauptfiliale in Islamabad."
         }
       },
@@ -696,6 +701,7 @@
       "admin": {
         "title": "Filial-Admin-Konto",
         "description": "Erstellen Sie den Administrator auf Filialebene, der diese Filiale nach der Registrierung verwaltet.",
+        "sameAsOwner": "Wie Restaurantinhaber",
         "fields": {
           "firstName": {
             "label": "Vorname",
@@ -724,11 +730,15 @@
         "fields": {
           "street": {
             "requiredLabel": "Straße*",
+            "placeholder": "Main Boulevard"
+          },
+          "houseNumber": {
+            "optionalLabel": "Haus- / Shopnummer (optional)",
             "placeholder": "Shop 12, Block A"
           },
-          "area": {
-            "requiredLabel": "Gebiet*",
-            "placeholder": "F-6 Super Market"
+          "postalCode": {
+            "optionalLabel": "Postleitzahl (optional)",
+            "placeholder": "54000"
           },
           "city": {
             "requiredLabel": "Stadt*",
@@ -798,6 +808,10 @@
           "zone": {
             "label": "Polygonzonen",
             "description": "Zeichnen Sie mehrere Liefergebiete direkt in Google Maps."
+          },
+          "zoneBands": {
+            "label": "Distanzbänder",
+            "description": "Verwenden Sie Distanzstufen mit separaten Gebühren und Schwellenwerten."
           },
           "postalCode": {
             "label": "Postleitzahlen",
@@ -912,7 +926,7 @@
         },
         "postalRules": {
           "title": "Postleitzahlregeln",
-          "description": "Fügen Sie eine oder mehrere Postleitzahlen mit separaten Liefergebühren hinzu.",
+          "description": "Fügen Sie Postleitzahlen mit Liefergebühr, Mindestbestellung und Schwelle für kostenlose Lieferung hinzu.",
           "add": "Postleitzahl hinzufügen",
           "remove": "Postleitzahlregel entfernen",
           "empty": "Noch keine Postleitzahlregel konfiguriert."
@@ -946,31 +960,39 @@
         "requiredLabel": "Mandantenname*"
       },
       "tenantBio": {
-        "requiredLabel": "Mandantenbeschreibung*"
+        "requiredLabel": "Mandantenbeschreibung*",
+        "optionalLabel": "Mandantenbeschreibung (optional)"
       },
       "restaurantName": {
         "requiredLabel": "Restaurantname*"
       },
       "slug": {
-        "requiredLabel": "Slug*"
+        "requiredLabel": "Slug*",
+        "optionalLabel": "Slug (optional)"
       },
       "tagline": {
-        "requiredLabel": "Tagline*"
+        "requiredLabel": "Tagline*",
+        "optionalLabel": "Slogan (optional)"
       },
       "supportEmail": {
-        "requiredLabel": "Support-E-Mail*"
+        "requiredLabel": "Support-E-Mail*",
+        "optionalLabel": "Support-E-Mail (optional)"
       },
       "supportPhone": {
-        "requiredLabel": "Support-Telefon*"
+        "requiredLabel": "Support-Telefon*",
+        "optionalLabel": "Support-Telefon (optional)"
       },
       "supportWhatsapp": {
-        "requiredLabel": "Support-WhatsApp*"
+        "requiredLabel": "Support-WhatsApp*",
+        "optionalLabel": "Support-WhatsApp (optional)"
       },
       "primaryColor": {
-        "requiredLabel": "Primärfarbe*"
+        "requiredLabel": "Primärfarbe*",
+        "optionalLabel": "Primärfarbe (optional)"
       },
       "secondaryColor": {
-        "requiredLabel": "Sekundärfarbe*"
+        "requiredLabel": "Sekundärfarbe*",
+        "optionalLabel": "Sekundärfarbe (optional)"
       },
       "fontFamily": {
         "label": "Schriftart"
@@ -1072,6 +1094,14 @@
         "description": "Der Inhaber kann sich mit der registrierten E-Mail-Adresse anmelden. Der Dashboard-Link enthält den Restaurantkontext für eine reibungslosere Anmeldung.",
         "loginUrl": "Login-URL"
       },
+      "credentials": {
+        "title": "Login-Zugangsdaten",
+        "description": "Prüfen Sie die erzeugten Zugangsdaten, bevor Sie diese Seite verlassen. Passwörter sind standardmäßig ausgeblendet und können zur Kontrolle angezeigt werden.",
+        "ownerEmail": "Inhaber-E-Mail",
+        "ownerPassword": "Inhaber-Passwort",
+        "branchAdminEmail": "Filial-Admin-E-Mail",
+        "branchAdminPassword": "Filial-Admin-Passwort"
+      },
       "systemReferences": {
         "title": "Systemreferenzen",
         "description": "Interne IDs, die nach erfolgreichem Onboarding von der Plattform generiert wurden."
@@ -1160,6 +1190,10 @@
       "restaurantLogoMaxSize": "Restaurantlogo muss kleiner als {size} MB sein.",
       "branchCoverImageMaxSize": "Titelbild muss kleiner als {size} MB sein.",
       "areaRequired": "Bereich ist erforderlich",
+      "branchAdminEmailRequired": "Filial-Admin-E-Mail ist erforderlich",
+      "branchAdminFirstNameRequired": "Vorname des Filial-Admins ist erforderlich",
+      "branchAdminLastNameRequired": "Nachname des Filial-Admins ist erforderlich",
+      "branchAdminPasswordRequired": "Filial-Admin-Passwort ist erforderlich",
       "branchNameRequired": "Filialname ist erforderlich",
       "cityRequired": "Stadt ist erforderlich",
       "countryRequired": "Land ist erforderlich",

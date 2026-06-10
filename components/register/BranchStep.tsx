@@ -16,6 +16,7 @@ import { BranchAdminInfo } from "./branch/BranchAdminInfo";
 import { BranchBasicInfo } from "./branch/BranchBasicInfo";
 import { BranchLocationSearch } from "./branch/BranchLocationSearch";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import type {
   BranchAddressField,
   BranchAddressValue,
@@ -65,6 +66,11 @@ const toFiniteNumber = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const toNumber = (value: unknown, fallback = 0) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
 const getGoogleMaps = () => {
   return (window.google as { maps?: GoogleMapsNamespace } | undefined)?.maps;
 };
@@ -98,6 +104,7 @@ export function BranchStep({
   const [mapsError, setMapsError] = useState("");
   const [selectedGoogleAddress, setSelectedGoogleAddress] = useState("");
   const [addressSearching, setAddressSearching] = useState(false);
+  const [branchAdminSameAsOwner, setBranchAdminSameAsOwner] = useState(false);
   const autocompleteInputRef = useRef<HTMLInputElement | null>(null);
   const autocompleteInstanceRef = useRef<GoogleAutocomplete | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -125,8 +132,9 @@ export function BranchStep({
 
   const composeAddress = (address: BranchAddressValue) => {
     return [
+      address?.houseNumber,
       address?.street,
-      address?.area,
+      address?.postalCode,
       address?.city,
       address?.state,
       address?.country,
@@ -138,7 +146,7 @@ export function BranchStep({
   const hasMeaningfulAddress = (address: BranchAddressValue) => {
     return Boolean(
       address?.street ||
-        address?.area ||
+        address?.postalCode ||
         address?.city ||
         address?.state ||
         (address?.lat && address?.lng)
@@ -151,8 +159,35 @@ export function BranchStep({
   };
 
   const updateBranchAdminField = (field: BranchAdminField, value: string) => {
+    setBranchAdminSameAsOwner(false);
     updateFormData("branchAdmin", { [field]: value });
     clearError(`branchAdmin.${String(field)}`);
+  };
+
+  const copyOwnerToBranchAdmin = () => {
+    updateFormData("branchAdmin", {
+      email: formData.user?.email || "",
+      firstName: formData.user?.firstName || "",
+      lastName: formData.user?.lastName || "",
+      password: formData.user?.password || "",
+      phone: formData.user?.phone || "",
+    });
+
+    [
+      "branchAdmin.email",
+      "branchAdmin.firstName",
+      "branchAdmin.lastName",
+      "branchAdmin.password",
+      "branchAdmin.phone",
+    ].forEach(clearError);
+  };
+
+  const handleBranchAdminSameAsOwnerChange = (checked: boolean) => {
+    setBranchAdminSameAsOwner(checked);
+
+    if (checked) {
+      copyOwnerToBranchAdmin();
+    }
   };
 
   const updateAddressField = (
@@ -290,21 +325,10 @@ export function BranchStep({
       return false;
     }
 
-    const streetNumber = getAddressComponent(components, ["street_number"]);
+    const houseNumber = getAddressComponent(components, ["street_number"]);
     const route = getAddressComponent(components, ["route"]);
-    const street =
-      [streetNumber, route].filter(Boolean).join(" ").trim() ||
-      place.name ||
-      "";
-
-    const area =
-      getAddressComponent(components, [
-        "sublocality",
-        "sublocality_level_1",
-        "sublocality_level_2",
-        "neighborhood",
-        "premise",
-      ]) || "";
+    const street = route || place.name || "";
+    const postalCode = getAddressComponent(components, ["postal_code"]);
 
     const city =
       getAddressComponent(components, ["locality"]) ||
@@ -329,8 +353,9 @@ export function BranchStep({
 
     const nextAddress = {
       ...(branchAddressRef.current || branchAddress),
+      houseNumber,
       street,
-      area,
+      postalCode,
       city,
       state,
       country,
@@ -346,8 +371,9 @@ export function BranchStep({
       place.formatted_address || composeAddress(nextAddress) || "";
 
     updateFormData("branch", {
+      houseNumber: nextAddress.houseNumber,
       street: nextAddress.street,
-      area: nextAddress.area,
+      postalCode: nextAddress.postalCode,
       city: nextAddress.city,
       state: nextAddress.state,
       country: nextAddress.country,
@@ -367,7 +393,8 @@ export function BranchStep({
 
     [
       "branch.address.street",
-      "branch.address.area",
+      "branch.address.houseNumber",
+      "branch.address.postalCode",
       "branch.address.city",
       "branch.address.state",
       "branch.address.country",
@@ -802,13 +829,165 @@ export function BranchStep({
           maximumAge: 0,
         }
       );
-    } catch (err) {
+    } catch {
       setGettingLocation(false);
       setLocationError(tRegister("branch.location.permissionCheckFailed"));
     }
   };
 
   /* ---------------- VALIDATION ---------------- */
+
+  const scrollToFirstError = (fieldErrors: Record<string, string>) => {
+    const firstError = Object.keys(fieldErrors)[0];
+    if (!firstError) return;
+
+    window.setTimeout(() => {
+      const target = document.querySelector<HTMLElement>(
+        `[data-field="${firstError}"]`
+      );
+      const input = target?.querySelector<
+        HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement
+      >("input, textarea, button");
+
+      (target || input)?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      window.setTimeout(() => input?.focus(), 250);
+    }, 50);
+  };
+
+  const validateBranchAdmin = () => {
+    const nextErrors: Record<string, string> = {};
+
+    if (!branchAdmin.firstName?.trim()) {
+      nextErrors["branchAdmin.firstName"] = tValidation(
+        "register.branchAdminFirstNameRequired"
+      );
+    }
+
+    if (!branchAdmin.lastName?.trim()) {
+      nextErrors["branchAdmin.lastName"] = tValidation(
+        "register.branchAdminLastNameRequired"
+      );
+    }
+
+    if (!branchAdmin.email?.trim()) {
+      nextErrors["branchAdmin.email"] = tValidation(
+        "register.branchAdminEmailRequired"
+      );
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(branchAdmin.email)) {
+      nextErrors["branchAdmin.email"] = tValidation("register.invalidEmailFormat");
+    }
+
+    if (!branchAdmin.password?.trim()) {
+      nextErrors["branchAdmin.password"] = tValidation(
+        "register.branchAdminPasswordRequired"
+      );
+    } else if (branchAdmin.password.length < 8) {
+      nextErrors["branchAdmin.password"] = tValidation("register.passwordMin");
+    }
+
+    return nextErrors;
+  };
+
+  const validateDeliverySettings = () => {
+    const deliveryConfig = branchSettings.deliveryConfig;
+
+    if (!deliveryConfig || typeof deliveryConfig !== "object") return true;
+
+    const config = deliveryConfig as {
+      mode?: string;
+      postalCodeRules?: {
+        deliveryFee?: number | string;
+        postalCode?: string;
+      }[];
+      zoneBands?: {
+        deliveryFee?: number | string;
+        fromKm?: number | string;
+        toKm?: number | string;
+      }[];
+      zones?: {
+        deliveryFee?: number | string;
+        name?: string;
+        polygon?: unknown[];
+      }[];
+    };
+
+    if (config.mode === "POSTAL_CODE") {
+      const rules = Array.isArray(config.postalCodeRules)
+        ? config.postalCodeRules
+        : [];
+      const postalCodes = rules
+        .map((rule) => String(rule.postalCode || "").trim())
+        .filter(Boolean);
+
+      if (!rules.length || rules.some((rule) => !rule.postalCode || rule.deliveryFee === "")) {
+        toast.error("Add at least one postal code rule with postal code and delivery fee.");
+        return false;
+      }
+
+      if (new Set(postalCodes).size !== postalCodes.length) {
+        toast.error("Postal code rules cannot contain duplicate postal codes.");
+        return false;
+      }
+    }
+
+    if (config.mode === "ZONE_BANDS") {
+      const bands = Array.isArray(config.zoneBands) ? config.zoneBands : [];
+      const normalizedBands = bands.map((band) => ({
+        fromKm: toNumber(band.fromKm, NaN),
+        toKm: toNumber(band.toKm, NaN),
+        deliveryFee: toNumber(band.deliveryFee, NaN),
+      }));
+
+      if (
+        !normalizedBands.length ||
+        normalizedBands.some(
+          (band) =>
+            !Number.isFinite(band.fromKm) ||
+            !Number.isFinite(band.toKm) ||
+            !Number.isFinite(band.deliveryFee) ||
+            band.fromKm < 0 ||
+            band.toKm <= band.fromKm
+        )
+      ) {
+        toast.error("Add valid distance bands with from/to km and delivery fee.");
+        return false;
+      }
+
+      const sortedBands = [...normalizedBands].sort((a, b) => a.fromKm - b.fromKm);
+      const hasOverlap = sortedBands.some((band, index) => {
+        const previous = sortedBands[index - 1];
+        return previous ? band.fromKm < previous.toKm : false;
+      });
+
+      if (hasOverlap) {
+        toast.error("Distance bands cannot overlap.");
+        return false;
+      }
+    }
+
+    if (config.mode === "ZONE") {
+      const zones = Array.isArray(config.zones) ? config.zones : [];
+
+      if (
+        !zones.length ||
+        zones.some(
+          (zone) =>
+            !zone.name ||
+            zone.deliveryFee === "" ||
+            !Array.isArray(zone.polygon) ||
+            zone.polygon.length < 3
+        )
+      ) {
+        toast.error("Add at least one delivery zone with a name, fee, and three map points.");
+        return false;
+      }
+    }
+
+    return true;
+  };
 
   const handleNext = () => {
     const { success, errors } = validateZod(
@@ -817,8 +996,22 @@ export function BranchStep({
       "branch"
     );
 
-    if (!success) {
-      setErrors(errors);
+    const branchAdminErrors = validateBranchAdmin();
+    const mergedErrors = {
+      ...errors,
+      ...branchAdminErrors,
+    };
+
+    if (!success || Object.keys(branchAdminErrors).length > 0) {
+      setErrors(mergedErrors);
+      scrollToFirstError(mergedErrors);
+      return;
+    }
+
+    if (!validateDeliverySettings()) {
+      document
+        .querySelector<HTMLElement>('[data-field="branch.settings.deliveryConfig"]')
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
@@ -840,7 +1033,9 @@ export function BranchStep({
       <BranchAdminInfo
         branchAdmin={branchAdmin}
         error={error}
+        isSameAsOwner={branchAdminSameAsOwner}
         onFieldChange={(field, value) => updateBranchAdminField(field, value)}
+        onSameAsOwnerChange={handleBranchAdminSameAsOwnerChange}
       />
 
       {/* Address */}

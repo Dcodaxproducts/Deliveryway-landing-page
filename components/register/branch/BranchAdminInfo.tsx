@@ -7,29 +7,45 @@ import { useTranslations } from "next-intl";
 interface BranchAdminInfoProps {
   branchAdmin: BranchAdminValue;
   error: (path: string) => string | undefined;
+  isSameAsOwner: boolean;
   onFieldChange: (field: BranchAdminField, value: string) => void;
+  onSameAsOwnerChange: (checked: boolean) => void;
 }
 
 export function BranchAdminInfo({
   branchAdmin,
   error,
+  isSameAsOwner,
   onFieldChange,
+  onSameAsOwnerChange,
 }: BranchAdminInfoProps) {
   const tRegister = useTranslations("register");
 
   return (
     <section className="mb-10 rounded-2xl border border-gray-100 bg-gray-50/70 p-5">
-      <div className="mb-5 flex flex-col gap-1">
-        <h2 className="text-[20px] font-semibold text-gray-900">
-          {tRegister("branch.admin.title")}
-        </h2>
-        <p className="text-sm text-gray-500">
-          {tRegister("branch.admin.description")}
-        </p>
+      <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-[20px] font-semibold text-gray-900">
+            {tRegister("branch.admin.title")}
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            {tRegister("branch.admin.description")}
+          </p>
+        </div>
+
+        <label className="flex cursor-pointer items-center gap-3 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800">
+          <input
+            type="checkbox"
+            checked={isSameAsOwner}
+            onChange={(event) => onSameAsOwnerChange(event.target.checked)}
+            className="h-4 w-4 accent-primary"
+          />
+          {tRegister("branch.admin.sameAsOwner")}
+        </label>
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <div>
+        <div data-field="branchAdmin.firstName">
           <FormInput
             label={tRegister("branch.admin.fields.firstName.label")}
             placeholder={tRegister("branch.admin.fields.firstName.placeholder")}
@@ -43,7 +59,7 @@ export function BranchAdminInfo({
           )}
         </div>
 
-        <div>
+        <div data-field="branchAdmin.lastName">
           <FormInput
             label={tRegister("branch.admin.fields.lastName.label")}
             placeholder={tRegister("branch.admin.fields.lastName.placeholder")}
@@ -57,7 +73,7 @@ export function BranchAdminInfo({
           )}
         </div>
 
-        <div>
+        <div data-field="branchAdmin.email">
           <FormInput
             label={tRegister("branch.admin.fields.email.label")}
             placeholder={tRegister("branch.admin.fields.email.placeholder")}
@@ -85,12 +101,13 @@ export function BranchAdminInfo({
           )}
         </div>
 
-        <div className="sm:col-span-2">
+        <div className="sm:col-span-2" data-field="branchAdmin.password">
           <FormInput
             label={tRegister("branch.admin.fields.password.label")}
             placeholder={tRegister("branch.admin.fields.password.placeholder")}
             value={branchAdmin.password || ""}
             onChange={(val) => onFieldChange("password", val)}
+            showPasswordToggle
           />
           {error("branchAdmin.password") && (
             <p className="mt-1 text-xs text-red-500">

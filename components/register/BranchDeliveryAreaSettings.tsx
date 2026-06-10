@@ -95,7 +95,9 @@ export function BranchDeliveryAreaSettings({
 
   const deliveryConfig = settings?.deliveryConfig || {};
   const deliveryMode: DeliveryMode =
-    deliveryConfig.mode === "ZONE" || deliveryConfig.mode === "POSTAL_CODE"
+    deliveryConfig.mode === "ZONE" ||
+    deliveryConfig.mode === "POSTAL_CODE" ||
+    deliveryConfig.mode === "ZONE_BANDS"
       ? deliveryConfig.mode
       : "RADIUS";
 
@@ -1015,7 +1017,10 @@ export function BranchDeliveryAreaSettings({
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+      <section
+        className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+        data-field="branch.settings.deliveryConfig"
+      >
         <div className="mb-5">
           <h2 className="text-[20px] font-semibold text-gray-900">
             {tRegister("branch.delivery.title")}
@@ -1127,7 +1132,7 @@ export function BranchDeliveryAreaSettings({
             />
           ) : null}
 
-          {deliveryMode === "RADIUS" ? (
+          {deliveryMode === "ZONE_BANDS" ? (
             <RadiusDeliverySettings
               onAddBand={addZoneBand}
               onDuplicateBand={duplicateZoneBand}

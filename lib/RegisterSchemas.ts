@@ -11,6 +11,10 @@ export type RegisterValidationTranslator = (
 
 export type RegisterValidationMessages = {
   areaRequired: string;
+  branchAdminEmailRequired: string;
+  branchAdminFirstNameRequired: string;
+  branchAdminLastNameRequired: string;
+  branchAdminPasswordRequired: string;
   branchNameRequired: string;
   cityRequired: string;
   countryRequired: string;
@@ -63,6 +67,10 @@ export type RegisterValidationMessages = {
 
 export const DEFAULT_REGISTER_VALIDATION_MESSAGES: RegisterValidationMessages = {
   areaRequired: "Area is required",
+  branchAdminEmailRequired: "Branch admin email is required",
+  branchAdminFirstNameRequired: "Branch admin first name is required",
+  branchAdminLastNameRequired: "Branch admin last name is required",
+  branchAdminPasswordRequired: "Branch admin password is required",
   branchNameRequired: "Branch name is required",
   cityRequired: "City is required",
   countryRequired: "Country is required",
@@ -117,6 +125,10 @@ export const createRegisterValidationMessages = (
   t: RegisterValidationTranslator
 ): RegisterValidationMessages => ({
   areaRequired: t("register.areaRequired"),
+  branchAdminEmailRequired: t("register.branchAdminEmailRequired"),
+  branchAdminFirstNameRequired: t("register.branchAdminFirstNameRequired"),
+  branchAdminLastNameRequired: t("register.branchAdminLastNameRequired"),
+  branchAdminPasswordRequired: t("register.branchAdminPasswordRequired"),
   branchNameRequired: t("register.branchNameRequired"),
   cityRequired: t("register.cityRequired"),
   countryRequired: t("register.countryRequired"),
@@ -296,7 +308,7 @@ export const createTenantSchema = (
   messages = DEFAULT_REGISTER_VALIDATION_MESSAGES
 ) =>
   z.object({
-    bio: z.string().min(1, messages.tenantBioRequired),
+    bio: optionalString,
     logoFile: createOptionalImageSchema(2, messages).optional(),
     logoPreviewUrl: optionalString,
     logoUrl: optionalString,
@@ -309,18 +321,21 @@ export const createRestaurantSchema = (
   messages = DEFAULT_REGISTER_VALIDATION_MESSAGES
 ) =>
   z.object({
-    branding: z.object({
-      fontFamily: z.string().min(1, messages.fontFamilyRequired),
-      primaryColor: z
-        .string()
-        .min(1, messages.primaryColorRequired)
-        .regex(/^#([0-9A-Fa-f]{3}){1,2}$/, messages.invalidHexColor),
-
-      secondaryColor: z
-        .string()
-        .min(1, messages.secondaryColorRequired)
-        .regex(/^#([0-9A-Fa-f]{3}){1,2}$/, messages.invalidHexColor),
-    }),
+    branding: z
+      .object({
+        fontFamily: optionalString,
+        primaryColor: z
+          .string()
+          .regex(/^#([0-9A-Fa-f]{3}){1,2}$/, messages.invalidHexColor)
+          .optional()
+          .or(z.literal("")),
+        secondaryColor: z
+          .string()
+          .regex(/^#([0-9A-Fa-f]{3}){1,2}$/, messages.invalidHexColor)
+          .optional()
+          .or(z.literal("")),
+      })
+      .optional(),
 
     logoFile: createOptionalImageSchema(2, messages).optional(),
     logoPreviewUrl: optionalString,
@@ -330,22 +345,25 @@ export const createRestaurantSchema = (
 
     slug: z
       .string()
-      .min(1, messages.slugRequired)
-      .regex(/^[a-z0-9-]+$/, messages.slugInvalid),
+      .regex(/^[a-z0-9-]+$/, messages.slugInvalid)
+      .optional()
+      .or(z.literal("")),
 
     supportContact: z.object({
       email: z
         .string()
-        .min(1, messages.supportEmailRequired)
-        .email(messages.invalidEmail),
-      phone: z.string().min(1, messages.supportPhoneRequired),
+        .email(messages.invalidEmail)
+        .optional()
+        .or(z.literal("")),
+      phone: optionalString,
       whatsapp: z
         .string()
-        .min(1, messages.whatsappRequired)
-        .regex(/^\+?[0-9]{10,15}$/, messages.invalidWhatsappNumber),
+        .regex(/^\+?[0-9]{10,15}$/, messages.invalidWhatsappNumber)
+        .optional()
+        .or(z.literal("")),
     }),
 
-    tagline: z.string().min(1, messages.taglineRequired),
+    tagline: optionalString,
   });
 
 /* ---------------- BRANCH ---------------- */
@@ -376,9 +394,9 @@ export const createBranchSchema = (
 ) =>
   z.object({
     address: z.object({
-      area: z.string().min(1, messages.areaRequired),
       city: z.string().min(1, messages.cityRequired),
       country: z.string().min(1, messages.countryRequired),
+      houseNumber: optionalString,
 
       lat: z
         .string()
@@ -395,13 +413,14 @@ export const createBranchSchema = (
 
       state: z.string().min(1, messages.stateRequired),
       street: z.string().min(1, messages.streetRequired),
+      postalCode: optionalString,
     }),
 
     coverImageFile: createOptionalImageSchema(1, messages).optional(),
     coverImagePreviewUrl: optionalString,
     coverImageUrl: optionalString,
 
-    description: z.string().min(1, messages.descriptionRequired),
+    description: optionalString,
 
     name: z.string().min(1, messages.branchNameRequired),
 
