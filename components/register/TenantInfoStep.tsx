@@ -1159,7 +1159,7 @@ const handleRestaurantLogoChange = async (
         <div className="space-y-5 p-5 lg:p-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ColorControl
-              description="Buttons, active states, checkout highlights."
+              description="Buttons, active states, and checkout highlights."
               label="Primary Brand Color"
               value={getBrandingString(["primaryColor"], "#c1000a")}
               onChange={(value) => {
@@ -1225,7 +1225,7 @@ const handleRestaurantLogoChange = async (
               }}
             />
             <TextControl
-              description="Use px values like 12px to match admin."
+              description="Use px values like 12px to match admin defaults."
               label="Border Radius"
               placeholder="12px"
               value={getBrandingString(["borderRadius"], "12px")}
@@ -1240,349 +1240,383 @@ const handleRestaurantLogoChange = async (
           </div>
 
           <AdvancedPanel
-            icon={<Type className="h-5 w-5" />}
-            summary="Fonts, button style, theme mode, menu cards, and category flags."
-            title="Typography & Layout"
-          >
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              <SelectControl
-                description="Body font used across storefront surfaces."
-                label="Body Font Family"
-                options={FONT_OPTIONS}
-                value={getBrandingString(["fontFamily"], DEFAULT_FONT_FAMILY)}
-                onChange={(value) => {
-                  updateBrandingMany([
-                    { path: ["fontFamily"], value },
-                    { path: ["theme", "fontFamily"], value },
-                  ]);
-                }}
-              />
-              <SelectControl
-                description="Heading font for storefront titles."
-                label="Heading Font Family"
-                options={FONT_OPTIONS}
-                value={getBrandingString(
-                  ["headingFontFamily"],
-                  DEFAULT_FONT_FAMILY
-                )}
-                onChange={(value) => {
-                  updateBrandingMany([
-                    { path: ["headingFontFamily"], value },
-                    { path: ["theme", "headingFontFamily"], value },
-                  ]);
-                }}
-              />
-              <SelectControl
-                description="Primary button shape preference."
-                label="Button Style"
-                options={BUTTON_STYLE_OPTIONS}
-                value={getBrandingString(["buttonStyle"], "rounded")}
-                onChange={(value) => {
-                  updateBrandingMany([
-                    { path: ["buttonStyle"], value },
-                    { path: ["theme", "buttonStyle"], value },
-                  ]);
-                }}
-              />
-              <SelectControl
-                description="Default storefront color mode."
-                label="Theme Mode"
-                options={THEME_MODE_OPTIONS}
-                value={getBrandingString(["theme", "mode"], "light")}
-                onChange={(value) => updateBranding(["theme", "mode"], value)}
-              />
-              <SelectControl
-                description="Main storefront landing layout."
-                label="Home Layout"
-                options={HOME_LAYOUT_OPTIONS}
-                value={getBrandingString(["theme", "homeLayout"], "hero")}
-                onChange={(value) => {
-                  updateBrandingMany([
-                    { path: ["theme", "homeLayout"], value },
-                    { path: ["app", "homeLayout"], value },
-                  ]);
-                }}
-              />
-              <SelectControl
-                description="Menu item presentation style."
-                label="Menu Card Style"
-                options={MENU_CARD_STYLE_OPTIONS}
-                value={getBrandingString(["theme", "menuCardStyle"], "image-top")}
-                onChange={(value) => {
-                  updateBrandingMany([
-                    { path: ["theme", "menuCardStyle"], value },
-                    { path: ["app", "menuCardStyle"], value },
-                  ]);
-                }}
-              />
-              <ToggleControl
-                checked={getBrandingBoolean(["theme", "showPopularItems"], true)}
-                description="Show popular items section on storefront."
-                label="Show Popular Items"
-                onChange={(value) =>
-                  updateBranding(["theme", "showPopularItems"], value)
-                }
-              />
-              <ToggleControl
-                checked={getBrandingBoolean(["theme", "showCategories"], true)}
-                description="Show menu category navigation."
-                label="Show Categories"
-                onChange={(value) =>
-                  updateBranding(["theme", "showCategories"], value)
-                }
-              />
-            </div>
-          </AdvancedPanel>
-
-          <AdvancedPanel
             icon={<Sparkles className="h-5 w-5" />}
-            summary="Dark theme palette used when customers prefer dark/system mode."
-            title="Dark Theme Colors"
+            summary="Open this panel to tune typography, dark theme, app, checkout, and brand assets."
+            title="Advanced Branding Options"
           >
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              <ColorControl
-                label="Dark Primary Brand Color"
-                value={getBrandingString(["dark", "primaryColor"], "#FF4D57")}
-                onChange={(value) => {
-                  updateBrandingMany([
-                    { path: ["dark", "primaryColor"], value },
-                    { path: ["theme", "dark", "primaryColor"], value },
-                  ]);
-                }}
-              />
-              <ColorControl
-                label="Dark Secondary Color"
-                value={getBrandingString(["dark", "secondaryColor"], "#F5F5F5")}
-                onChange={(value) => {
-                  updateBrandingMany([
-                    { path: ["dark", "secondaryColor"], value },
-                    { path: ["theme", "dark", "secondaryColor"], value },
-                  ]);
-                }}
-              />
-              <ColorControl
-                label="Dark Accent Color"
-                value={getBrandingString(["dark", "accentColor"], "#FBBF24")}
-                onChange={(value) => {
-                  updateBrandingMany([
-                    { path: ["dark", "accentColor"], value },
-                    { path: ["theme", "dark", "accentColor"], value },
-                  ]);
-                }}
-              />
-              <ColorControl
-                label="Dark Background Color"
-                value={getBrandingString(["dark", "backgroundColor"], "#030401")}
-                onChange={(value) => {
-                  updateBrandingMany([
-                    { path: ["dark", "backgroundColor"], value },
-                    { path: ["theme", "dark", "backgroundColor"], value },
-                  ]);
-                }}
-              />
-              <ColorControl
-                label="Dark Text Color"
-                value={getBrandingString(["dark", "textColor"], "#F5F5F5")}
-                onChange={(value) => {
-                  updateBrandingMany([
-                    { path: ["dark", "textColor"], value },
-                    { path: ["theme", "dark", "textColor"], value },
-                  ]);
-                }}
-              />
-            </div>
-          </AdvancedPanel>
+            <div className="space-y-5">
+              <section className="rounded-2xl border border-white bg-white/90 p-4 shadow-[0_16px_45px_rgba(15,23,42,0.04)]">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Type className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Typography & Layout
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      Font families, button style, and card/list rendering.
+                    </p>
+                  </div>
+                </div>
 
-          <AdvancedPanel
-            icon={<Smartphone className="h-5 w-5" />}
-            summary="Mobile app shell and checkout state colors."
-            title="App & Checkout"
-          >
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              <ToggleControl
-                checked={getBrandingBoolean(["app", "showTagline"], true)}
-                description="Show restaurant tagline in app/storefront."
-                label="Show Tagline"
-                onChange={(value) => updateBranding(["app", "showTagline"], value)}
-              />
-              <ToggleControl
-                checked={getBrandingBoolean(["app", "showHeroBanner"], true)}
-                description="Show hero banner on customer-facing home."
-                label="Show Hero Banner"
-                onChange={(value) =>
-                  updateBranding(["app", "showHeroBanner"], value)
-                }
-              />
-              <ColorControl
-                label="App Splash Color"
-                value={getBrandingString(["app", "splashColor"], "#c1000a")}
-                onChange={(value) => updateBranding(["app", "splashColor"], value)}
-              />
-              <ColorControl
-                label="Status Bar Color"
-                value={getBrandingString(["app", "statusBarColor"], "#030401")}
-                onChange={(value) =>
-                  updateBranding(["app", "statusBarColor"], value)
-                }
-              />
-              <ColorControl
-                label="Bottom Nav Color"
-                value={getBrandingString(["app", "bottomNavColor"], "#F5F5F5")}
-                onChange={(value) =>
-                  updateBranding(["app", "bottomNavColor"], value)
-                }
-              />
-              <ToggleControl
-                checked={getBrandingBoolean(["checkout", "showLogo"], true)}
-                description="Show brand logo during checkout."
-                label="Checkout Logo"
-                onChange={(value) =>
-                  updateBranding(["checkout", "showLogo"], value)
-                }
-              />
-              <ToggleControl
-                checked={getBrandingBoolean(
-                  ["checkout", "showSupportContact"],
-                  true
-                )}
-                description="Show support contact during checkout."
-                label="Checkout Support Contact"
-                onChange={(value) =>
-                  updateBranding(["checkout", "showSupportContact"], value)
-                }
-              />
-              <TextControl
-                description="Message shown after a successful order."
-                label="Checkout Success Message"
-                placeholder="Thank you for ordering with us."
-                value={getBrandingString(
-                  ["checkout", "successMessage"],
-                  "Thank you for ordering with us."
-                )}
-                onChange={(value) =>
-                  updateBranding(["checkout", "successMessage"], value)
-                }
-              />
-              <ColorControl
-                label="Checkout Highlight Color"
-                value={getBrandingString(
-                  ["checkout", "highlightColor"],
-                  "#c1000a"
-                )}
-                onChange={(value) =>
-                  updateBranding(["checkout", "highlightColor"], value)
-                }
-              />
-              <ColorControl
-                label="Checkout Success Color"
-                value={getBrandingString(["checkout", "successColor"], "#00A63E")}
-                onChange={(value) =>
-                  updateBranding(["checkout", "successColor"], value)
-                }
-              />
-              <ColorControl
-                label="Checkout Warning Color"
-                value={getBrandingString(["checkout", "warningColor"], "#F59E0B")}
-                onChange={(value) =>
-                  updateBranding(["checkout", "warningColor"], value)
-                }
-              />
-              <ColorControl
-                label="Checkout Error Color"
-                value={getBrandingString(["checkout", "errorColor"], "#c1000a")}
-                onChange={(value) =>
-                  updateBranding(["checkout", "errorColor"], value)
-                }
-              />
-            </div>
-          </AdvancedPanel>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <SelectControl
+                    description="Body font used across storefront surfaces."
+                    label="Body Font Family"
+                    options={FONT_OPTIONS}
+                    value={getBrandingString(["fontFamily"], DEFAULT_FONT_FAMILY)}
+                    onChange={(value) => {
+                      updateBrandingMany([
+                        { path: ["fontFamily"], value },
+                        { path: ["theme", "fontFamily"], value },
+                      ]);
+                    }}
+                  />
+                  <SelectControl
+                    description="Heading font for storefront titles."
+                    label="Heading Font Family"
+                    options={FONT_OPTIONS}
+                    value={getBrandingString(
+                      ["headingFontFamily"],
+                      DEFAULT_FONT_FAMILY
+                    )}
+                    onChange={(value) => {
+                      updateBrandingMany([
+                        { path: ["headingFontFamily"], value },
+                        { path: ["theme", "headingFontFamily"], value },
+                      ]);
+                    }}
+                  />
+                  <SelectControl
+                    description="Primary button shape preference."
+                    label="Button Style"
+                    options={BUTTON_STYLE_OPTIONS}
+                    value={getBrandingString(["buttonStyle"], "rounded")}
+                    onChange={(value) => {
+                      updateBrandingMany([
+                        { path: ["buttonStyle"], value },
+                        { path: ["theme", "buttonStyle"], value },
+                      ]);
+                    }}
+                  />
+                  <SelectControl
+                    description="Default storefront color mode."
+                    label="Theme Mode"
+                    options={THEME_MODE_OPTIONS}
+                    value={getBrandingString(["theme", "mode"], "light")}
+                    onChange={(value) => updateBranding(["theme", "mode"], value)}
+                  />
+                  <SelectControl
+                    description="Main storefront landing layout."
+                    label="Home Layout"
+                    options={HOME_LAYOUT_OPTIONS}
+                    value={getBrandingString(["theme", "homeLayout"], "hero")}
+                    onChange={(value) => {
+                      updateBrandingMany([
+                        { path: ["theme", "homeLayout"], value },
+                        { path: ["app", "homeLayout"], value },
+                      ]);
+                    }}
+                  />
+                  <SelectControl
+                    description="Menu item presentation style."
+                    label="Menu Card Style"
+                    options={MENU_CARD_STYLE_OPTIONS}
+                    value={getBrandingString(["theme", "menuCardStyle"], "image-top")}
+                    onChange={(value) => {
+                      updateBrandingMany([
+                        { path: ["theme", "menuCardStyle"], value },
+                        { path: ["app", "menuCardStyle"], value },
+                      ]);
+                    }}
+                  />
+                </div>
+              </section>
 
-          <AdvancedPanel
-            icon={<ImageIcon className="h-5 w-5" />}
-            summary="Logo, hero, cover, favicon, and placeholder asset URLs."
-            title="Brand Assets"
-          >
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <TextControl
-                label="Restaurant Logo URL"
-                placeholder="https://cdn.example.com/logo.png"
-                value={getBrandingString(["assets", "logoUrl"], "")}
-                onChange={(value) => updateBranding(["assets", "logoUrl"], value)}
-              />
-              <TextControl
-                label="Cover Image URL"
-                placeholder="https://cdn.example.com/cover.png"
-                value={getBrandingString(["assets", "coverImage"], "")}
-                onChange={(value) =>
-                  updateBranding(["assets", "coverImage"], value)
-                }
-              />
-              <TextControl
-                label="Hero Banner URL"
-                placeholder="https://cdn.example.com/hero.png"
-                value={getBrandingString(["assets", "heroBannerUrl"], "")}
-                onChange={(value) =>
-                  updateBranding(["assets", "heroBannerUrl"], value)
-                }
-              />
-              <TextControl
-                label="Placeholder Image URL"
-                placeholder="https://cdn.example.com/placeholder.png"
-                value={getBrandingString(["assets", "placeholderImage"], "")}
-                onChange={(value) =>
-                  updateBranding(["assets", "placeholderImage"], value)
-                }
-              />
-              <TextControl
-                label="Favicon URL"
-                placeholder="/favicon.ico"
-                value={getBrandingString(["assets", "faviconUrl"], "")}
-                onChange={(value) =>
-                  updateBranding(["assets", "faviconUrl"], value)
-                }
-              />
-              <TextControl
-                label="Primary Logo URL"
-                placeholder="https://cdn.example.com/logo-primary.png"
-                value={getBrandingString(
-                  ["assets", "logos", "primaryLogoUrl"],
-                  ""
-                )}
-                onChange={(value) =>
-                  updateBranding(["assets", "logos", "primaryLogoUrl"], value)
-                }
-              />
-              <TextControl
-                label="Compact Logo URL"
-                placeholder="https://cdn.example.com/logo-compact.png"
-                value={getBrandingString(
-                  ["assets", "logos", "compactLogoUrl"],
-                  ""
-                )}
-                onChange={(value) =>
-                  updateBranding(["assets", "logos", "compactLogoUrl"], value)
-                }
-              />
-              <TextControl
-                label="Asset Favicon URL"
-                placeholder="/favicon.ico"
-                value={getBrandingString(["assets", "logos", "faviconUrl"], "")}
-                onChange={(value) =>
-                  updateBranding(["assets", "logos", "faviconUrl"], value)
-                }
-              />
-              <TextControl
-                label="Logo for Light Backgrounds"
-                placeholder="https://cdn.example.com/logo-light.png"
-                value={getBrandingString(["logo", "light"], "")}
-                onChange={(value) => updateBranding(["logo", "light"], value)}
-              />
-              <TextControl
-                label="Logo for Dark Backgrounds"
-                placeholder="https://cdn.example.com/logo-dark.png"
-                value={getBrandingString(["logo", "dark"], "")}
-                onChange={(value) => updateBranding(["logo", "dark"], value)}
-              />
+              <section className="rounded-2xl border border-white bg-white/90 p-4 shadow-[0_16px_45px_rgba(15,23,42,0.04)]">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Sparkles className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Dark Theme Palette
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      Colors for system/dark mode and alternate storefront contrast.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <ColorControl
+                    label="Dark Primary Brand Color"
+                    value={getBrandingString(["dark", "primaryColor"], "#FF4D57")}
+                    onChange={(value) => {
+                      updateBrandingMany([
+                        { path: ["dark", "primaryColor"], value },
+                        { path: ["theme", "dark", "primaryColor"], value },
+                      ]);
+                    }}
+                  />
+                  <ColorControl
+                    label="Dark Secondary Color"
+                    value={getBrandingString(["dark", "secondaryColor"], "#F5F5F5")}
+                    onChange={(value) => {
+                      updateBrandingMany([
+                        { path: ["dark", "secondaryColor"], value },
+                        { path: ["theme", "dark", "secondaryColor"], value },
+                      ]);
+                    }}
+                  />
+                  <ColorControl
+                    label="Dark Accent Color"
+                    value={getBrandingString(["dark", "accentColor"], "#FBBF24")}
+                    onChange={(value) => {
+                      updateBrandingMany([
+                        { path: ["dark", "accentColor"], value },
+                        { path: ["theme", "dark", "accentColor"], value },
+                      ]);
+                    }}
+                  />
+                  <ColorControl
+                    label="Dark Background Color"
+                    value={getBrandingString(["dark", "backgroundColor"], "#030401")}
+                    onChange={(value) => {
+                      updateBrandingMany([
+                        { path: ["dark", "backgroundColor"], value },
+                        { path: ["theme", "dark", "backgroundColor"], value },
+                      ]);
+                    }}
+                  />
+                  <ColorControl
+                    label="Dark Text Color"
+                    value={getBrandingString(["dark", "textColor"], "#F5F5F5")}
+                    onChange={(value) => {
+                      updateBrandingMany([
+                        { path: ["dark", "textColor"], value },
+                        { path: ["theme", "dark", "textColor"], value },
+                      ]);
+                    }}
+                  />
+                </div>
+              </section>
+
+              <section className="rounded-2xl border border-white bg-white/90 p-4 shadow-[0_16px_45px_rgba(15,23,42,0.04)]">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Smartphone className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      App & Checkout
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      Configure storefront behavior, labels, and checkout visuals.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <ToggleControl
+                    checked={getBrandingBoolean(["app", "showTagline"], true)}
+                    description="Show restaurant tagline in app/storefront."
+                    label="Show Tagline"
+                    onChange={(value) =>
+                      updateBranding(["app", "showTagline"], value)
+                    }
+                  />
+                  <ToggleControl
+                    checked={getBrandingBoolean(["app", "showHeroBanner"], true)}
+                    description="Show hero banner on customer home."
+                    label="Show Hero Banner"
+                    onChange={(value) =>
+                      updateBranding(["app", "showHeroBanner"], value)
+                    }
+                  />
+                  <ColorControl
+                    label="App Splash Color"
+                    value={getBrandingString(["app", "splashColor"], "#c1000a")}
+                    onChange={(value) => updateBranding(["app", "splashColor"], value)}
+                  />
+                  <ColorControl
+                    label="Status Bar Color"
+                    value={getBrandingString(["app", "statusBarColor"], "#030401")}
+                    onChange={(value) =>
+                      updateBranding(["app", "statusBarColor"], value)
+                    }
+                  />
+                  <ColorControl
+                    label="Bottom Nav Color"
+                    value={getBrandingString(["app", "bottomNavColor"], "#F5F5F5")}
+                    onChange={(value) =>
+                      updateBranding(["app", "bottomNavColor"], value)
+                    }
+                  />
+                  <ToggleControl
+                    checked={getBrandingBoolean(["checkout", "showLogo"], true)}
+                    description="Show brand logo during checkout."
+                    label="Checkout Logo"
+                    onChange={(value) =>
+                      updateBranding(["checkout", "showLogo"], value)
+                    }
+                  />
+                  <ToggleControl
+                    checked={getBrandingBoolean(
+                      ["checkout", "showSupportContact"],
+                      true
+                    )}
+                    description="Show support contact during checkout."
+                    label="Checkout Support Contact"
+                    onChange={(value) =>
+                      updateBranding(["checkout", "showSupportContact"], value)
+                    }
+                  />
+                  <TextControl
+                    description="Message shown after a successful order."
+                    label="Checkout Success Message"
+                    placeholder="Thank you for ordering with us."
+                    value={getBrandingString(
+                      ["checkout", "successMessage"],
+                      "Thank you for ordering with us."
+                    )}
+                    onChange={(value) =>
+                      updateBranding(["checkout", "successMessage"], value)
+                    }
+                  />
+                  <ColorControl
+                    label="Checkout Highlight Color"
+                    value={getBrandingString(
+                      ["checkout", "highlightColor"],
+                      "#c1000a"
+                    )}
+                    onChange={(value) =>
+                      updateBranding(["checkout", "highlightColor"], value)
+                    }
+                  />
+                  <ColorControl
+                    label="Checkout Success Color"
+                    value={getBrandingString(["checkout", "successColor"], "#00A63E")}
+                    onChange={(value) =>
+                      updateBranding(["checkout", "successColor"], value)
+                    }
+                  />
+                  <ColorControl
+                    label="Checkout Warning Color"
+                    value={getBrandingString(["checkout", "warningColor"], "#F59E0B")}
+                    onChange={(value) =>
+                      updateBranding(["checkout", "warningColor"], value)
+                    }
+                  />
+                  <ColorControl
+                    label="Checkout Error Color"
+                    value={getBrandingString(["checkout", "errorColor"], "#c1000a")}
+                    onChange={(value) =>
+                      updateBranding(["checkout", "errorColor"], value)
+                    }
+                  />
+                </div>
+              </section>
+
+              <section className="rounded-2xl border border-white bg-white/90 p-4 shadow-[0_16px_45px_rgba(15,23,42,0.04)]">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <ImageIcon className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Brand Assets
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      Add brand assets and logos for complete storefront branding.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <TextControl
+                    label="Restaurant Logo URL"
+                    placeholder="https://cdn.example.com/logo.png"
+                    value={getBrandingString(["assets", "logoUrl"], "")}
+                    onChange={(value) => updateBranding(["assets", "logoUrl"], value)}
+                  />
+                  <TextControl
+                    label="Cover Image URL"
+                    placeholder="https://cdn.example.com/cover.png"
+                    value={getBrandingString(["assets", "coverImage"], "")}
+                    onChange={(value) =>
+                      updateBranding(["assets", "coverImage"], value)
+                    }
+                  />
+                  <TextControl
+                    label="Hero Banner URL"
+                    placeholder="https://cdn.example.com/hero.png"
+                    value={getBrandingString(["assets", "heroBannerUrl"], "")}
+                    onChange={(value) =>
+                      updateBranding(["assets", "heroBannerUrl"], value)
+                    }
+                  />
+                  <TextControl
+                    label="Placeholder Image URL"
+                    placeholder="https://cdn.example.com/placeholder.png"
+                    value={getBrandingString(["assets", "placeholderImage"], "")}
+                    onChange={(value) =>
+                      updateBranding(["assets", "placeholderImage"], value)
+                    }
+                  />
+                  <TextControl
+                    label="Favicon URL"
+                    placeholder="/favicon.ico"
+                    value={getBrandingString(["assets", "faviconUrl"], "")}
+                    onChange={(value) =>
+                      updateBranding(["assets", "faviconUrl"], value)
+                    }
+                  />
+                  <TextControl
+                    label="Primary Logo URL"
+                    placeholder="https://cdn.example.com/logo-primary.png"
+                    value={getBrandingString(
+                      ["assets", "logos", "primaryLogoUrl"],
+                      ""
+                    )}
+                    onChange={(value) =>
+                      updateBranding(["assets", "logos", "primaryLogoUrl"], value)
+                    }
+                  />
+                  <TextControl
+                    label="Compact Logo URL"
+                    placeholder="https://cdn.example.com/logo-compact.png"
+                    value={getBrandingString(
+                      ["assets", "logos", "compactLogoUrl"],
+                      ""
+                    )}
+                    onChange={(value) =>
+                      updateBranding(["assets", "logos", "compactLogoUrl"], value)
+                    }
+                  />
+                  <TextControl
+                    label="Asset Favicon URL"
+                    placeholder="/favicon.ico"
+                    value={getBrandingString(["assets", "logos", "faviconUrl"], "")}
+                    onChange={(value) =>
+                      updateBranding(["assets", "logos", "faviconUrl"], value)
+                    }
+                  />
+                  <TextControl
+                    label="Logo for Light Backgrounds"
+                    placeholder="https://cdn.example.com/logo-light.png"
+                    value={getBrandingString(["logo", "light"], "")}
+                    onChange={(value) => updateBranding(["logo", "light"], value)}
+                  />
+                  <TextControl
+                    label="Logo for Dark Backgrounds"
+                    placeholder="https://cdn.example.com/logo-dark.png"
+                    value={getBrandingString(["logo", "dark"], "")}
+                    onChange={(value) => updateBranding(["logo", "dark"], value)}
+                  />
+                </div>
+              </section>
             </div>
           </AdvancedPanel>
         </div>

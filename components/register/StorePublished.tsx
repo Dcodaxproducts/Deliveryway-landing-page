@@ -267,13 +267,16 @@ export function StorePublished({ formData, publishedData }: Props) {
     <div className="min-h-[80vh] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         {/* SUCCESS HEADER */}
-        <div className="relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#c1000a_0%,#d61f2a_46%,#f59e0b_130%)] px-6 py-8 text-white shadow-xl shadow-primary/20 sm:px-10 sm:py-10">
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,4,1,0.18),rgba(3,4,1,0)_55%)]" />
+        <div className="relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#8f0010_0%,#c1000a_36%,#ef304f_72%,#ff7aa2_128%)] px-6 py-8 text-white shadow-[0_26px_70px_rgba(193,0,10,0.26)] sm:px-10 sm:py-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(255,255,255,0.24),transparent_32%),radial-gradient(circle_at_88%_8%,rgba(255,190,212,0.55),transparent_34%),linear-gradient(90deg,rgba(55,0,8,0.28),rgba(55,0,8,0)_58%)]" />
+          <div className="absolute -right-12 -top-16 h-44 w-44 rounded-full border border-white/20 bg-white/10" />
+          <div className="absolute bottom-5 right-8 hidden h-20 w-20 rounded-full bg-white/10 blur-sm sm:block" />
+          <div className="absolute -bottom-14 left-1/2 h-32 w-32 rounded-full bg-[#ffbfd1]/25 blur-2xl" />
 
           <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-white/90 backdrop-blur">
-                <CheckCircle2 size={18} className="text-green-300" />
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-2 text-sm font-medium text-white shadow-sm backdrop-blur">
+                <CheckCircle2 size={18} className="text-white" />
                 {tRegister("published.successBadge")}
               </div>
 
@@ -281,7 +284,7 @@ export function StorePublished({ formData, publishedData }: Props) {
                 {tRegister("published.title")}
               </h1>
 
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70 sm:text-base">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/85 sm:text-base">
                 {tRegister("published.description")}
               </p>
             </div>
@@ -289,7 +292,7 @@ export function StorePublished({ formData, publishedData }: Props) {
             <div className="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
               <Button
                 onClick={openDashboard}
-                className="h-12 rounded-xl bg-white px-6 text-gray-950 hover:bg-gray-100"
+                className="h-12 rounded-xl bg-white px-6 text-[#9f0010] shadow-lg shadow-black/10 hover:bg-[#fff4f7]"
               >
                 {tRegister("published.actions.openDashboard")}
                 <ArrowRight size={18} className="ml-2" />
@@ -300,7 +303,7 @@ export function StorePublished({ formData, publishedData }: Props) {
                 variant="outline"
                 onClick={copyDashboardLink}
                 disabled={copying}
-                className="h-12 rounded-xl border-white/20 bg-white/10 px-6 text-white hover:bg-white/20 hover:text-white"
+                className="h-12 rounded-xl border-white/25 bg-white/15 px-6 text-white shadow-sm backdrop-blur hover:bg-white/25 hover:text-white"
               >
                 <Copy size={17} className="mr-2" />
                 {copying
