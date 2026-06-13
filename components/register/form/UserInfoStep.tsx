@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "./FormInput";
-import { Upload } from "lucide-react";
+import { PremiumImageDropzone } from "./PremiumImageDropzone";
 import { validateZod } from "@/hooks/useZodValidator";
 import {
   createRegisterValidationMessages,
@@ -220,13 +220,10 @@ export function UserInfoStep({ formData, updateFormData, next }: Props) {
 const MAX_PROFILE_IMAGE_SIZE_MB = 2;
 const MAX_PROFILE_IMAGE_SIZE_BYTES = MAX_PROFILE_IMAGE_SIZE_MB * 1024 * 1024;
 
-const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
+const handleProfileFileSelect = async (file: File) => {
   if (!file) return;
 
   if (file.size > MAX_PROFILE_IMAGE_SIZE_BYTES) {
-    e.target.value = "";
-
     setErrors((prev) => ({
       ...prev,
       profileFile: tValidation("register.profilePhotoMaxSize", {
@@ -256,7 +253,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     return newErrors;
   });
 
-  const res = await uploadFile(e);
+  const res = await uploadFile(file);
 
   if (res?.fileUrl) {
     updateFormData("user", {
@@ -511,62 +508,19 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             {tRegister("user.profilePhoto.optionalLabel")}
           </label>
 
-          <label className="flex items-center gap-4 cursor-pointer rounded-lg pt-1 hover:bg-gray-50 transition">
-            {/* AVATAR BOX */}
-            <div className="relative w-14 h-14">
-              {/* shimmer while uploading */}
-              {uploading && (
-                <div className="absolute inset-0 rounded-full bg-gray-200 animate-pulse" />
-              )}
-
-              {/* image preview replaces icon */}
-              {preview || user.profileUrl ? (
-                <img
-                  src={
-                    user.profilePreviewUrl ||
-                    user.profileUrl ||
-                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330"
-                  }
-                  alt="profile"
-                  className="w-14 h-14 rounded-full object-cover border"
-                />
-              ) : (
-                <div className="w-14 h-14 border border-[#909090] rounded-full flex items-center justify-center">
-                  <Upload className="text-[#909090]" />
-                </div>
-              )}
-
-              {/* progress overlay */}
-              {uploading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full">
-                  <span className="text-white text-xs font-semibold">
-                    {progress}%
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <p className="text-sm font-medium">
-                {uploading
-                  ? tRegister("upload.uploading")
-                  : user.profileUrl
-                  ? tRegister("upload.imageUploaded")
-                  : tRegister("upload.chooseFile")}
-              </p>
-
-              <p className="text-xs text-[#909090]">
-                {tRegister("upload.helper2Mb")}
-              </p>
-            </div>
-
-            <input
-              type="file"
-              accept=".png,.jpg,.jpeg"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-          </label>
+          <PremiumImageDropzone
+            alt="profile"
+            helperText={tRegister("upload.helper2Mb")}
+            isAvatar
+            label={tRegister("user.profilePhoto.optionalLabel")}
+            onFileSelect={handleProfileFileSelect}
+            progress={progress}
+            selectedText={tRegister("upload.imageUploaded")}
+            uploadText={tRegister("upload.uploading")}
+            uploading={uploading}
+            uploadTextIdle={tRegister("upload.chooseFile")}
+            value={user.profilePreviewUrl || user.profileUrl || preview || ""}
+          />
 
         {(errors.profileFile || errors.profileUrl) && (
   <p className="text-red-500 text-xs">

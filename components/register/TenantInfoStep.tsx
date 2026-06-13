@@ -16,9 +16,9 @@ import {
   Smartphone,
   Sparkles,
   Type,
-  Upload,
 } from "lucide-react";
 import { FormInput } from "./form/FormInput";
+import { PremiumImageDropzone } from "./form/PremiumImageDropzone";
 import { validateZod } from "@/hooks/useZodValidator";
 import {
   createRegisterValidationMessages,
@@ -561,15 +561,10 @@ useEffect(() => {
   };
 
   /* ---------------- FILE HANDLERS ---------------- */
-const handleTenantLogoChange = async (
-  e: React.ChangeEvent<HTMLInputElement>
-) => {
-  const file = e.target.files?.[0];
+const handleTenantLogoSelect = async (file: File) => {
   if (!file) return;
 
   if (file.size > MAX_LOGO_IMAGE_SIZE_BYTES) {
-    e.target.value = "";
-
     setErrors((prev) => ({
       ...prev,
       "tenant.logoFile": tValidation("register.tenantLogoMaxSize", {
@@ -603,7 +598,7 @@ const handleTenantLogoChange = async (
     return updated;
   });
 
-  const res = await uploadFile(e);
+  const res = await uploadFile(file);
 
   if (res?.fileUrl) {
     updateFormData("tenant", {
@@ -613,15 +608,10 @@ const handleTenantLogoChange = async (
 };
 
 
-const handleRestaurantLogoChange = async (
-  e: React.ChangeEvent<HTMLInputElement>
-) => {
-  const file = e.target.files?.[0];
+const handleRestaurantLogoSelect = async (file: File) => {
   if (!file) return;
 
   if (file.size > MAX_LOGO_IMAGE_SIZE_BYTES) {
-    e.target.value = "";
-
     setErrors((prev) => ({
       ...prev,
       "restaurant.logoFile": tValidation("register.restaurantLogoMaxSize", {
@@ -655,7 +645,7 @@ const handleRestaurantLogoChange = async (
     return updated;
   });
 
-  const res = await uploadFile(e);
+  const res = await uploadFile(file);
 
   if (res?.fileUrl) {
     updateFormData("restaurant", {
@@ -770,50 +760,18 @@ const handleRestaurantLogoChange = async (
             {tRegister("tenant.logo.label")}
           </label>
 
-          <label className="flex items-center gap-4 cursor-pointer rounded-lg hover:bg-gray-50 transition">
-         <div className="relative w-14 h-14">
-  {uploading && (
-    <div className="absolute inset-0 rounded-lg bg-gray-200 animate-pulse" />
-  )}
-
-  {formData.tenant.logoPreviewUrl ? (
-    <img
-      src={formData.tenant.logoPreviewUrl}
-      alt="tenant logo preview"
-      className="w-14 h-14 rounded-lg object-cover border"
-    />
-  ) : (
-    <div className="w-14 h-14 border border-[#909090] rounded-lg flex items-center justify-center">
-      <Upload className="text-[#909090]" />
-    </div>
-  )}
-
-  {uploading && formData.tenant.logoPreviewUrl && (
-    <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-lg">
-      <span className="text-white text-xs font-semibold">{progress}%</span>
-    </div>
-  )}
-</div>
-
-<div>
-  <p className="text-sm font-medium">
-    {uploading
-      ? tRegister("upload.uploading")
-      : formData.tenant.logoPreviewUrl
-      ? tRegister("upload.imageSelected")
-      : tRegister("upload.chooseFile")}
-  </p>
-  <p className="text-xs text-[#909090]">
-    {tRegister("upload.helper2Mb")}
-  </p>
-</div>
-            <input
-              type="file"
-              accept=".png,.jpg,.jpeg"
-              className="hidden"
-              onChange={handleTenantLogoChange}
-            />
-          </label>
+          <PremiumImageDropzone
+            alt="tenant logo preview"
+            helperText={tRegister("upload.helper2Mb")}
+            label={tRegister("tenant.logo.label")}
+            onFileSelect={handleTenantLogoSelect}
+            progress={progress}
+            selectedText={tRegister("upload.imageSelected")}
+            uploadText={tRegister("upload.uploading")}
+            uploading={uploading}
+            uploadTextIdle={tRegister("upload.chooseFile")}
+            value={formData.tenant.logoPreviewUrl || formData.tenant.logoUrl}
+          />
 
        {(errors["tenant.logoFile"] || errors["tenant.logoUrl"]) && (
   <p className="text-red-500 text-xs">
@@ -881,50 +839,20 @@ const handleRestaurantLogoChange = async (
             {tRegister("restaurant.logo.label")}
           </label>
 
-          <label className="flex items-center gap-4 cursor-pointer rounded-lg hover:bg-gray-50 transition">
-           <div className="relative w-14 h-14">
-  {uploading && (
-    <div className="absolute inset-0 rounded-lg bg-gray-200 animate-pulse" />
-  )}
-
-  {formData.restaurant.logoPreviewUrl ? (
-    <img
-      src={formData.restaurant.logoPreviewUrl}
-      alt="restaurant logo preview"
-      className="w-14 h-14 rounded-lg object-cover border"
-    />
-  ) : (
-    <div className="w-14 h-14 border border-[#909090] rounded-lg flex items-center justify-center">
-      <Upload className="text-[#909090]" />
-    </div>
-  )}
-
-  {uploading && formData.restaurant.logoPreviewUrl && (
-    <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-lg">
-      <span className="text-white text-xs font-semibold">{progress}%</span>
-    </div>
-  )}
-</div>
-
-<div>
-  <p className="text-sm font-medium">
-    {uploading
-      ? tRegister("upload.uploading")
-      : formData.restaurant.logoPreviewUrl
-      ? tRegister("upload.imageSelected")
-      : tRegister("upload.chooseFile")}
-  </p>
-  <p className="text-xs text-[#909090]">
-    {tRegister("upload.helper2Mb")}
-  </p>
-</div>
-            <input
-              type="file"
-              accept=".png,.jpg,.jpeg"
-              className="hidden"
-              onChange={handleRestaurantLogoChange}
-            />
-          </label>
+          <PremiumImageDropzone
+            alt="restaurant logo preview"
+            helperText={tRegister("upload.helper2Mb")}
+            label={tRegister("restaurant.logo.label")}
+            onFileSelect={handleRestaurantLogoSelect}
+            progress={progress}
+            selectedText={tRegister("upload.imageSelected")}
+            uploadText={tRegister("upload.uploading")}
+            uploading={uploading}
+            uploadTextIdle={tRegister("upload.chooseFile")}
+            value={
+              formData.restaurant.logoPreviewUrl || formData.restaurant.logoUrl
+            }
+          />
 
         {(errors["restaurant.logoFile"] || errors["restaurant.logoUrl"]) && (
   <p className="text-red-500 text-xs">

@@ -407,13 +407,10 @@ export function BranchStep({
 
   /* ---------------- FILE ---------------- */
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
+  const handleImageSelect = async (file: File) => {
   if (!file) return;
 
   if (file.size > MAX_BRANCH_COVER_IMAGE_SIZE_BYTES) {
-    e.target.value = "";
-
     setErrors((prev) => ({
       ...prev,
       "branch.coverImageFile": tValidation("register.branchCoverImageMaxSize", {
@@ -447,7 +444,7 @@ export function BranchStep({
     return updated;
   });
 
-  const res = await uploadFile(e);
+  const res = await uploadFile(file);
 
   if (res?.fileUrl) {
     updateFormData("branch", {
@@ -1025,7 +1022,7 @@ export function BranchStep({
         branch={branch}
         error={error}
         onFieldChange={(field, value) => updateField(field, value)}
-        onImageChange={handleImageChange}
+        onImageChange={handleImageSelect}
         progress={progress}
         uploading={uploading}
       />

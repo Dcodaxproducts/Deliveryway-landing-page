@@ -28,10 +28,7 @@ export const useFileUpload = () => {
   const tCommon = useTranslations("common");
   const tErrors = useTranslations("errors");
 
-  const uploadFile = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): Promise<UploadResult | null> => {
-    const file = e.target.files?.[0];
+  const uploadFile = async (file: File): Promise<UploadResult | null> => {
     if (!file) return null;
 
     try {
