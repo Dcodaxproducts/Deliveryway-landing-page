@@ -628,6 +628,7 @@
   "register": {
     "title": "Business-Onboarding",
     "subtitle": "Schließen Sie die Schritte unten ab, um Ihr Unternehmen einzurichten",
+    "selectedPlan": "Ausgewählter Paketplan:",
     "steps": {
       "account": "Konto",
       "tenantRestaurant": "Mandant & Restaurant",

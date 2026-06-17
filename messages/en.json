@@ -628,6 +628,7 @@
   "register": {
     "title": "Business Onboarding",
     "subtitle": "Complete the steps below to set up your business",
+    "selectedPlan": "Selected package plan:",
     "steps": {
       "account": "Account",
       "tenantRestaurant": "Tenant & Restaurant",

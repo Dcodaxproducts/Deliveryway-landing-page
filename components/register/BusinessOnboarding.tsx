@@ -394,6 +394,7 @@ export function BusinessOnboarding() {
   const tRegister = useTranslations("register");
   const [activeStep, setActiveStep] = useState<number>(1);
   const [publishedData, setPublishedData] = useState<PublishedResponseData | null>(null);
+  const [selectedPackagePlanId, setSelectedPackagePlanId] = useState("");
 
   /* ================= OTP STATES ================= */
 
@@ -604,6 +605,19 @@ export function BusinessOnboarding() {
       behavior: "smooth",
     });
   }, [activeStep, showOtpVerification]);
+
+  useEffect(() => {
+    const packagePlanId = new URLSearchParams(window.location.search).get(
+      "packagePlanId"
+    );
+    const storedPackagePlanId = localStorage.getItem("selectedPackagePlanId");
+    const nextPackagePlanId = packagePlanId || storedPackagePlanId || "";
+
+    if (!nextPackagePlanId) return;
+
+    localStorage.setItem("selectedPackagePlanId", nextPackagePlanId);
+    queueMicrotask(() => setSelectedPackagePlanId(nextPackagePlanId));
+  }, []);
 
   /* ================= DERIVED VALUES ================= */
 
@@ -1011,6 +1025,11 @@ export function BusinessOnboarding() {
         <p className="text-xs sm:text-sm text-gray-500 mt-1">
           {tRegister("subtitle")}
         </p>
+        {selectedPackagePlanId && (
+          <p className="mx-auto mt-3 max-w-xl rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary sm:text-sm">
+            {tRegister("selectedPlan")} {selectedPackagePlanId}
+          </p>
+        )}
       </div>
 
       {/* STEPPER */}
