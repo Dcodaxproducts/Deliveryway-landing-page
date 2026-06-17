@@ -1,11 +1,16 @@
 "use client";
 
 import { pricingHeaders } from "@/constants/pricing";
+import type { PackagePlan } from "@/types/package-plans";
 import { useTranslations } from "next-intl";
 import { SectionHeader } from "../about/SectionHeader";
 import { FeatureTable } from "./comparison/FeatureTable";
 
-export function Comparison() {
+interface ComparisonProps {
+  packagePlans: PackagePlan[];
+}
+
+export function Comparison({ packagePlans }: ComparisonProps) {
   const t = useTranslations();
 
   return (
@@ -16,7 +21,7 @@ export function Comparison() {
           description={t(pricingHeaders.comparisonDescriptionKey)}
         />
 
-        <FeatureTable />
+        <FeatureTable packagePlans={packagePlans} />
       </div>
     </section>
   );

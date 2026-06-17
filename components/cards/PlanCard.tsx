@@ -4,22 +4,19 @@ import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Plan, pricingHeaders } from "@/constants/pricing";
+import {
+  formatPackagePlanLabel,
+  getPackagePlanFeatures,
+} from "@/lib/package-plan-display";
 import type { PackagePlan } from "@/types/package-plans";
 
 interface PlanCardProps {
   plan: Plan | PackagePlan;
+  isHighlighted?: boolean;
 }
 
 const isPackagePlan = (plan: Plan | PackagePlan): plan is PackagePlan => {
   return "id" in plan;
-};
-
-const formatLabel = (value: string) => {
-  return value
-    .replace(/_/g, " ")
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .toLowerCase()
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 };
 
 const formatPrice = (plan: PackagePlan) => {
@@ -35,24 +32,18 @@ const formatPrice = (plan: PackagePlan) => {
   return price;
 };
 
-const getPackagePlanFeatures = (plan: PackagePlan) => {
-  const labels = Object.entries(plan.features)
-    .filter(([, value]) => Boolean(value))
-    .map(([key, value]) => {
-      if (value === true) return formatLabel(key);
-      return `${formatLabel(key)}: ${String(value)}`;
-    });
-
-  return Array.from(new Set(labels));
-};
-
-const PlanCard = ({ plan }: PlanCardProps) => {
+const PlanCard = ({ plan, isHighlighted: highlightedOverride }: PlanCardProps) => {
   const t = useTranslations();
   const packagePlan = isPackagePlan(plan) ? plan : null;
   const staticPlan = plan as Plan;
-  const isHighlighted = packagePlan ? packagePlan.isDefault : staticPlan.highlighted;
+  const isHighlighted =
+    highlightedOverride ?? (packagePlan ? packagePlan.isDefault : staticPlan.highlighted);
   const features: string[] = packagePlan
     ? getPackagePlanFeatures(packagePlan)
+        .map((feature) => {
+          if (feature.value === true) return feature.label;
+          return `${feature.label}: ${String(feature.value)}`;
+        })
     : staticPlan.featureKeys;
   const href = packagePlan
     ? `/register?packagePlanId=${encodeURIComponent(packagePlan.id)}`
@@ -62,7 +53,7 @@ const PlanCard = ({ plan }: PlanCardProps) => {
     ? packagePlan.description || "Package plan for your restaurant operations."
     : t(staticPlan.descriptionKey);
   const period = packagePlan
-    ? `/${formatLabel(packagePlan.billingInterval).toLowerCase()}`
+    ? `/${formatPackagePlanLabel(packagePlan.billingInterval).toLowerCase()}`
     : staticPlan.period;
 
   return (
@@ -98,10 +89,10 @@ const PlanCard = ({ plan }: PlanCardProps) => {
         </div>
         {packagePlan && (
           <div className="mt-4 flex flex-col gap-2 text-sm text-slate-600">
-            <span>{formatLabel(packagePlan.billingModel)} billing</span>
+            <span>{formatPackagePlanLabel(packagePlan.billingModel)} billing</span>
             {packagePlan.commissionType && (
               <span>
-                Commission: {formatLabel(packagePlan.commissionType)}
+                Commission: {formatPackagePlanLabel(packagePlan.commissionType)}
                 {packagePlan.commissionPercentage ? ` ${packagePlan.commissionPercentage}%` : ""}
               </span>
             )}
@@ -120,7 +111,7 @@ const PlanCard = ({ plan }: PlanCardProps) => {
                 </span>
               )}
             {packagePlan.vatPercentage && <span>VAT: {packagePlan.vatPercentage}%</span>}
-            {packagePlan.payoutCycle && <span>Payout: {formatLabel(packagePlan.payoutCycle)}</span>}
+            {packagePlan.payoutCycle && <span>Payout: {formatPackagePlanLabel(packagePlan.payoutCycle)}</span>}
             {packagePlan.trialDays > 0 && <span>{packagePlan.trialDays} day trial</span>}
           </div>
         )}
