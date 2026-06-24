@@ -27,7 +27,9 @@ type PublicRestaurant = {
 const isPublicRestaurant = (value: unknown): value is PublicRestaurant => {
   const restaurant = normalizeResponse(value);
 
-  return typeof restaurant.id === "string" && typeof restaurant.name === "string";
+  return (
+    typeof restaurant.id === "string" && typeof restaurant.name === "string"
+  );
 };
 
 export const ContactForm = () => {
@@ -120,7 +122,8 @@ export const ContactForm = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const restaurantId = selectedRestaurantId;
 
     if (!restaurantId) {
@@ -158,7 +161,7 @@ export const ContactForm = () => {
         );
       }
 
-      event.currentTarget.reset();
+      form.reset();
       toast.success(t("forms.status.submitSuccess"));
     } catch (error: unknown) {
       toast.error(

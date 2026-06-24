@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CheckCircle2, CreditCard, FileText } from "lucide-react";
+import { CheckCircle2, CreditCard, FileText, Mail } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { API_BASE_URL } from "@/lib/constants";
 
 type StoredSubscription = {
   registration?: {
@@ -48,8 +51,18 @@ const parseStoredSubscription = (value: string | null): StoredSubscription => {
   }
 };
 
+const normalizeResponse = (value: unknown) => {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
+};
+
 export default function PackagePaymentPage() {
   const [storedData, setStoredData] = useState<StoredSubscription>({});
+  const [token, setToken] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [verified, setVerified] = useState(false);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -58,6 +71,7 @@ export default function PackagePaymentPage() {
           sessionStorage.getItem("deliverywayPackageSubscription")
         )
       );
+      setToken(localStorage.getItem("tenantSignupToken") || "");
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
@@ -74,6 +88,53 @@ export default function PackagePaymentPage() {
       maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
     }).format(amount);
   }, [amount, plan?.currency, plan?.planPrice]);
+  const cleanedOtp = useMemo(() => otp.replace(/\D/g, "").slice(0, 6), [otp]);
+  const canVerifyOtp = Boolean(token) && cleanedOtp.length >= 4;
+
+  const verifyEmail = async () => {
+    if (!token) {
+      toast.error("Signup token is missing. Please register again.");
+      return;
+    }
+
+    if (cleanedOtp.length < 4) {
+      toast.error("Please enter the OTP sent to your email.");
+      return;
+    }
+
+    setOtpLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/v1/auth/verify-email`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ otp: cleanedOtp }),
+      });
+      const payload: unknown = await response.json();
+      const responseData = normalizeResponse(payload);
+
+      if (!response.ok) {
+        throw new Error(
+          getString(responseData.message, "OTP verification failed")
+        );
+      }
+
+      localStorage.removeItem("tenantSignupToken");
+      setVerified(true);
+      setToken("");
+      setOtp("");
+      toast.success("Email verified successfully.");
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : "OTP verification failed"
+      );
+    } finally {
+      setOtpLoading(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
@@ -86,22 +147,15 @@ export default function PackagePaymentPage() {
                 Package payment pending
               </div>
               <h1 className="text-2xl font-semibold text-slate-950 sm:text-3xl">
-                Your subscription is ready for invoice payment
+                Your restaurant workspace has been created
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-                DeliveryWays created the tenant subscription during onboarding.
-                Online subscription payment is waiting on the dedicated backend
-                payment endpoint, so use this screen as the invoice/manual
-                payment handoff for now.
+                This package currently requires invoice or manual payment.
+                Online card payment for subscriptions is not connected yet.
+                Next step: verify your email so the account can continue
+                through approval.
               </p>
             </div>
-
-            <Link href="/register" className="shrink-0">
-              <Button className="h-11 rounded-xl px-5">
-                Verify email later
-                <ArrowRight size={17} className="ml-2" />
-              </Button>
-            </Link>
           </div>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -155,7 +209,7 @@ export default function PackagePaymentPage() {
               <FileText className="mt-0.5 shrink-0 text-amber-700" size={20} />
               <div>
                 <h2 className="text-sm font-semibold text-amber-950">
-                  Stripe subscription payment is not connected here yet
+                  Invoice or manual payment required
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-amber-800">
                   Do not use the order payment endpoint for this subscription.
@@ -167,12 +221,81 @@ export default function PackagePaymentPage() {
             </div>
           </div>
 
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-700">
+                  <Mail size={20} />
+                </div>
+                <div>
+                  <h2 className="text-sm font-semibold text-slate-950">
+                    Verify your email now
+                  </h2>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                    Enter the OTP sent to the owner email. Verification can be
+                    completed before subscription payment is collected.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex w-full flex-col gap-3 sm:flex-row lg:max-w-md">
+                <Input
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  placeholder="Enter OTP"
+                  value={cleanedOtp}
+                  onChange={(event) =>
+                    setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && canVerifyOtp && !otpLoading) {
+                      verifyEmail();
+                    }
+                  }}
+                  disabled={verified}
+                  className="h-11 text-center font-semibold tracking-[0.3em]"
+                />
+                <Button
+                  type="button"
+                  onClick={verifyEmail}
+                  disabled={!canVerifyOtp || otpLoading || verified}
+                  className="h-11 shrink-0 rounded-xl px-5"
+                >
+                  {verified
+                    ? "Verified"
+                    : otpLoading
+                      ? "Verifying..."
+                      : "Verify email now"}
+                </Button>
+              </div>
+            </div>
+
+            {!token && !verified ? (
+              <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
+                Signup token was not found in this browser. Please complete
+                registration again to receive a fresh OTP session.
+              </p>
+            ) : null}
+          </div>
+
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <Link href="/contact" className="w-full sm:w-auto">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 w-full rounded-xl px-5 sm:w-auto"
+              >
+                Contact support / invoice payment
+              </Button>
+            </Link>
+          </div>
+
           <div className="mt-8 flex items-start gap-3 rounded-2xl border border-green-100 bg-green-50 p-5">
             <CheckCircle2 className="mt-0.5 shrink-0 text-green-700" size={20} />
             <p className="text-sm leading-6 text-green-800">
-              Your restaurant, branch, owner, and subscription records were
-              created successfully. Keep this page open while the invoice or
-              manual payment is handled.
+              Your restaurant, branch, owner, and subscription records are
+              created. After email verification, superadmin approval and payment
+              handling can continue separately.
             </p>
           </div>
         </div>
