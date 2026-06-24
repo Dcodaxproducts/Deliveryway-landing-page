@@ -112,6 +112,10 @@ const toStringValue = (value: unknown, fallback = "") => {
   return String(value);
 };
 
+const normalizeEnumValue = (value: unknown) => {
+  return toStringValue(value).trim().toUpperCase();
+};
+
 const createSlug = (value: string, fallback = "restaurant") => {
   const slug = value
     .toLowerCase()
@@ -159,6 +163,39 @@ const buildPublishedFormSummary = (formData: {
       email: normalizeEmail(formData.user.email),
     },
   };
+};
+
+const shouldCollectPackagePayment = ({
+  selectedPackagePlan,
+  subscription,
+}: {
+  selectedPackagePlan: PackagePlan;
+  subscription: PlainObject;
+}) => {
+  const paymentRequiredNow = subscription.paymentRequiredNow === true;
+  const paymentStatus = normalizeEnumValue(subscription.paymentStatus);
+  const subscriptionPlan = normalizePlainObject(subscription.plan);
+  const billingModel =
+    normalizeEnumValue(subscriptionPlan.billingModel) ||
+    normalizeEnumValue(selectedPackagePlan.billingModel);
+  const trialDays = toNumber(
+    subscriptionPlan.trialDays,
+    selectedPackagePlan.trialDays
+  );
+  const planPrice = toNumber(
+    subscriptionPlan.planPrice,
+    toNumber(selectedPackagePlan.planPrice)
+  );
+  const selectedPaidPlanRequiresPayment =
+    trialDays <= 0 &&
+    planPrice > 0 &&
+    (billingModel === "PLAN" || billingModel === "HYBRID");
+
+  return (
+    paymentRequiredNow ||
+    paymentStatus === "PENDING" ||
+    selectedPaidPlanRequiresPayment
+  );
 };
 
 const normalizeDeliveryMode = (mode: unknown) => {
@@ -909,8 +946,10 @@ export function BusinessOnboarding() {
 
       const token = extractAccessToken(data);
       const subscription = normalizePlainObject(nestedResponseData.subscription);
-      const paymentRequiredNow = subscription.paymentRequiredNow === true;
-      const paymentStatus = getMessageValue(subscription.paymentStatus);
+      const shouldShowPackagePayment = shouldCollectPackagePayment({
+        selectedPackagePlan,
+        subscription,
+      });
 
       setPublishedData(omitAuthTokens(nestedResponseData));
 
@@ -921,7 +960,7 @@ export function BusinessOnboarding() {
 
       localStorage.removeItem("selectedPackagePlanId");
 
-      if (paymentRequiredNow || paymentStatus === "PENDING") {
+      if (shouldShowPackagePayment) {
         sessionStorage.setItem(
           "deliverywayPackageSubscription",
           JSON.stringify({
