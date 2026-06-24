@@ -26,6 +26,7 @@ import { toast } from "sonner";
 interface Props {
   formData: OnboardingPublishedFormData;
   publishedData: PublishedResponseData | null;
+  variant?: "live" | "pendingApproval";
 }
 
 type OnboardingPublishedFormData = {
@@ -169,11 +170,16 @@ function CredentialRow({
   );
 }
 
-export function StorePublished({ formData, publishedData }: Props) {
+export function StorePublished({
+  formData,
+  publishedData,
+  variant = "live",
+}: Props) {
   const tRegister = useTranslations("register");
   const qrRef = useRef<HTMLDivElement>(null);
   const [copying, setCopying] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const isPendingApproval = variant === "pendingApproval";
 
   const baseUrl = normalizeBaseUrl(
     process.env.NEXT_PUBLIC_ADMIN_URL ||
@@ -277,15 +283,21 @@ export function StorePublished({ formData, publishedData }: Props) {
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-2 text-sm font-medium text-white shadow-sm backdrop-blur">
                 <CheckCircle2 size={18} className="text-white" />
-                {tRegister("published.successBadge")}
+                {isPendingApproval
+                  ? "Email verified"
+                  : tRegister("published.successBadge")}
               </div>
 
               <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                {tRegister("published.title")}
+                {isPendingApproval
+                  ? "Setup details saved"
+                  : tRegister("published.title")}
               </h1>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-white/85 sm:text-base">
-                {tRegister("published.description")}
+                {isPendingApproval
+                  ? "Your restaurant workspace has been created and email verification is complete. Package payment and account approval are still in review."
+                  : tRegister("published.description")}
               </p>
             </div>
 
@@ -331,7 +343,9 @@ export function StorePublished({ formData, publishedData }: Props) {
                 </div>
 
                 <span className="w-fit rounded-full bg-green-50 px-4 py-2 text-xs font-semibold text-green-700">
-                  {tRegister("published.summary.active")}
+                  {isPendingApproval
+                    ? "Pending approval"
+                    : tRegister("published.summary.active")}
                 </span>
               </div>
 

@@ -2,18 +2,36 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, CreditCard, FileText, Mail } from "lucide-react";
+import { CheckCircle2, Clock3, CreditCard, FileText, Mail } from "lucide-react";
 import { toast } from "sonner";
 
+import { StorePublished } from "@/components/register/StorePublished";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { API_BASE_URL } from "@/lib/constants";
 
 type StoredSubscription = {
+  emailVerified?: boolean;
+  formData?: PublishedFormSummary;
   registration?: {
     branchId?: unknown;
+    branchAdminCredentials?: {
+      email?: unknown;
+      password?: unknown;
+    };
+    email?: unknown;
+    ownerId?: unknown;
+    restaurant?: {
+      id?: unknown;
+      restaurantId?: unknown;
+    };
     restaurantId?: unknown;
     tenantId?: unknown;
+    user?: {
+      email?: unknown;
+      firstName?: unknown;
+      lastName?: unknown;
+    };
   };
   subscription?: {
     id?: unknown;
@@ -29,6 +47,22 @@ type StoredSubscription = {
       trialDays?: unknown;
     };
     status?: unknown;
+  };
+};
+
+type PublishedFormSummary = {
+  branch?: {
+    name?: string;
+  };
+  restaurant?: {
+    name?: string;
+  };
+  tenant?: {
+    name?: string;
+  };
+  user?: {
+    email?: string;
+    password?: string;
   };
 };
 
@@ -57,6 +91,28 @@ const normalizeResponse = (value: unknown) => {
     : {};
 };
 
+const buildPublishedFormData = (
+  storedData: StoredSubscription
+): PublishedFormSummary => {
+  return {
+    branch: {
+      name: storedData.formData?.branch?.name,
+    },
+    restaurant: {
+      name: storedData.formData?.restaurant?.name,
+    },
+    tenant: {
+      name: storedData.formData?.tenant?.name,
+    },
+    user: {
+      email:
+        storedData.formData?.user?.email ||
+        getString(storedData.registration?.email) ||
+        getString(storedData.registration?.user?.email),
+    },
+  };
+};
+
 export default function PackagePaymentPage() {
   const [storedData, setStoredData] = useState<StoredSubscription>({});
   const [token, setToken] = useState("");
@@ -66,12 +122,12 @@ export default function PackagePaymentPage() {
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      setStoredData(
-        parseStoredSubscription(
-          sessionStorage.getItem("deliverywayPackageSubscription")
-        )
+      const nextStoredData = parseStoredSubscription(
+        sessionStorage.getItem("deliverywayPackageSubscription")
       );
+      setStoredData(nextStoredData);
       setToken(localStorage.getItem("tenantSignupToken") || "");
+      setVerified(nextStoredData.emailVerified === true);
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
@@ -123,6 +179,15 @@ export default function PackagePaymentPage() {
       }
 
       localStorage.removeItem("tenantSignupToken");
+      const nextStoredData = {
+        ...storedData,
+        emailVerified: true,
+      };
+      sessionStorage.setItem(
+        "deliverywayPackageSubscription",
+        JSON.stringify(nextStoredData)
+      );
+      setStoredData(nextStoredData);
       setVerified(true);
       setToken("");
       setOtp("");
@@ -135,6 +200,57 @@ export default function PackagePaymentPage() {
       setOtpLoading(false);
     }
   };
+
+  const publishedFormData = useMemo(
+    () => buildPublishedFormData(storedData),
+    [storedData]
+  );
+  const publishedData = storedData.registration || null;
+
+  if (verified) {
+    return (
+      <main className="min-h-screen bg-slate-50">
+        <section className="px-4 pt-10 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-6xl rounded-3xl border border-green-100 bg-green-50 p-5 shadow-sm sm:p-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-start gap-3">
+                <CheckCircle2
+                  className="mt-0.5 shrink-0 text-green-700"
+                  size={22}
+                />
+                <div>
+                  <p className="text-base font-semibold text-green-950">
+                    Email verified successfully
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-green-800">
+                    Your workspace is created and your email is verified. Your
+                    selected package is pending invoice/payment review, and the
+                    team will continue the account approval process.
+                  </p>
+                </div>
+              </div>
+
+              <Link href="/contact" className="w-full sm:w-auto">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 w-full rounded-xl border-green-200 bg-white px-5 text-green-800 hover:bg-green-100 sm:w-auto"
+                >
+                  Contact support
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <StorePublished
+          formData={publishedFormData}
+          publishedData={publishedData}
+          variant="pendingApproval"
+        />
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
@@ -150,10 +266,9 @@ export default function PackagePaymentPage() {
                 Your restaurant workspace has been created
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-                This package currently requires invoice or manual payment.
-                Online card payment for subscriptions is not connected yet.
-                Next step: verify your email so the account can continue
-                through approval.
+                Your workspace has been created. This package requires invoice
+                or manual payment before final activation. Please verify your
+                email now so your account can continue through review.
               </p>
             </div>
           </div>
@@ -212,10 +327,9 @@ export default function PackagePaymentPage() {
                   Invoice or manual payment required
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-amber-800">
-                  Do not use the order payment endpoint for this subscription.
-                  Once backend exposes a dedicated subscription payment attempt
-                  endpoint, this page can create the Stripe session from the
-                  subscription ID.
+                  Our team will share the invoice or payment instructions for
+                  this package. You can verify your email now while payment and
+                  approval are being processed.
                 </p>
               </div>
             </div>
@@ -272,8 +386,10 @@ export default function PackagePaymentPage() {
 
             {!token && !verified ? (
               <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
-                Signup token was not found in this browser. Please complete
-                registration again to receive a fresh OTP session.
+                We could not find the email verification session in this
+                browser. If you already verified your email, you can continue
+                with the payment support step. Otherwise, please restart
+                registration to receive a fresh OTP.
               </p>
             ) : null}
           </div>
@@ -291,11 +407,11 @@ export default function PackagePaymentPage() {
           </div>
 
           <div className="mt-8 flex items-start gap-3 rounded-2xl border border-green-100 bg-green-50 p-5">
-            <CheckCircle2 className="mt-0.5 shrink-0 text-green-700" size={20} />
+            <Clock3 className="mt-0.5 shrink-0 text-green-700" size={20} />
             <p className="text-sm leading-6 text-green-800">
-              Your restaurant, branch, owner, and subscription records are
-              created. After email verification, superadmin approval and payment
-              handling can continue separately.
+              Your restaurant profile, branch, owner account, and package
+              subscription have been created. After email verification, payment
+              confirmation and account approval will continue.
             </p>
           </div>
         </div>

@@ -139,6 +139,28 @@ const omitAuthTokens = (value: PlainObject): PublishedResponseData => {
   return rest;
 };
 
+const buildPublishedFormSummary = (formData: {
+  branch: { name?: string };
+  restaurant: { name?: string };
+  tenant: { name?: string };
+  user: { email?: string };
+}) => {
+  return {
+    branch: {
+      name: formData.branch.name,
+    },
+    restaurant: {
+      name: formData.restaurant.name,
+    },
+    tenant: {
+      name: formData.tenant.name,
+    },
+    user: {
+      email: normalizeEmail(formData.user.email),
+    },
+  };
+};
+
 const normalizeDeliveryMode = (mode: unknown) => {
   if (mode === "ZONE" || mode === "POSTAL_CODE" || mode === "ZONE_BANDS") {
     return mode;
@@ -903,6 +925,8 @@ export function BusinessOnboarding() {
         sessionStorage.setItem(
           "deliverywayPackageSubscription",
           JSON.stringify({
+            emailVerified: false,
+            formData: buildPublishedFormSummary(formData),
             registration: omitAuthTokens(nestedResponseData),
             subscription,
           })
