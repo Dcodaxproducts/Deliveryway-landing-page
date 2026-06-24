@@ -629,6 +629,13 @@
     "title": "Business-Onboarding",
     "subtitle": "Schließen Sie die Schritte unten ab, um Ihr Unternehmen einzurichten",
     "selectedPlan": "Ausgewählter Paketplan:",
+    "plans": {
+      "label": "Paketplan",
+      "loading": "Paketpläne werden geladen...",
+      "placeholder": "Aktiven Paketplan auswählen",
+      "required": "Wählen Sie vor dem Veröffentlichen einen aktiven Paketplan aus.",
+      "loadError": "Paketpläne konnten nicht geladen werden"
+    },
     "steps": {
       "account": "Konto",
       "tenantRestaurant": "Mandant & Restaurant",
@@ -1154,6 +1161,10 @@
         "label": "Restaurantname",
         "placeholder": "The Gusto Kitchen"
       },
+      "subject": {
+        "label": "Betreff",
+        "placeholder": "Frage zu meiner Bestellung"
+      },
       "message": {
         "label": "Nachricht",
         "placeholder": "Wie können wir Ihrem Unternehmen heute helfen?"
@@ -1180,7 +1191,8 @@
     },
     "status": {
       "submitSuccess": "Nachricht erfolgreich gesendet.",
-      "submitError": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+      "submitError": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+      "missingRestaurant": "Dem Kontaktformular fehlt eine Restaurant-ID."
     }
   },
   "validation": {

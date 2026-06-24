@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import type { PackagePlan } from "@/types/package-plans";
 
 type PublishedResponseData = {
   branchAdminCredentials?: {
@@ -26,6 +27,7 @@ type PublishedResponseData = {
     restaurantId?: unknown;
   };
   restaurantId?: unknown;
+  subscription?: RegistrationSubscription;
   tenantId?: unknown;
 };
 
@@ -35,6 +37,23 @@ type OnboardingStepConfig = {
 };
 
 type PlainObject = Record<string, unknown>;
+
+type RegistrationSubscription = {
+  id?: unknown;
+  packagePlanId?: unknown;
+  paymentRequiredNow?: unknown;
+  paymentStatus?: unknown;
+  plan?: {
+    billingInterval?: unknown;
+    billingModel?: unknown;
+    currency?: unknown;
+    id?: unknown;
+    name?: unknown;
+    planPrice?: unknown;
+    trialDays?: unknown;
+  };
+  status?: unknown;
+};
 
 const ONBOARDING_STEPS: OnboardingStepConfig[] = [
   { id: 1, labelKey: "steps.account" },
@@ -395,6 +414,9 @@ export function BusinessOnboarding() {
   const [activeStep, setActiveStep] = useState<number>(1);
   const [publishedData, setPublishedData] = useState<PublishedResponseData | null>(null);
   const [selectedPackagePlanId, setSelectedPackagePlanId] = useState("");
+  const [packagePlans, setPackagePlans] = useState<PackagePlan[]>([]);
+  const [packagePlansLoading, setPackagePlansLoading] = useState(true);
+  const [packagePlansError, setPackagePlansError] = useState("");
 
   /* ================= OTP STATES ================= */
 
@@ -619,9 +641,78 @@ export function BusinessOnboarding() {
     queueMicrotask(() => setSelectedPackagePlanId(nextPackagePlanId));
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadPackagePlans = async () => {
+      setPackagePlansLoading(true);
+      setPackagePlansError("");
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/v1/package-plans?page=1&limit=100&includeInactive=false`
+        );
+        const payload: unknown = await response.json();
+        const responseData = normalizePlainObject(payload);
+        const plans = normalizeArray(responseData.data)
+          .filter((plan): plan is PackagePlan => {
+            const packagePlan = normalizePlainObject(plan);
+
+            return (
+              typeof packagePlan.id === "string" &&
+              typeof packagePlan.name === "string" &&
+              typeof packagePlan.billingModel === "string" &&
+              typeof packagePlan.billingInterval === "string" &&
+              typeof packagePlan.planPrice === "string" &&
+              typeof packagePlan.currency === "string" &&
+              packagePlan.isActive === true
+            );
+          });
+
+        if (!response.ok) {
+          throw new Error(
+            getMessageValue(responseData.message) ||
+              "Unable to load package plans"
+          );
+        }
+
+        if (!isMounted) return;
+
+        setPackagePlans(plans);
+
+        const storedPlanId = localStorage.getItem("selectedPackagePlanId");
+
+        if (plans.length === 1 && !storedPlanId) {
+          setSelectedPackagePlanId(plans[0].id);
+          localStorage.setItem("selectedPackagePlanId", plans[0].id);
+        }
+      } catch (error: unknown) {
+        if (!isMounted) return;
+
+        setPackagePlansError(
+          error instanceof Error ? error.message : "Unable to load package plans"
+        );
+      } finally {
+        if (isMounted) {
+          setPackagePlansLoading(false);
+        }
+      }
+    };
+
+    loadPackagePlans();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   /* ================= DERIVED VALUES ================= */
 
   const activeIndex = ONBOARDING_STEPS.findIndex((s) => s.id === activeStep);
+  const selectedPackagePlan = useMemo(() => {
+    return packagePlans.find((plan) => plan.id === selectedPackagePlanId) || null;
+  }, [packagePlans, selectedPackagePlanId]);
+  const canSubmitRegistration = Boolean(selectedPackagePlan);
 
   const verificationEmail = useMemo(() => {
     return normalizeEmail(otpEmail || formData.user.email);
@@ -681,6 +772,11 @@ export function BusinessOnboarding() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
+    if (!selectedPackagePlan) {
+      toast.error(tRegister("plans.required"));
+      return;
+    }
+
     setLoading(true);
 
     const branchSettingsPayload = buildBranchSettingsPayload(
@@ -692,6 +788,7 @@ export function BusinessOnboarding() {
     );
 
     const payload = {
+      packagePlanId: selectedPackagePlan.id,
       user: {
         email: normalizeEmail(formData.user.email),
         password: formData.user.password,
@@ -789,11 +886,29 @@ export function BusinessOnboarding() {
       }
 
       const token = extractAccessToken(data);
+      const subscription = normalizePlainObject(nestedResponseData.subscription);
+      const paymentRequiredNow = subscription.paymentRequiredNow === true;
+      const paymentStatus = getMessageValue(subscription.paymentStatus);
 
       setPublishedData(omitAuthTokens(nestedResponseData));
 
       if (!token) {
         toast.error(tRegister("toasts.accessTokenMissing"));
+        return;
+      }
+
+      localStorage.removeItem("selectedPackagePlanId");
+
+      if (paymentRequiredNow || paymentStatus === "PENDING") {
+        sessionStorage.setItem(
+          "deliverywayPackageSubscription",
+          JSON.stringify({
+            registration: omitAuthTokens(nestedResponseData),
+            subscription,
+          })
+        );
+        localStorage.setItem("tenantSignupToken", token);
+        window.location.assign("/package-payment");
         return;
       }
 
@@ -1001,7 +1116,10 @@ export function BusinessOnboarding() {
             updateFormData={updateFormData}
             next={handleSubmit}
             back={() => setActiveStep(3)}
-            isLoading={loading}
+            isLoading={loading || !canSubmitRegistration}
+            disabledReason={
+              canSubmitRegistration ? "" : tRegister("plans.required")
+            }
           />
         );
 
@@ -1025,11 +1143,44 @@ export function BusinessOnboarding() {
         <p className="text-xs sm:text-sm text-gray-500 mt-1">
           {tRegister("subtitle")}
         </p>
-        {selectedPackagePlanId && (
-          <p className="mx-auto mt-3 max-w-xl rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary sm:text-sm">
-            {tRegister("selectedPlan")} {selectedPackagePlanId}
-          </p>
-        )}
+        <div className="mx-auto mt-4 max-w-2xl rounded-2xl border border-primary/10 bg-white p-4 text-left shadow-sm">
+          <label
+            htmlFor="packagePlanId"
+            className="text-sm font-semibold text-gray-900"
+          >
+            {tRegister("plans.label")}
+          </label>
+          <select
+            id="packagePlanId"
+            value={selectedPackagePlanId}
+            disabled={packagePlansLoading || !packagePlans.length}
+            onChange={(event) => {
+              setSelectedPackagePlanId(event.target.value);
+              localStorage.setItem("selectedPackagePlanId", event.target.value);
+            }}
+            className="mt-2 h-12 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:bg-gray-50"
+          >
+            <option value="">
+              {packagePlansLoading
+                ? tRegister("plans.loading")
+                : tRegister("plans.placeholder")}
+            </option>
+            {packagePlans.map((plan) => (
+              <option key={plan.id} value={plan.id}>
+                {plan.name} · {plan.currency} {plan.planPrice}
+              </option>
+            ))}
+          </select>
+          {selectedPackagePlan ? (
+            <p className="mt-2 text-xs text-gray-500">
+              {tRegister("selectedPlan")} {selectedPackagePlan.name}
+            </p>
+          ) : (
+            <p className="mt-2 text-xs text-primary">
+              {packagePlansError || tRegister("plans.required")}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* STEPPER */}

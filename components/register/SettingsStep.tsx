@@ -11,6 +11,7 @@ interface Props {
   updateFormData: (section: string, data: Record<string, unknown>) => void;
   next: () => void;
   back: () => void;
+  disabledReason?: string;
   isLoading: boolean;
 }
 
@@ -51,6 +52,7 @@ export function SettingsStep({
   updateFormData,
   next,
   back,
+  disabledReason,
   isLoading,
 }: Props) {
   const tCommon = useTranslations("common");
@@ -98,20 +100,27 @@ export function SettingsStep({
           {tCommon("actions.back")}
         </Button>
 
-        <Button
-          onClick={next}
-          disabled={isLoading}
-          className="bg-primary hover:bg-red-800 px-16 py-2.5 rounded-[10px] flex items-center justify-center min-w-[180px]"
-        >
-          {isLoading ? (
-            <>
-              <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-              {tRegister("settings.actions.publishing")}
-            </>
-          ) : (
-            tRegister("settings.actions.publish")
-          )}
-        </Button>
+        <div className="flex flex-col items-end gap-2">
+          {disabledReason ? (
+            <p className="max-w-xs text-right text-xs text-primary">
+              {disabledReason}
+            </p>
+          ) : null}
+          <Button
+            onClick={next}
+            disabled={isLoading}
+            className="bg-primary hover:bg-red-800 px-16 py-2.5 rounded-[10px] flex items-center justify-center min-w-[180px]"
+          >
+            {isLoading && !disabledReason ? (
+              <>
+                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                {tRegister("settings.actions.publishing")}
+              </>
+            ) : (
+              tRegister("settings.actions.publish")
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -629,6 +629,13 @@
     "title": "Business Onboarding",
     "subtitle": "Complete the steps below to set up your business",
     "selectedPlan": "Selected package plan:",
+    "plans": {
+      "label": "Package plan",
+      "loading": "Loading package plans...",
+      "placeholder": "Select an active package plan",
+      "required": "Select an active package plan before publishing.",
+      "loadError": "Unable to load package plans"
+    },
     "steps": {
       "account": "Account",
       "tenantRestaurant": "Tenant & Restaurant",
@@ -1154,6 +1161,10 @@
         "label": "Restaurant Name",
         "placeholder": "The Gusto Kitchen"
       },
+      "subject": {
+        "label": "Subject",
+        "placeholder": "Question about my order"
+      },
       "message": {
         "label": "Message",
         "placeholder": "How can we help your business today?"
@@ -1180,7 +1191,8 @@
     },
     "status": {
       "submitSuccess": "Message sent successfully.",
-      "submitError": "Something went wrong. Please try again."
+      "submitError": "Something went wrong. Please try again.",
+      "missingRestaurant": "Contact form is missing a restaurant ID."
     }
   },
   "validation": {

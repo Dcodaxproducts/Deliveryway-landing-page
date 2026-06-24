@@ -16,22 +16,26 @@ const isPackagePlan = (value: unknown): value is PackagePlan => {
     typeof plan.billingModel === "string" &&
     typeof plan.billingInterval === "string" &&
     typeof plan.planPrice === "string" &&
-    typeof plan.currency === "string"
+    typeof plan.currency === "string" &&
+    typeof plan.isActive === "boolean"
   );
 };
 
 export const getPackagePlans = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/v1/package-plans`, {
-      cache: "no-store",
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/v1/package-plans?page=1&limit=100&includeInactive=false`,
+      {
+        cache: "no-store",
+      }
+    );
 
     if (!response.ok) return [];
 
     const payload = (await response.json()) as PackagePlansResponse;
     const plans = Array.isArray(payload.data) ? payload.data : [];
 
-    return plans.filter(isPackagePlan);
+    return plans.filter(isPackagePlan).filter((plan) => plan.isActive);
   } catch {
     return [];
   }
