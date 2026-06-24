@@ -1151,44 +1151,6 @@ export function BusinessOnboarding() {
         <p className="text-xs sm:text-sm text-gray-500 mt-1">
           {tRegister("subtitle")}
         </p>
-        <div className="mx-auto mt-4 max-w-2xl rounded-2xl border border-primary/10 bg-white p-4 text-left shadow-sm">
-          <label
-            htmlFor="packagePlanId"
-            className="text-sm font-semibold text-gray-900"
-          >
-            {tRegister("plans.label")}
-          </label>
-          <select
-            id="packagePlanId"
-            value={selectedPackagePlanId}
-            disabled={packagePlansLoading || !packagePlans.length}
-            onChange={(event) => {
-              setSelectedPackagePlanId(event.target.value);
-              localStorage.setItem("selectedPackagePlanId", event.target.value);
-            }}
-            className="mt-2 h-12 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:bg-gray-50"
-          >
-            <option value="">
-              {packagePlansLoading
-                ? tRegister("plans.loading")
-                : tRegister("plans.placeholder")}
-            </option>
-            {packagePlans.map((plan) => (
-              <option key={plan.id} value={plan.id}>
-                {plan.name} · {plan.currency} {plan.planPrice}
-              </option>
-            ))}
-          </select>
-          {selectedPackagePlan ? (
-            <p className="mt-2 text-xs text-gray-500">
-              {tRegister("selectedPlan")} {selectedPackagePlan.name}
-            </p>
-          ) : (
-            <p className="mt-2 text-xs text-primary">
-              {packagePlansError || tRegister("plans.required")}
-            </p>
-          )}
-        </div>
       </div>
 
       {/* STEPPER */}

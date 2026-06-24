@@ -11,8 +11,11 @@ import {
 import type { PackagePlan } from "@/types/package-plans";
 
 interface PlanCardProps {
+  actionLabel?: string;
+  badgeLabel?: string;
   plan: Plan | PackagePlan;
   isHighlighted?: boolean;
+  onSelect?: () => void;
 }
 
 const isPackagePlan = (plan: Plan | PackagePlan): plan is PackagePlan => {
@@ -32,7 +35,13 @@ const formatPrice = (plan: PackagePlan) => {
   return price;
 };
 
-const PlanCard = ({ plan, isHighlighted: highlightedOverride }: PlanCardProps) => {
+const PlanCard = ({
+  actionLabel,
+  badgeLabel,
+  plan,
+  isHighlighted: highlightedOverride,
+  onSelect,
+}: PlanCardProps) => {
   const t = useTranslations();
   const packagePlan = isPackagePlan(plan) ? plan : null;
   const staticPlan = plan as Plan;
@@ -48,7 +57,8 @@ const PlanCard = ({ plan, isHighlighted: highlightedOverride }: PlanCardProps) =
   const href = packagePlan
     ? `/register?packagePlanId=${encodeURIComponent(packagePlan.id)}`
     : "/register";
-  const buttonText = packagePlan ? "Start registration" : t(staticPlan.buttonTextKey);
+  const buttonText =
+    actionLabel || (packagePlan ? "Start registration" : t(staticPlan.buttonTextKey));
   const description = packagePlan
     ? packagePlan.description || "Package plan for your restaurant operations."
     : t(staticPlan.descriptionKey);
@@ -67,7 +77,9 @@ const PlanCard = ({ plan, isHighlighted: highlightedOverride }: PlanCardProps) =
       {/* Most Popular Badge */}
       {isHighlighted && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-red-600 rounded-full">
-          <span className="text-white text-xs font-bold uppercase tracking-wider">{t(pricingHeaders.mostPopularKey)}</span>
+          <span className="text-white text-xs font-bold uppercase tracking-wider">
+            {badgeLabel || t(pricingHeaders.mostPopularKey)}
+          </span>
         </div>
       )}
 
@@ -143,21 +155,35 @@ const PlanCard = ({ plan, isHighlighted: highlightedOverride }: PlanCardProps) =
         </a>
       )}
 
-      <Link
-        href={href}
-        onClick={() => {
-          if (packagePlan) {
-            localStorage.setItem("selectedPackagePlanId", packagePlan.id);
-          }
-        }}
-        className={`w-full py-3 rounded-xl flex justify-center items-center ${
-          isHighlighted
-            ? "bg-red-600 text-white shadow-[0px_4px_6px_-4px_rgba(242,13,13,0.30)] shadow-[0px_10px_15px_-3px_rgba(242,13,13,0.30)]"
-            : "outline outline-2 outline-slate-200 text-slate-900"
-        }`}
-      >
-        <span className="text-base font-bold leading-6">{buttonText}</span>
-      </Link>
+      {onSelect ? (
+        <button
+          type="button"
+          onClick={onSelect}
+          className={`w-full py-3 rounded-xl flex justify-center items-center ${
+            isHighlighted
+              ? "bg-red-600 text-white shadow-[0px_4px_6px_-4px_rgba(242,13,13,0.30)] shadow-[0px_10px_15px_-3px_rgba(242,13,13,0.30)]"
+              : "outline outline-2 outline-slate-200 text-slate-900"
+          }`}
+        >
+          <span className="text-base font-bold leading-6">{buttonText}</span>
+        </button>
+      ) : (
+        <Link
+          href={href}
+          onClick={() => {
+            if (packagePlan) {
+              localStorage.setItem("selectedPackagePlanId", packagePlan.id);
+            }
+          }}
+          className={`w-full py-3 rounded-xl flex justify-center items-center ${
+            isHighlighted
+              ? "bg-red-600 text-white shadow-[0px_4px_6px_-4px_rgba(242,13,13,0.30)] shadow-[0px_10px_15px_-3px_rgba(242,13,13,0.30)]"
+              : "outline outline-2 outline-slate-200 text-slate-900"
+          }`}
+        >
+          <span className="text-base font-bold leading-6">{buttonText}</span>
+        </Link>
+      )}
     </div>
   );
 };

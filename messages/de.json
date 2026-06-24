@@ -636,7 +636,9 @@
       "required": "Wählen Sie vor dem Veröffentlichen einen aktiven Paketplan aus.",
       "loadError": "Paketpläne konnten nicht geladen werden",
       "finalStepTitle": "Wählen Sie Ihren Paketplan",
-      "finalStepDescription": "Wählen Sie vor dem Veröffentlichen den Plan für dieses Unternehmen. Zahlung oder Rechnung folgt nach der Registrierung."
+      "finalStepDescription": "Wählen Sie vor dem Veröffentlichen den Plan für dieses Unternehmen. Zahlung oder Rechnung folgt nach der Registrierung.",
+      "chooseAction": "Plan auswählen",
+      "selectedAction": "Ausgewählt"
     },
     "steps": {
       "account": "Konto",
