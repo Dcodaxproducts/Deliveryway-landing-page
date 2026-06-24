@@ -17,6 +17,6 @@ export interface PackagePlan {
   currency: string;
   trialDays: number;
   features: Record<string, PackagePlanFeatureValue>;
-  isActive: boolean;
+  isActive?: boolean;
   isDefault: boolean;
 }

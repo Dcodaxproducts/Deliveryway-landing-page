@@ -16,8 +16,7 @@ const isPackagePlan = (value: unknown): value is PackagePlan => {
     typeof plan.billingModel === "string" &&
     typeof plan.billingInterval === "string" &&
     typeof plan.planPrice === "string" &&
-    typeof plan.currency === "string" &&
-    typeof plan.isActive === "boolean"
+    typeof plan.currency === "string"
   );
 };
 
@@ -35,7 +34,7 @@ export const getPackagePlans = async () => {
     const payload = (await response.json()) as PackagePlansResponse;
     const plans = Array.isArray(payload.data) ? payload.data : [];
 
-    return plans.filter(isPackagePlan).filter((plan) => plan.isActive);
+    return plans.filter(isPackagePlan).filter((plan) => plan.isActive !== false);
   } catch {
     return [];
   }

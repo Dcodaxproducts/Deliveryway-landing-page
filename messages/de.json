@@ -634,7 +634,9 @@
       "loading": "Paketpläne werden geladen...",
       "placeholder": "Aktiven Paketplan auswählen",
       "required": "Wählen Sie vor dem Veröffentlichen einen aktiven Paketplan aus.",
-      "loadError": "Paketpläne konnten nicht geladen werden"
+      "loadError": "Paketpläne konnten nicht geladen werden",
+      "finalStepTitle": "Wählen Sie Ihren Paketplan",
+      "finalStepDescription": "Wählen Sie vor dem Veröffentlichen den Plan für dieses Unternehmen. Zahlung oder Rechnung folgt nach der Registrierung."
     },
     "steps": {
       "account": "Konto",

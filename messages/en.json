@@ -634,7 +634,9 @@
       "loading": "Loading package plans...",
       "placeholder": "Select an active package plan",
       "required": "Select an active package plan before publishing.",
-      "loadError": "Unable to load package plans"
+      "loadError": "Unable to load package plans",
+      "finalStepTitle": "Choose your package plan",
+      "finalStepDescription": "Select the plan for this business before publishing. Payment or invoice routing happens after registration."
     },
     "steps": {
       "account": "Account",

@@ -665,7 +665,7 @@ export function BusinessOnboarding() {
               typeof packagePlan.billingInterval === "string" &&
               typeof packagePlan.planPrice === "string" &&
               typeof packagePlan.currency === "string" &&
-              packagePlan.isActive === true
+              packagePlan.isActive !== false
             );
           });
 
@@ -1112,11 +1112,19 @@ export function BusinessOnboarding() {
       case 4:
         return (
           <SettingsStep
+            packagePlans={packagePlans}
+            packagePlansError={packagePlansError}
+            packagePlansLoading={packagePlansLoading}
             formData={formData}
             updateFormData={updateFormData}
             next={handleSubmit}
             back={() => setActiveStep(3)}
             isLoading={loading || !canSubmitRegistration}
+            onPackagePlanChange={(packagePlanId) => {
+              setSelectedPackagePlanId(packagePlanId);
+              localStorage.setItem("selectedPackagePlanId", packagePlanId);
+            }}
+            selectedPackagePlanId={selectedPackagePlanId}
             disabledReason={
               canSubmitRegistration ? "" : tRegister("plans.required")
             }

@@ -5,14 +5,20 @@ import { Switch } from "@/components/ui/switch";
 import { Bike, ShoppingBag, UtensilsCrossed } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { BranchSettingsValue, RegisterFormData } from "@/types/register";
+import type { PackagePlan } from "@/types/package-plans";
 
 interface Props {
+  packagePlans: PackagePlan[];
+  packagePlansError: string;
+  packagePlansLoading: boolean;
   formData: RegisterFormData;
   updateFormData: (section: string, data: Record<string, unknown>) => void;
   next: () => void;
   back: () => void;
   disabledReason?: string;
   isLoading: boolean;
+  onPackagePlanChange: (packagePlanId: string) => void;
+  selectedPackagePlanId: string;
 }
 
 type OrderTypeValue = "TAKEAWAY" | "DELIVERY" | "DINE_IN";
@@ -47,13 +53,30 @@ const getStringArray = (value: unknown) => {
   return Array.isArray(value) ? value.map(String) : [];
 };
 
+const formatPlanPrice = (plan: PackagePlan) => {
+  const amount = Number(plan.planPrice);
+
+  if (!Number.isFinite(amount)) return `${plan.currency} ${plan.planPrice}`;
+
+  return new Intl.NumberFormat("en", {
+    style: "currency",
+    currency: plan.currency,
+    maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
+  }).format(amount);
+};
+
 export function SettingsStep({
+  packagePlans,
+  packagePlansError,
+  packagePlansLoading,
   formData,
   updateFormData,
   next,
   back,
   disabledReason,
   isLoading,
+  onPackagePlanChange,
+  selectedPackagePlanId,
 }: Props) {
   const tCommon = useTranslations("common");
   const tRegister = useTranslations("register");
@@ -89,6 +112,82 @@ export function SettingsStep({
             onToggle={() => toggleOrderType(type.value)}
           />
         ))}
+      </div>
+
+      <div className="mb-10 rounded-2xl border border-primary/10 bg-primary/5 p-5">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              {tRegister("plans.finalStepTitle")}
+            </h3>
+            <p className="mt-1 text-sm text-gray-600">
+              {tRegister("plans.finalStepDescription")}
+            </p>
+          </div>
+
+          {packagePlansLoading ? (
+            <span className="text-sm font-medium text-primary">
+              {tRegister("plans.loading")}
+            </span>
+          ) : null}
+        </div>
+
+        {packagePlansError ? (
+          <p className="mt-4 rounded-xl bg-white px-4 py-3 text-sm text-primary">
+            {packagePlansError}
+          </p>
+        ) : null}
+
+        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+          {packagePlans.map((plan) => {
+            const selected = selectedPackagePlanId === plan.id;
+
+            return (
+              <button
+                key={plan.id}
+                type="button"
+                onClick={() => onPackagePlanChange(plan.id)}
+                className={`rounded-2xl border bg-white p-4 text-left transition ${
+                  selected
+                    ? "border-primary shadow-[0_14px_30px_rgba(193,0,10,0.12)] ring-2 ring-primary/10"
+                    : "border-gray-100 hover:border-primary/40"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h4 className="font-semibold text-gray-900">
+                      {plan.name}
+                    </h4>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {plan.billingModel} · {plan.billingInterval}
+                    </p>
+                  </div>
+                  <span
+                    className={`h-5 w-5 rounded-full border ${
+                      selected
+                        ? "border-primary bg-primary shadow-[inset_0_0_0_4px_white]"
+                        : "border-gray-300"
+                    }`}
+                    aria-hidden="true"
+                  />
+                </div>
+                <p className="mt-4 text-2xl font-semibold text-gray-950">
+                  {formatPlanPrice(plan)}
+                </p>
+                {plan.trialDays > 0 ? (
+                  <p className="mt-2 text-sm font-medium text-green-700">
+                    {plan.trialDays} day trial
+                  </p>
+                ) : null}
+                {plan.description ? (
+                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-600">
+                    {plan.description}
+                  </p>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* FOOTER */}
