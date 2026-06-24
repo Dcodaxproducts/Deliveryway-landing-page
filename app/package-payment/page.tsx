@@ -239,6 +239,14 @@ export default function PackagePaymentPage() {
                   Contact support
                 </Button>
               </Link>
+              <Link href="/payment-management" className="w-full sm:w-auto">
+                <Button
+                  type="button"
+                  className="h-11 w-full rounded-xl px-5 sm:w-auto"
+                >
+                  Manage payment setup
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
@@ -395,6 +403,14 @@ export default function PackagePaymentPage() {
           </div>
 
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <Link href="/payment-management" className="w-full sm:w-auto">
+              <Button
+                type="button"
+                className="h-11 w-full rounded-xl px-5 sm:w-auto"
+              >
+                Manage payment setup
+              </Button>
+            </Link>
             <Link href="/contact" className="w-full sm:w-auto">
               <Button
                 type="button"

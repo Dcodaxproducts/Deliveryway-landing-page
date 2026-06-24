@@ -970,6 +970,7 @@ export function BusinessOnboarding() {
             subscription,
           })
         );
+        sessionStorage.setItem("deliverywayPaymentManagementToken", token);
         localStorage.setItem("tenantSignupToken", token);
         window.location.assign("/package-payment");
         return;
