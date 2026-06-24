@@ -1165,6 +1165,11 @@
         "label": "Restaurantname",
         "placeholder": "The Gusto Kitchen"
       },
+      "restaurantSelect": {
+        "label": "Restaurant",
+        "loading": "Restaurants werden geladen...",
+        "placeholder": "Restaurant auswählen"
+      },
       "subject": {
         "label": "Betreff",
         "placeholder": "Frage zu meiner Bestellung"
@@ -1196,7 +1201,8 @@
     "status": {
       "submitSuccess": "Nachricht erfolgreich gesendet.",
       "submitError": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
-      "missingRestaurant": "Dem Kontaktformular fehlt eine Restaurant-ID."
+      "missingRestaurant": "Bitte wählen Sie ein Restaurant aus.",
+      "restaurantsLoadError": "Restaurants konnten nicht geladen werden."
     }
   },
   "validation": {

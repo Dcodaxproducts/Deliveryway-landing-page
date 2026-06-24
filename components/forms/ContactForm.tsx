@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,23 +19,109 @@ const normalizeResponse = (value: unknown) => {
     : {};
 };
 
+type PublicRestaurant = {
+  id: string;
+  name: string;
+};
+
+const isPublicRestaurant = (value: unknown): value is PublicRestaurant => {
+  const restaurant = normalizeResponse(value);
+
+  return typeof restaurant.id === "string" && typeof restaurant.name === "string";
+};
+
 export const ContactForm = () => {
   const t = useTranslations();
   const [loading, setLoading] = useState(false);
+  const [restaurants, setRestaurants] = useState<PublicRestaurant[]>([]);
+  const [restaurantsLoading, setRestaurantsLoading] = useState(true);
+  const [restaurantsError, setRestaurantsError] = useState("");
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadRestaurants = async () => {
+      try {
+        const loadedRestaurants: PublicRestaurant[] = [];
+        let page = 1;
+        let hasNext = true;
+
+        while (hasNext) {
+          const params = new URLSearchParams({
+            page: String(page),
+            limit: "100",
+            sortBy: "name",
+            sortOrder: "ASC",
+          });
+          const response = await fetch(
+            `${API_BASE_URL}/v1/restaurants/public?${params.toString()}`
+          );
+          const payload: unknown = await response.json();
+          const responseData = normalizeResponse(payload);
+          const meta = normalizeResponse(responseData.meta);
+
+          if (!response.ok) {
+            throw new Error(
+              getMessageValue(responseData.message) ||
+                t("forms.status.restaurantsLoadError")
+            );
+          }
+
+          const restaurantsPage = Array.isArray(responseData.data)
+            ? responseData.data.filter(isPublicRestaurant)
+            : [];
+
+          loadedRestaurants.push(...restaurantsPage);
+
+          hasNext = meta.hasNext === true;
+          page += 1;
+        }
+
+        if (!isMounted) return;
+
+        setRestaurants(loadedRestaurants);
+        setSelectedRestaurantId((current) => {
+          if (current) return current;
+
+          const pageParams = new URLSearchParams(window.location.search);
+          const restaurantIdFromUrl = pageParams.get("restaurantId") || "";
+          const hasRestaurantFromUrl = loadedRestaurants.some(
+            (restaurant) => restaurant.id === restaurantIdFromUrl
+          );
+
+          if (hasRestaurantFromUrl) return restaurantIdFromUrl;
+          if (loadedRestaurants.length === 1) return loadedRestaurants[0].id;
+
+          return "";
+        });
+      } catch (error: unknown) {
+        if (!isMounted) return;
+
+        setRestaurantsError(
+          error instanceof Error
+            ? error.message
+            : t("forms.status.restaurantsLoadError")
+        );
+      } finally {
+        if (isMounted) {
+          setRestaurantsLoading(false);
+        }
+      }
+    };
+
+    loadRestaurants();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [t]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    const pageParams = new URLSearchParams(window.location.search);
-    const restaurantId =
-      pageParams.get("restaurantId") ||
-      process.env.NEXT_PUBLIC_CONTACT_RESTAURANT_ID ||
-      "";
-    const branchId =
-      pageParams.get("branchId") ||
-      process.env.NEXT_PUBLIC_CONTACT_BRANCH_ID ||
-      "";
+    const restaurantId = selectedRestaurantId;
 
     if (!restaurantId) {
       toast.error(t("forms.status.missingRestaurant"));
@@ -46,10 +132,6 @@ export const ContactForm = () => {
 
     try {
       const query = new URLSearchParams({ restaurantId });
-
-      if (branchId) {
-        query.set("branchId", branchId);
-      }
 
       const response = await fetch(
         `${API_BASE_URL}/v1/public-content/contact-form?${query.toString()}`,
@@ -115,6 +197,36 @@ export const ContactForm = () => {
             className="mt-1 border border-slate-200"
           />
         </div>
+      </div>
+
+      {/* Restaurant */}
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="restaurantId">
+          {t("forms.fields.restaurantSelect.label")}
+        </Label>
+        <select
+          id="restaurantId"
+          name="restaurantId"
+          required
+          value={selectedRestaurantId}
+          disabled={restaurantsLoading || !restaurants.length}
+          onChange={(event) => setSelectedRestaurantId(event.target.value)}
+          className="mt-1 h-11 rounded-md border border-slate-200 bg-white px-3 text-sm outline-none transition focus:border-red-500 focus:ring-1 focus:ring-red-500 disabled:cursor-not-allowed disabled:bg-slate-50"
+        >
+          <option value="">
+            {restaurantsLoading
+              ? t("forms.fields.restaurantSelect.loading")
+              : t("forms.fields.restaurantSelect.placeholder")}
+          </option>
+          {restaurants.map((restaurant) => (
+            <option key={restaurant.id} value={restaurant.id}>
+              {restaurant.name}
+            </option>
+          ))}
+        </select>
+        {restaurantsError ? (
+          <p className="mt-1 text-xs text-red-600">{restaurantsError}</p>
+        ) : null}
       </div>
 
       {/* Subject */}

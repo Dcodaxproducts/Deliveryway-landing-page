@@ -97,7 +97,7 @@ export default function PackagePaymentPage() {
             </div>
 
             <Link href="/register" className="shrink-0">
-              <Button className="h-11 rounded-xl">
+              <Button className="h-11 rounded-xl px-5">
                 Verify email later
                 <ArrowRight size={17} className="ml-2" />
               </Button>
