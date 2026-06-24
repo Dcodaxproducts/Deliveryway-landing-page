@@ -1027,11 +1027,16 @@
       "helper": "Bitte prüfen Sie Ihren Posteingang oder Spam-Ordner auf den Verifizierungscode.",
       "verifying": "Wird verifiziert...",
       "verify": "OTP verifizieren",
+      "resending": "OTP wird gesendet...",
+      "resend": "OTP erneut senden",
       "changeEmail": "E-Mail ändern",
       "enterOtpError": "Bitte geben Sie den OTP ein",
       "validOtpError": "Bitte geben Sie einen gültigen OTP ein",
       "verificationFailed": "OTP-Verifizierung fehlgeschlagen",
-      "emailVerified": "E-Mail erfolgreich verifiziert!"
+      "emailVerified": "E-Mail erfolgreich verifiziert!",
+      "emailMissing": "E-Mail-Adresse fehlt",
+      "resendSent": "Falls das Konto existiert, wurde der OTP gesendet",
+      "resendFailed": "OTP konnte nicht erneut gesendet werden"
     },
     "toasts": {
       "userAlreadyExists": "Benutzer existiert bereits. Bitte verifizieren Sie den OTP, der an Ihre E-Mail gesendet wurde.",

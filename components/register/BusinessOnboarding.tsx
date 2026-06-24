@@ -484,6 +484,7 @@ export function BusinessOnboarding() {
   const [otpEmail, setOtpEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [otpLoading, setOtpLoading] = useState(false);
+  const [resendOtpLoading, setResendOtpLoading] = useState(false);
 
   /* ================= GLOBAL FORM DATA ================= */
 
@@ -1060,6 +1061,56 @@ export function BusinessOnboarding() {
     }
   };
 
+  const handleResendOtp = async () => {
+    const email = normalizeEmail(otpEmail || formData.user.email);
+
+    if (!email) {
+      toast.error(tRegister("otp.emailMissing"));
+      return;
+    }
+
+    setResendOtpLoading(true);
+
+    try {
+      const restaurantId =
+        getMessageValue(publishedData?.restaurantId) ||
+        getMessageValue(publishedData?.restaurant?.id) ||
+        getMessageValue(publishedData?.restaurant?.restaurantId);
+      const response = await fetch(`${API_BASE_URL}/v1/auth/resend-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          ...(restaurantId ? { restaurantId } : {}),
+          purpose: "VERIFICATION",
+        }),
+      });
+      const data: unknown = await response.json();
+      const responseData = normalizePlainObject(data);
+      const responseError = normalizePlainObject(responseData.error);
+
+      if (!response.ok) {
+        throw new Error(
+          getMessageValue(responseData.message) ||
+            getMessageValue(responseError.message) ||
+            tRegister("otp.resendFailed")
+        );
+      }
+
+      toast.success(
+        getMessageValue(responseData.message) || tRegister("otp.resendSent")
+      );
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : tRegister("otp.resendFailed")
+      );
+    } finally {
+      setResendOtpLoading(false);
+    }
+  };
+
   /* ================= OTP VIEW ================= */
 
   const renderOtpVerification = () => {
@@ -1105,6 +1156,7 @@ export function BusinessOnboarding() {
                   handleVerifyOtp();
                 }
               }}
+              disabled={resendOtpLoading}
               className="mt-2 text-center tracking-[0.35em] font-semibold"
             />
 
@@ -1115,7 +1167,7 @@ export function BusinessOnboarding() {
 
           <Button
             onClick={handleVerifyOtp}
-            disabled={otpLoading || !isOtpValid}
+            disabled={otpLoading || resendOtpLoading || !isOtpValid}
             className="w-full py-5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {otpLoading ? tRegister("otp.verifying") : tRegister("otp.verify")}
@@ -1124,8 +1176,20 @@ export function BusinessOnboarding() {
           <Button
             type="button"
             variant="outline"
+            onClick={handleResendOtp}
+            disabled={resendOtpLoading || otpLoading}
+            className="w-full py-5 rounded-xl"
+          >
+            {resendOtpLoading
+              ? tRegister("otp.resending")
+              : tRegister("otp.resend")}
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
             onClick={resetOtpVerification}
-            disabled={otpLoading}
+            disabled={otpLoading || resendOtpLoading}
             className="w-full py-5 rounded-xl"
           >
             {tRegister("otp.changeEmail")}

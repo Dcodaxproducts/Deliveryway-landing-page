@@ -107,7 +107,12 @@ const normalizeResponse = (value: unknown) => {
 
 const getPaymentSession = (value: unknown): PaymentSession | null => {
   const record = normalizeResponse(value);
-  const paymentSession = normalizeResponse(record.paymentSession);
+  const data = normalizeResponse(record.data);
+  const transaction = normalizeResponse(data.transaction);
+  const providerData = normalizeResponse(transaction.providerData);
+  const paymentSession = normalizeResponse(
+    record.paymentSession || data.paymentSession || providerData
+  );
   const clientSecret = getString(paymentSession.clientSecret);
   const publishableKey = getString(paymentSession.publishableKey);
 
@@ -148,6 +153,7 @@ export default function PackagePaymentPage() {
   const [token, setToken] = useState("");
   const [otp, setOtp] = useState("");
   const [otpLoading, setOtpLoading] = useState(false);
+  const [resendOtpLoading, setResendOtpLoading] = useState(false);
   const [verified, setVerified] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentSession, setPaymentSession] = useState<PaymentSession | null>(
@@ -188,6 +194,14 @@ export default function PackagePaymentPage() {
   const cleanedOtp = useMemo(() => otp.replace(/\D/g, "").slice(0, 6), [otp]);
   const canVerifyOtp = Boolean(token) && cleanedOtp.length >= 4;
   const subscriptionId = getString(storedData.subscription?.id);
+  const ownerEmail =
+    storedData.formData?.user?.email ||
+    getString(storedData.registration?.email) ||
+    getString(storedData.registration?.user?.email);
+  const restaurantId =
+    getString(storedData.registration?.restaurantId) ||
+    getString(storedData.registration?.restaurant?.id) ||
+    getString(storedData.registration?.restaurant?.restaurantId);
   const paymentPublishableKey = paymentSession?.publishableKey || "";
   const stripePromise = useMemo(
     () => (paymentPublishableKey ? loadStripe(paymentPublishableKey) : null),
@@ -302,6 +316,41 @@ export default function PackagePaymentPage() {
       );
     } finally {
       setOtpLoading(false);
+    }
+  };
+
+  const resendVerificationOtp = async () => {
+    if (!ownerEmail) {
+      toast.error("Owner email was not found. Please complete registration again.");
+      return;
+    }
+
+    setResendOtpLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/v1/auth/resend-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: ownerEmail,
+          ...(restaurantId ? { restaurantId } : {}),
+          purpose: "VERIFICATION",
+        }),
+      });
+      const payload: unknown = await response.json();
+      const responseData = normalizeResponse(payload);
+
+      if (!response.ok) {
+        throw new Error(getString(responseData.message, "Unable to resend OTP."));
+      }
+
+      toast.success(getString(responseData.message, "If account exists, OTP has been sent"));
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Unable to resend OTP.");
+    } finally {
+      setResendOtpLoading(false);
     }
   };
 
@@ -481,6 +530,11 @@ export default function PackagePaymentPage() {
                     Enter the OTP sent to the owner email. Verification can be
                     completed alongside your package payment.
                   </p>
+                  {ownerEmail ? (
+                    <p className="mt-2 text-xs font-semibold text-slate-500">
+                      OTP sent to {ownerEmail}
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
@@ -504,7 +558,7 @@ export default function PackagePaymentPage() {
                 <Button
                   type="button"
                   onClick={verifyEmail}
-                  disabled={!canVerifyOtp || otpLoading || verified}
+                  disabled={!canVerifyOtp || otpLoading || resendOtpLoading || verified}
                   className="h-11 shrink-0 rounded-xl px-5"
                 >
                   {verified
@@ -514,6 +568,18 @@ export default function PackagePaymentPage() {
                       : "Verify email now"}
                 </Button>
               </div>
+            </div>
+
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={resendVerificationOtp}
+                disabled={resendOtpLoading || otpLoading || verified || !ownerEmail}
+                className="h-10 rounded-xl px-4"
+              >
+                {resendOtpLoading ? "Sending OTP..." : "Resend OTP"}
+              </Button>
             </div>
 
             {!token && !verified ? (

@@ -1027,11 +1027,16 @@
       "helper": "Please check your inbox or spam folder for the verification code.",
       "verifying": "Verifying...",
       "verify": "Verify OTP",
+      "resending": "Sending OTP...",
+      "resend": "Resend OTP",
       "changeEmail": "Change Email",
       "enterOtpError": "Please enter OTP",
       "validOtpError": "Please enter a valid OTP",
       "verificationFailed": "OTP verification failed",
-      "emailVerified": "Email verified successfully!"
+      "emailVerified": "Email verified successfully!",
+      "emailMissing": "Email address is missing",
+      "resendSent": "If account exists, OTP has been sent",
+      "resendFailed": "Unable to resend OTP"
     },
     "toasts": {
       "userAlreadyExists": "User already exists. Please verify the OTP sent to your email.",
