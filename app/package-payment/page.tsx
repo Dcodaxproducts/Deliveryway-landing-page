@@ -2,6 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import {
+  Elements,
+  PaymentElement,
+  useElements,
+  useStripe,
+} from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import { CheckCircle2, Clock3, CreditCard, FileText, Mail } from "lucide-react";
 import { toast } from "sonner";
 
@@ -66,6 +73,13 @@ type PublishedFormSummary = {
   };
 };
 
+type PaymentSession = {
+  clientSecret: string;
+  paymentIntentId?: string;
+  provider?: string;
+  publishableKey: string;
+};
+
 const getString = (value: unknown, fallback = "") => {
   if (value === null || value === undefined || value === "") return fallback;
   return String(value);
@@ -89,6 +103,22 @@ const normalizeResponse = (value: unknown) => {
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : {};
+};
+
+const getPaymentSession = (value: unknown): PaymentSession | null => {
+  const record = normalizeResponse(value);
+  const paymentSession = normalizeResponse(record.paymentSession);
+  const clientSecret = getString(paymentSession.clientSecret);
+  const publishableKey = getString(paymentSession.publishableKey);
+
+  if (!clientSecret || !publishableKey) return null;
+
+  return {
+    clientSecret,
+    paymentIntentId: getString(paymentSession.paymentIntentId),
+    provider: getString(paymentSession.provider),
+    publishableKey,
+  };
 };
 
 const buildPublishedFormData = (
@@ -119,6 +149,11 @@ export default function PackagePaymentPage() {
   const [otp, setOtp] = useState("");
   const [otpLoading, setOtpLoading] = useState(false);
   const [verified, setVerified] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentSession, setPaymentSession] = useState<PaymentSession | null>(
+    null
+  );
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -133,6 +168,12 @@ export default function PackagePaymentPage() {
     return () => window.clearTimeout(timeoutId);
   }, []);
 
+  useEffect(() => {
+    if (!verified || !paymentConfirmed) return;
+    localStorage.removeItem("tenantSignupToken");
+    setToken("");
+  }, [paymentConfirmed, verified]);
+
   const plan = storedData.subscription?.plan;
   const amount = Number(plan?.planPrice);
   const formattedAmount = useMemo(() => {
@@ -146,6 +187,71 @@ export default function PackagePaymentPage() {
   }, [amount, plan?.currency, plan?.planPrice]);
   const cleanedOtp = useMemo(() => otp.replace(/\D/g, "").slice(0, 6), [otp]);
   const canVerifyOtp = Boolean(token) && cleanedOtp.length >= 4;
+  const subscriptionId = getString(storedData.subscription?.id);
+  const paymentPublishableKey = paymentSession?.publishableKey || "";
+  const stripePromise = useMemo(
+    () => (paymentPublishableKey ? loadStripe(paymentPublishableKey) : null),
+    [paymentPublishableKey]
+  );
+
+  const createSubscriptionPaymentAttempt = async () => {
+    if (!subscriptionId) {
+      toast.error("Subscription ID is missing. Please register again.");
+      return;
+    }
+
+    if (!token) {
+      toast.error("Signup session is missing. Please register again.");
+      return;
+    }
+
+    setPaymentLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/v1/payments/subscriptions/${subscriptionId}/attempts`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            currency: getString(plan?.currency) || undefined,
+            note: "Initial plan payment",
+          }),
+        }
+      );
+      const payload: unknown = await response.json();
+      const responseData = normalizeResponse(payload);
+
+      if (!response.ok) {
+        throw new Error(
+          getString(
+            responseData.message,
+            "Unable to start subscription payment"
+          )
+        );
+      }
+
+      const nextPaymentSession = getPaymentSession(payload);
+
+      if (!nextPaymentSession) {
+        throw new Error("Stripe payment session was not returned.");
+      }
+
+      setPaymentSession(nextPaymentSession);
+      toast.success("Secure payment form is ready.");
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Unable to start subscription payment"
+      );
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
 
   const verifyEmail = async () => {
     if (!token) {
@@ -178,7 +284,6 @@ export default function PackagePaymentPage() {
         );
       }
 
-      localStorage.removeItem("tenantSignupToken");
       const nextStoredData = {
         ...storedData,
         emailVerified: true,
@@ -189,7 +294,6 @@ export default function PackagePaymentPage() {
       );
       setStoredData(nextStoredData);
       setVerified(true);
-      setToken("");
       setOtp("");
       toast.success("Email verified successfully.");
     } catch (error: unknown) {
@@ -223,9 +327,9 @@ export default function PackagePaymentPage() {
                     Email verified successfully
                   </p>
                   <p className="mt-1 text-sm leading-6 text-green-800">
-                    Your workspace is created and your email is verified. Your
-                    selected package is pending invoice/payment review, and the
-                    team will continue the account approval process.
+                    Your workspace is created and your email is verified. If
+                    your package payment is still pending, complete the secure
+                    payment step below so the team can continue approval.
                   </p>
                 </div>
               </div>
@@ -240,6 +344,21 @@ export default function PackagePaymentPage() {
                 </Button>
               </Link>
             </div>
+          </div>
+        </section>
+
+        <section className="px-4 pt-6 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <SubscriptionPaymentSection
+              canStartPayment={Boolean(token && subscriptionId)}
+              formattedAmount={formattedAmount}
+              loading={paymentLoading}
+              onStartPayment={createSubscriptionPaymentAttempt}
+              paymentConfirmed={paymentConfirmed}
+              paymentSession={paymentSession}
+              setPaymentConfirmed={setPaymentConfirmed}
+              stripePromise={stripePromise}
+            />
           </div>
         </section>
 
@@ -324,15 +443,28 @@ export default function PackagePaymentPage() {
               <FileText className="mt-0.5 shrink-0 text-amber-700" size={20} />
               <div>
                 <h2 className="text-sm font-semibold text-amber-950">
-                  Invoice or manual payment required
+                  Secure package payment
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-amber-800">
-                  Our team will share the invoice or payment instructions for
-                  this package. You can verify your email now while payment and
-                  approval are being processed.
+                  Pay this package online with Stripe. After payment is
+                  confirmed, Stripe notifies the platform and your subscription
+                  status is updated automatically.
                 </p>
               </div>
             </div>
+          </div>
+
+          <div className="mt-8">
+            <SubscriptionPaymentSection
+              canStartPayment={Boolean(token && subscriptionId)}
+              formattedAmount={formattedAmount}
+              loading={paymentLoading}
+              onStartPayment={createSubscriptionPaymentAttempt}
+              paymentConfirmed={paymentConfirmed}
+              paymentSession={paymentSession}
+              setPaymentConfirmed={setPaymentConfirmed}
+              stripePromise={stripePromise}
+            />
           </div>
 
           <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
@@ -347,7 +479,7 @@ export default function PackagePaymentPage() {
                   </h2>
                   <p className="mt-1 text-sm leading-6 text-slate-600">
                     Enter the OTP sent to the owner email. Verification can be
-                    completed before subscription payment is collected.
+                    completed alongside your package payment.
                   </p>
                 </div>
               </div>
@@ -417,5 +549,156 @@ export default function PackagePaymentPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+type SubscriptionPaymentSectionProps = {
+  canStartPayment: boolean;
+  formattedAmount: string;
+  loading: boolean;
+  onStartPayment: () => void;
+  paymentConfirmed: boolean;
+  paymentSession: PaymentSession | null;
+  setPaymentConfirmed: (confirmed: boolean) => void;
+  stripePromise: ReturnType<typeof loadStripe> | null;
+};
+
+function SubscriptionPaymentSection({
+  canStartPayment,
+  formattedAmount,
+  loading,
+  onStartPayment,
+  paymentConfirmed,
+  paymentSession,
+  setPaymentConfirmed,
+  stripePromise,
+}: SubscriptionPaymentSectionProps) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <h2 className="text-sm font-semibold text-slate-950">
+            Pay package online
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            Complete the selected package payment securely. Amount due:{" "}
+            <span className="font-semibold text-slate-950">
+              {formattedAmount}
+            </span>
+            .
+          </p>
+        </div>
+
+        <Button
+          type="button"
+          onClick={onStartPayment}
+          disabled={!canStartPayment || loading || Boolean(paymentSession)}
+          className="h-11 shrink-0 rounded-xl px-5"
+        >
+          {loading
+            ? "Preparing..."
+            : paymentSession
+              ? "Payment form ready"
+              : "Start secure payment"}
+        </Button>
+      </div>
+
+      {!canStartPayment ? (
+        <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
+          We could not find the active signup session for this browser. Please
+          complete registration again if you need to start a new online payment.
+        </p>
+      ) : null}
+
+      {paymentSession && stripePromise ? (
+        <div className="mt-5 rounded-xl border border-slate-100 bg-slate-50 p-4">
+          <Elements
+            stripe={stripePromise}
+            options={{ clientSecret: paymentSession.clientSecret }}
+          >
+            <SubscriptionPaymentForm
+              paymentConfirmed={paymentConfirmed}
+              setPaymentConfirmed={setPaymentConfirmed}
+            />
+          </Elements>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function SubscriptionPaymentForm({
+  paymentConfirmed,
+  setPaymentConfirmed,
+}: {
+  paymentConfirmed: boolean;
+  setPaymentConfirmed: (confirmed: boolean) => void;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [confirming, setConfirming] = useState(false);
+
+  const submitPayment = async () => {
+    if (!stripe || !elements) {
+      toast.error("Stripe payment form is still loading.");
+      return;
+    }
+
+    setConfirming(true);
+
+    try {
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        redirect: "if_required",
+      });
+
+      if (error) {
+        throw new Error(error.message || "Payment could not be confirmed.");
+      }
+
+      if (
+        paymentIntent?.status === "succeeded" ||
+        paymentIntent?.status === "processing"
+      ) {
+        setPaymentConfirmed(true);
+        toast.success(
+          paymentIntent.status === "succeeded"
+            ? "Payment confirmed successfully."
+            : "Payment is processing. We will update the subscription shortly."
+        );
+        return;
+      }
+
+      toast.info("Payment confirmation is pending. Please check again shortly.");
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : "Payment confirmation failed"
+      );
+    } finally {
+      setConfirming(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {paymentConfirmed ? (
+        <div className="rounded-xl bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+          Payment confirmed. Your subscription will update automatically after
+          Stripe webhook confirmation.
+        </div>
+      ) : (
+        <>
+          <PaymentElement />
+          <Button
+            type="button"
+            onClick={submitPayment}
+            disabled={!stripe || !elements || confirming}
+            className="h-11 rounded-xl px-5"
+          >
+            {confirming ? "Confirming..." : "Confirm package payment"}
+          </Button>
+        </>
+      )}
+    </div>
   );
 }
