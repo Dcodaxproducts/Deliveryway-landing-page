@@ -228,16 +228,16 @@ const createOptionalImageSchema = (
 /* ---------------- FILE SCHEMAS ---------------- */
 
 export const image2MB = createRequiredImageSchema(
-  2,
+  20,
   DEFAULT_REGISTER_VALIDATION_MESSAGES.fileRequired
 );
 export const image1MB = createRequiredImageSchema(
-  1,
+  20,
   DEFAULT_REGISTER_VALIDATION_MESSAGES.imageRequired
 );
 
-export const image2MBOptional = createOptionalImageSchema(2);
-export const image1MBOptional = createOptionalImageSchema(1);
+export const image2MBOptional = createOptionalImageSchema(20);
+export const image1MBOptional = createOptionalImageSchema(20);
 
 /* ---------------- COMMON ---------------- */
 

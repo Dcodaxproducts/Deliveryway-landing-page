@@ -708,7 +708,7 @@
         "previewAlt": "Cover preview",
         "clickToUpload": "Click to upload",
         "dragDrop": "or drag and drop",
-        "helper": "JPG, JPEG, PNG less than 2MB"
+        "helper": "JPG, JPEG, PNG up to 20MB"
       },
       "admin": {
         "title": "Branch Admin Account",
@@ -1015,7 +1015,7 @@
       "imageUploaded": "Image uploaded",
       "imageSelected": "Image selected",
       "chooseFile": "Choose File",
-      "helper2Mb": "PNG, JPG, JPEG upto 2MB"
+      "helper2Mb": "PNG, JPG, JPEG up to 20MB"
     },
     "otp": {
       "title": "Verify Email",

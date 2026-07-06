@@ -708,7 +708,7 @@
         "previewAlt": "Titelbild-Vorschau",
         "clickToUpload": "Zum Hochladen klicken",
         "dragDrop": "oder per Drag-and-drop",
-        "helper": "JPG, JPEG, PNG unter 2 MB"
+        "helper": "JPG, JPEG, PNG bis 20 MB"
       },
       "admin": {
         "title": "Filial-Admin-Konto",
@@ -1015,7 +1015,7 @@
       "imageUploaded": "Bild hochgeladen",
       "imageSelected": "Bild ausgewählt",
       "chooseFile": "Datei auswählen",
-      "helper2Mb": "PNG, JPG, JPEG bis 2 MB"
+      "helper2Mb": "PNG, JPG, JPEG bis 20 MB"
     },
     "otp": {
       "title": "E-Mail verifizieren",

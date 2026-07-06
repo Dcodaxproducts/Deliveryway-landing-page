@@ -217,7 +217,7 @@ export function UserInfoStep({ formData, updateFormData, next }: Props) {
   }, [normalizedEmail, emailLooksValid, tRegister]);
 
   /* ---------------- FILE UPLOAD ---------------- */
-const MAX_PROFILE_IMAGE_SIZE_MB = 2;
+const MAX_PROFILE_IMAGE_SIZE_MB = 20;
 const MAX_PROFILE_IMAGE_SIZE_BYTES = MAX_PROFILE_IMAGE_SIZE_MB * 1024 * 1024;
 
 const handleProfileFileSelect = async (file: File) => {

@@ -470,7 +470,7 @@ const { uploadFile, uploading, progress } = useFileUpload();
     return readBrandingBoolean(branding, path, fallback);
   };
 
-const MAX_LOGO_IMAGE_SIZE_MB = 2;
+const MAX_LOGO_IMAGE_SIZE_MB = 20;
 const MAX_LOGO_IMAGE_SIZE_BYTES = MAX_LOGO_IMAGE_SIZE_MB * 1024 * 1024;
 
 const scrollToInput = (input: HTMLInputElement | null) => {
