@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { API_BASE_URL } from "@/lib/constants";
+import { prepareUploadFile } from "@/lib/prepare-upload-file";
 import { useTranslations } from "next-intl";
 
 interface UploadResult {
@@ -35,6 +36,8 @@ export const useFileUpload = () => {
       setUploading(true);
       setProgress(0);
 
+      const prepared = await prepareUploadFile(file);
+
       const token =
         typeof window !== "undefined"
           ? localStorage.getItem("token")
@@ -50,8 +53,8 @@ export const useFileUpload = () => {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify({
-            fileName: file.name,
-            contentType: file.type,
+            fileName: prepared.file.name,
+            contentType: prepared.file.type,
           }),
         }
       );
@@ -100,7 +103,7 @@ export const useFileUpload = () => {
 
         xhr.onerror = () => reject(new Error(tErrors("uploadFailed")));
 
-        xhr.send(file);
+        xhr.send(prepared.file);
       });
 
       toast.success(tCommon("fileUploaded"));
