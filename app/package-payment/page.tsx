@@ -192,7 +192,7 @@ export default function PackagePaymentPage() {
     }).format(amount);
   }, [amount, plan?.currency, plan?.planPrice]);
   const cleanedOtp = useMemo(() => otp.replace(/\D/g, "").slice(0, 6), [otp]);
-  const canVerifyOtp = Boolean(token) && cleanedOtp.length >= 4;
+  const canVerifyOtp = Boolean(token) && cleanedOtp.length === 6;
   const subscriptionId = getString(storedData.subscription?.id);
   const ownerEmail =
     storedData.formData?.user?.email ||
@@ -273,8 +273,8 @@ export default function PackagePaymentPage() {
       return;
     }
 
-    if (cleanedOtp.length < 4) {
-      toast.error("Please enter the OTP sent to your email.");
+    if (cleanedOtp.length !== 6) {
+      toast.error("Please enter the 6-digit OTP sent to your email.");
       return;
     }
 
@@ -542,7 +542,7 @@ export default function PackagePaymentPage() {
                 <Input
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  placeholder="Enter OTP"
+                  placeholder="Enter 6-digit OTP"
                   value={cleanedOtp}
                   onChange={(event) =>
                     setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))

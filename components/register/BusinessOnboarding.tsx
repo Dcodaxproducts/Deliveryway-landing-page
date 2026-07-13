@@ -75,22 +75,6 @@ const getMessageValue = (value: unknown) => {
   return typeof value === "string" ? value : "";
 };
 
-const isUserAlreadyExistsError = (data: unknown) => {
-  const response = normalizePlainObject(data);
-  const error = normalizePlainObject(response.error);
-  const message = [
-    response.message,
-    error.message,
-    error.code,
-  ]
-    .map(getMessageValue)
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  return message.includes("user already exists");
-};
-
 const extractAccessToken = (data: unknown) => {
   const response = normalizePlainObject(data);
   const responseData = normalizePlainObject(response.data);
@@ -782,7 +766,7 @@ export function BusinessOnboarding() {
     return otp.replace(/\D/g, "").slice(0, 6);
   }, [otp]);
 
-  const isOtpValid = cleanedOtp.length >= 4;
+  const isOtpValid = cleanedOtp.length === 6;
 
   /* ================= UPDATE HELPER ================= */
 
@@ -894,11 +878,9 @@ export function BusinessOnboarding() {
         coverImage: formData.branch.coverImage,
         description: formData.branch.description,
         settings: branchSettingsPayload,
-        street: [formData.branch.address.houseNumber, formData.branch.address.street]
-          .filter(Boolean)
-          .join(" ")
-          .trim(),
-        area: formData.branch.address.postalCode || "",
+        street: formData.branch.address.street.trim(),
+        shopNumber: formData.branch.address.houseNumber.trim(),
+        postalCode: formData.branch.address.postalCode.trim(),
         city: formData.branch.address.city,
         state: formData.branch.address.state,
         country: formData.branch.address.country,
@@ -925,19 +907,6 @@ export function BusinessOnboarding() {
       const nestedResponseData = normalizePlainObject(responseData.data);
 
       if (!response.ok) {
-        if (isUserAlreadyExistsError(data)) {
-          const tokenFromError = extractAccessToken(data);
-
-          startOtpVerification({
-            email: formData.user.email,
-            token: tokenFromError,
-            step: 1,
-          });
-
-          toast.info(tRegister("toasts.userAlreadyExists"));
-          return;
-        }
-
         toast.error(
           getMessageValue(responseData.message) ||
             tRegister("toasts.registrationFailed")
