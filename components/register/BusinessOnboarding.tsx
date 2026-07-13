@@ -86,6 +86,18 @@ const extractAccessToken = (data: unknown) => {
   );
 };
 
+const extractRefreshToken = (data: unknown) => {
+  const response = normalizePlainObject(data);
+  const responseData = normalizePlainObject(response.data);
+  return toStringValue(responseData.refreshToken || response.refreshToken);
+};
+
+const extractOwnerId = (data: unknown) => {
+  const response = normalizePlainObject(data);
+  const responseData = normalizePlainObject(response.data);
+  return toStringValue(responseData.ownerId || response.ownerId);
+};
+
 const toNumber = (value: unknown, fallback = 0) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
@@ -121,8 +133,9 @@ const normalizePlainObject = (value: unknown): PlainObject => {
 };
 
 const omitAuthTokens = (value: PlainObject): PublishedResponseData => {
-  const { accessToken, token, ...rest } = value;
+  const { accessToken, refreshToken, token, ...rest } = value;
   void accessToken;
+  void refreshToken;
   void token;
   return rest;
 };
@@ -147,6 +160,49 @@ const buildPublishedFormSummary = (formData: {
       email: normalizeEmail(formData.user.email),
     },
   };
+};
+
+const buildPackageSubscriptionSession = ({
+  accessToken,
+  formData,
+  refreshToken,
+  registration,
+  subscription,
+}: {
+  accessToken: string;
+  formData: Parameters<typeof buildPublishedFormSummary>[0];
+  refreshToken: string;
+  registration: PlainObject;
+  subscription: PlainObject;
+}) => {
+  const ownerId = toStringValue(registration.ownerId);
+
+  return {
+    auth: {
+      accessToken,
+      refreshToken,
+      ownerId,
+    },
+    emailVerified: false,
+    formData: buildPublishedFormSummary(formData),
+    registration: omitAuthTokens(registration),
+    subscription: {
+      ...subscription,
+      id: subscription.id,
+      paymentRequiredNow: subscription.paymentRequiredNow,
+      paymentStatus: subscription.paymentStatus,
+    },
+  };
+};
+
+const parsePackageSubscriptionSession = () => {
+  try {
+    return normalizePlainObject(
+      JSON.parse(sessionStorage.getItem("deliverywayPackageSubscription") || "{}")
+    );
+  } catch {
+    return {};
+  }
 };
 
 const shouldCollectPackagePayment = ({
@@ -915,13 +971,19 @@ export function BusinessOnboarding() {
       }
 
       const token = extractAccessToken(data);
-      const subscription = normalizePlainObject(nestedResponseData.subscription);
+      const refreshToken = extractRefreshToken(data);
+      const ownerId = extractOwnerId(data);
+      const registrationData: PlainObject = {
+        ...nestedResponseData,
+        ...(ownerId ? { ownerId } : {}),
+      };
+      const subscription = normalizePlainObject(registrationData.subscription);
       const shouldShowPackagePayment = shouldCollectPackagePayment({
         selectedPackagePlan,
         subscription,
       });
 
-      setPublishedData(omitAuthTokens(nestedResponseData));
+      setPublishedData(omitAuthTokens(registrationData));
 
       if (!token) {
         toast.error(tRegister("toasts.accessTokenMissing"));
@@ -929,20 +991,23 @@ export function BusinessOnboarding() {
       }
 
       localStorage.removeItem("selectedPackagePlanId");
+      localStorage.setItem("tenantSignupToken", token);
 
       if (shouldShowPackagePayment) {
         sessionStorage.setItem(
           "deliverywayPackageSubscription",
-          JSON.stringify({
-            emailVerified: false,
-            formData: buildPublishedFormSummary(formData),
-            registration: omitAuthTokens(nestedResponseData),
-            subscription,
-          })
+          JSON.stringify(
+            buildPackageSubscriptionSession({
+              accessToken: token,
+              formData,
+              refreshToken,
+              registration: registrationData,
+              subscription,
+            })
+          )
         );
-        localStorage.setItem("tenantSignupToken", token);
-        window.location.assign("/package-payment");
-        return;
+      } else {
+        sessionStorage.removeItem("deliverywayPackageSubscription");
       }
 
       startOtpVerification({
@@ -1010,6 +1075,20 @@ export function BusinessOnboarding() {
       }
 
       toast.success(tRegister("otp.emailVerified"));
+
+      const packageSubscription = parsePackageSubscriptionSession();
+
+      if (Object.keys(packageSubscription).length > 0) {
+        sessionStorage.setItem(
+          "deliverywayPackageSubscription",
+          JSON.stringify({
+            ...packageSubscription,
+            emailVerified: true,
+          })
+        );
+        window.location.assign("/package-payment");
+        return;
+      }
 
       localStorage.removeItem("tenantSignupToken");
 
@@ -1229,7 +1308,11 @@ export function BusinessOnboarding() {
 
       case 5:
         return (
-          <StorePublished formData={formData} publishedData={publishedData} />
+          <StorePublished
+            formData={formData}
+            publishedData={publishedData}
+            variant="pendingApproval"
+          />
         );
 
       default:

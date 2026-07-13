@@ -18,6 +18,11 @@ import { Input } from "@/components/ui/input";
 import { API_BASE_URL } from "@/lib/constants";
 
 type StoredSubscription = {
+  auth?: {
+    accessToken?: unknown;
+    ownerId?: unknown;
+    refreshToken?: unknown;
+  };
   emailVerified?: boolean;
   formData?: PublishedFormSummary;
   registration?: {
@@ -167,7 +172,10 @@ export default function PackagePaymentPage() {
         sessionStorage.getItem("deliverywayPackageSubscription")
       );
       setStoredData(nextStoredData);
-      setToken(localStorage.getItem("tenantSignupToken") || "");
+      setToken(
+        localStorage.getItem("tenantSignupToken") ||
+          getString(nextStoredData.auth?.accessToken)
+      );
       setVerified(nextStoredData.emailVerified === true);
     }, 0);
 
@@ -232,7 +240,7 @@ export default function PackagePaymentPage() {
           },
           body: JSON.stringify({
             currency: getString(plan?.currency) || undefined,
-            note: "Initial plan payment",
+            note: "Initial package subscription payment",
           }),
         }
       );
@@ -376,9 +384,10 @@ export default function PackagePaymentPage() {
                     Email verified successfully
                   </p>
                   <p className="mt-1 text-sm leading-6 text-green-800">
-                    Your workspace is created and your email is verified. If
-                    your package payment is still pending, complete the secure
-                    payment step below so the team can continue approval.
+                    Your workspace is created and your email is verified.
+                    Complete the secure package payment below; once Stripe
+                    confirms it, your account remains with the team for final
+                    approval.
                   </p>
                 </div>
               </div>
@@ -492,28 +501,15 @@ export default function PackagePaymentPage() {
               <FileText className="mt-0.5 shrink-0 text-amber-700" size={20} />
               <div>
                 <h2 className="text-sm font-semibold text-amber-950">
-                  Secure package payment
+                  Verify before payment
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-amber-800">
-                  Pay this package online with Stripe. After payment is
-                  confirmed, Stripe notifies the platform and your subscription
-                  status is updated automatically.
+                  Enter the 6-digit OTP first. After email verification, this
+                  page will show the secure Stripe payment form for your
+                  package subscription.
                 </p>
               </div>
             </div>
-          </div>
-
-          <div className="mt-8">
-            <SubscriptionPaymentSection
-              canStartPayment={Boolean(token && subscriptionId)}
-              formattedAmount={formattedAmount}
-              loading={paymentLoading}
-              onStartPayment={createSubscriptionPaymentAttempt}
-              paymentConfirmed={paymentConfirmed}
-              paymentSession={paymentSession}
-              setPaymentConfirmed={setPaymentConfirmed}
-              stripePromise={stripePromise}
-            />
           </div>
 
           <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
@@ -729,8 +725,8 @@ function SubscriptionPaymentForm({
         setPaymentConfirmed(true);
         toast.success(
           paymentIntent.status === "succeeded"
-            ? "Payment confirmed successfully."
-            : "Payment is processing. We will update the subscription shortly."
+            ? "Payment received. Your account is pending final approval."
+            : "Payment is processing. Your account remains pending approval."
         );
         return;
       }
@@ -749,8 +745,8 @@ function SubscriptionPaymentForm({
     <div className="space-y-4">
       {paymentConfirmed ? (
         <div className="rounded-xl bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
-          Payment confirmed. Your subscription will update automatically after
-          Stripe webhook confirmation.
+          Payment received. Your subscription is being updated and your account
+          is pending final approval.
         </div>
       ) : (
         <>
