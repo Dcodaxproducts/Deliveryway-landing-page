@@ -208,19 +208,6 @@ export function BranchDeliveryAreaSettings({
     });
   };
 
-  const updateServiceCharge = (
-    key: "isEnabled" | "type" | "value",
-    value: boolean | number | string
-  ) => {
-    emitSettings({
-      ...settings,
-      serviceCharge: {
-        ...(settings.serviceCharge || {}),
-        [key]: value,
-      },
-    });
-  };
-
   const updateContact = (key: "phone" | "whatsapp", value: string) => {
     emitSettings({
       ...settings,
@@ -1284,9 +1271,6 @@ export function BranchDeliveryAreaSettings({
                 backend.
               </p>
             </div>
-            <span className="rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-              Hidden: payment methods & tax
-            </span>
           </div>
         </div>
 
@@ -1346,59 +1330,6 @@ export function BranchDeliveryAreaSettings({
               }
             />
           </label>
-
-          <div className="lg:col-span-2">
-            <div className="rounded-[22px] border border-primary/10 bg-white p-4 shadow-[0_16px_40px_rgba(193,0,10,0.07)]">
-              <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <label className="flex cursor-pointer items-center gap-4">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                    %
-                  </span>
-                  <span>
-                    <span className="block text-sm font-semibold text-gray-950">
-                      Service Charge (Optional)
-                    </span>
-                    <span className="mt-1 block text-xs leading-5 text-gray-500">
-                      Add a percentage or fixed amount service fee at checkout.
-                    </span>
-                  </span>
-                </label>
-                <Switch
-                  checked={Boolean(settings.serviceCharge?.isEnabled)}
-                  onCheckedChange={(val) =>
-                    updateServiceCharge("isEnabled", val === true)
-                  }
-                />
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <label className="block">
-                  <span className="mb-2 block text-[16px] font-medium text-gray-900">
-                    Charge Type
-                  </span>
-                  <select
-                    value={settings.serviceCharge?.type || "PERCENTAGE"}
-                    onChange={(event) =>
-                      updateServiceCharge("type", event.target.value)
-                    }
-                    className="h-[52px] w-full rounded-[10px] border border-[#BBBBBB] bg-white px-3 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
-                  >
-                    <option value="PERCENTAGE">Percentage</option>
-                    <option value="AMOUNT">Fixed Amount</option>
-                  </select>
-                </label>
-
-                <FormInput
-                  label="Charge Value"
-                  placeholder="0"
-                  value={toInputNumber(settings.serviceCharge?.value)}
-                  onChange={(val) =>
-                    updateServiceCharge("value", val === "" ? 0 : Number(val))
-                  }
-                />
-              </div>
-            </div>
-          </div>
 
           <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
             <FormInput
