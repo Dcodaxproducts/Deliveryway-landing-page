@@ -19,20 +19,6 @@ export function BranchAddressFields({
 
   return (
     <>
-      <div>
-        <FormInput
-          label={tRegister("branch.address.fields.houseNumber.optionalLabel")}
-          placeholder={tRegister("branch.address.fields.houseNumber.placeholder")}
-          value={address.houseNumber || ""}
-          onChange={(val) => onFieldChange("houseNumber", val)}
-        />
-        {error("branch.address.houseNumber") && (
-          <p className="text-red-500 text-xs mt-1">
-            {error("branch.address.houseNumber")}
-          </p>
-        )}
-      </div>
-
       <div data-field="branch.address.street">
         <FormInput
           label={tRegister("branch.address.fields.street.requiredLabel")}
@@ -49,8 +35,26 @@ export function BranchAddressFields({
 
       <div>
         <FormInput
+          label={tRegister("branch.address.fields.houseNumber.optionalLabel")}
+          placeholder={tRegister(
+            "branch.address.fields.houseNumber.placeholder",
+          )}
+          value={address.houseNumber || ""}
+          onChange={(val) => onFieldChange("houseNumber", val)}
+        />
+        {error("branch.address.houseNumber") && (
+          <p className="text-red-500 text-xs mt-1">
+            {error("branch.address.houseNumber")}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <FormInput
           label={tRegister("branch.address.fields.postalCode.optionalLabel")}
-          placeholder={tRegister("branch.address.fields.postalCode.placeholder")}
+          placeholder={tRegister(
+            "branch.address.fields.postalCode.placeholder",
+          )}
           value={address.postalCode || ""}
           onChange={(val) => onFieldChange("postalCode", val)}
         />

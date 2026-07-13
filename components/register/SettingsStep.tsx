@@ -127,7 +127,7 @@ export function SettingsStep({
           </p>
         ) : null}
 
-        <div className="mt-8 flex flex-col items-center justify-center gap-8 lg:flex-row lg:items-stretch">
+        <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
           {packagePlans.map((plan) => {
             const selected = selectedPackagePlanId === plan.id;
 

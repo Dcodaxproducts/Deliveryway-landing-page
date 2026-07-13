@@ -116,7 +116,7 @@ const getPaymentSession = (value: unknown): PaymentSession | null => {
   const transaction = normalizeResponse(data.transaction);
   const providerData = normalizeResponse(transaction.providerData);
   const paymentSession = normalizeResponse(
-    record.paymentSession || data.paymentSession || providerData
+    record.paymentSession || data.paymentSession || providerData,
   );
   const clientSecret = getString(paymentSession.clientSecret);
   const publishableKey = getString(paymentSession.publishableKey);
@@ -132,7 +132,7 @@ const getPaymentSession = (value: unknown): PaymentSession | null => {
 };
 
 const buildPublishedFormData = (
-  storedData: StoredSubscription
+  storedData: StoredSubscription,
 ): PublishedFormSummary => {
   return {
     branch: {
@@ -162,19 +162,19 @@ export default function PackagePaymentPage() {
   const [verified, setVerified] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentSession, setPaymentSession] = useState<PaymentSession | null>(
-    null
+    null,
   );
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
       const nextStoredData = parseStoredSubscription(
-        sessionStorage.getItem("deliverywayPackageSubscription")
+        sessionStorage.getItem("deliverywayPackageSubscription"),
       );
       setStoredData(nextStoredData);
       setToken(
         localStorage.getItem("tenantSignupToken") ||
-          getString(nextStoredData.auth?.accessToken)
+          getString(nextStoredData.auth?.accessToken),
       );
       setVerified(nextStoredData.emailVerified === true);
     }, 0);
@@ -213,7 +213,7 @@ export default function PackagePaymentPage() {
   const paymentPublishableKey = paymentSession?.publishableKey || "";
   const stripePromise = useMemo(
     () => (paymentPublishableKey ? loadStripe(paymentPublishableKey) : null),
-    [paymentPublishableKey]
+    [paymentPublishableKey],
   );
 
   const createSubscriptionPaymentAttempt = async () => {
@@ -242,7 +242,7 @@ export default function PackagePaymentPage() {
             currency: getString(plan?.currency) || undefined,
             note: "Initial package subscription payment",
           }),
-        }
+        },
       );
       const payload: unknown = await response.json();
       const responseData = normalizeResponse(payload);
@@ -251,8 +251,8 @@ export default function PackagePaymentPage() {
         throw new Error(
           getString(
             responseData.message,
-            "Unable to start subscription payment"
-          )
+            "Unable to start subscription payment",
+          ),
         );
       }
 
@@ -268,7 +268,7 @@ export default function PackagePaymentPage() {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Unable to start subscription payment"
+          : "Unable to start subscription payment",
       );
     } finally {
       setPaymentLoading(false);
@@ -302,7 +302,7 @@ export default function PackagePaymentPage() {
 
       if (!response.ok) {
         throw new Error(
-          getString(responseData.message, "OTP verification failed")
+          getString(responseData.message, "OTP verification failed"),
         );
       }
 
@@ -312,7 +312,7 @@ export default function PackagePaymentPage() {
       };
       sessionStorage.setItem(
         "deliverywayPackageSubscription",
-        JSON.stringify(nextStoredData)
+        JSON.stringify(nextStoredData),
       );
       setStoredData(nextStoredData);
       setVerified(true);
@@ -320,7 +320,7 @@ export default function PackagePaymentPage() {
       toast.success("Email verified successfully.");
     } catch (error: unknown) {
       toast.error(
-        error instanceof Error ? error.message : "OTP verification failed"
+        error instanceof Error ? error.message : "OTP verification failed",
       );
     } finally {
       setOtpLoading(false);
@@ -329,7 +329,9 @@ export default function PackagePaymentPage() {
 
   const resendVerificationOtp = async () => {
     if (!ownerEmail) {
-      toast.error("Owner email was not found. Please complete registration again.");
+      toast.error(
+        "Owner email was not found. Please complete registration again.",
+      );
       return;
     }
 
@@ -351,12 +353,18 @@ export default function PackagePaymentPage() {
       const responseData = normalizeResponse(payload);
 
       if (!response.ok) {
-        throw new Error(getString(responseData.message, "Unable to resend OTP."));
+        throw new Error(
+          getString(responseData.message, "Unable to resend OTP."),
+        );
       }
 
-      toast.success(getString(responseData.message, "If account exists, OTP has been sent"));
+      toast.success(
+        getString(responseData.message, "If account exists, OTP has been sent"),
+      );
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : "Unable to resend OTP.");
+      toast.error(
+        error instanceof Error ? error.message : "Unable to resend OTP.",
+      );
     } finally {
       setResendOtpLoading(false);
     }
@@ -364,7 +372,7 @@ export default function PackagePaymentPage() {
 
   const publishedFormData = useMemo(
     () => buildPublishedFormData(storedData),
-    [storedData]
+    [storedData],
   );
   const publishedData = storedData.registration || null;
 
@@ -505,8 +513,8 @@ export default function PackagePaymentPage() {
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-amber-800">
                   Enter the 6-digit OTP first. After email verification, this
-                  page will show the secure Stripe payment form for your
-                  package subscription.
+                  page will show the secure Stripe payment form for your package
+                  subscription.
                 </p>
               </div>
             </div>
@@ -554,7 +562,9 @@ export default function PackagePaymentPage() {
                 <Button
                   type="button"
                   onClick={verifyEmail}
-                  disabled={!canVerifyOtp || otpLoading || resendOtpLoading || verified}
+                  disabled={
+                    !canVerifyOtp || otpLoading || resendOtpLoading || verified
+                  }
                   className="h-11 shrink-0 rounded-xl px-5"
                 >
                   {verified
@@ -571,7 +581,9 @@ export default function PackagePaymentPage() {
                 type="button"
                 variant="outline"
                 onClick={resendVerificationOtp}
-                disabled={resendOtpLoading || otpLoading || verified || !ownerEmail}
+                disabled={
+                  resendOtpLoading || otpLoading || verified || !ownerEmail
+                }
                 className="h-10 rounded-xl px-4"
               >
                 {resendOtpLoading ? "Sending OTP..." : "Resend OTP"}
@@ -665,7 +677,7 @@ function SubscriptionPaymentSection({
         </Button>
       </div>
 
-      {!canStartPayment ? (
+      {!canStartPayment && !paymentConfirmed ? (
         <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
           We could not find the active signup session for this browser. Please
           complete registration again if you need to start a new online payment.
@@ -726,15 +738,17 @@ function SubscriptionPaymentForm({
         toast.success(
           paymentIntent.status === "succeeded"
             ? "Payment received. Your account is pending final approval."
-            : "Payment is processing. Your account remains pending approval."
+            : "Payment is processing. Your account remains pending approval.",
         );
         return;
       }
 
-      toast.info("Payment confirmation is pending. Please check again shortly.");
+      toast.info(
+        "Payment confirmation is pending. Please check again shortly.",
+      );
     } catch (error: unknown) {
       toast.error(
-        error instanceof Error ? error.message : "Payment confirmation failed"
+        error instanceof Error ? error.message : "Payment confirmation failed",
       );
     } finally {
       setConfirming(false);
