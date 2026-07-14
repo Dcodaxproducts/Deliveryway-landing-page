@@ -63,6 +63,9 @@ const ONBOARDING_STEPS: OnboardingStepConfig[] = [
   { id: 5, labelKey: "steps.published" },
 ];
 
+const PACKAGE_SUBSCRIPTION_STORAGE_KEY = "deliverywayPackageSubscription";
+const TENANT_SIGNUP_TOKEN_STORAGE_KEY = "tenantSignupToken";
+
 const normalizeEmail = (email?: string) => {
   return String(email || "").trim().toLowerCase();
 };
@@ -195,11 +198,25 @@ const buildPackageSubscriptionSession = ({
   };
 };
 
+const persistPackageSubscriptionSession = (value: PlainObject) => {
+  const serialized = JSON.stringify(value);
+
+  sessionStorage.setItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY, serialized);
+  localStorage.setItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY, serialized);
+};
+
+const clearPackageSubscriptionSession = () => {
+  sessionStorage.removeItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY);
+  localStorage.removeItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY);
+};
+
 const parsePackageSubscriptionSession = () => {
+  const storedValue =
+    sessionStorage.getItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY) ||
+    localStorage.getItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY);
+
   try {
-    return normalizePlainObject(
-      JSON.parse(sessionStorage.getItem("deliverywayPackageSubscription") || "{}")
-    );
+    return normalizePlainObject(JSON.parse(storedValue || "{}"));
   } catch {
     return {};
   }
@@ -854,7 +871,7 @@ export function BusinessOnboarding() {
 
     if (token) {
       setAccessToken(token);
-      localStorage.setItem("tenantSignupToken", token);
+      localStorage.setItem(TENANT_SIGNUP_TOKEN_STORAGE_KEY, token);
     }
   };
 
@@ -863,7 +880,7 @@ export function BusinessOnboarding() {
     setOtpEmail("");
     setAccessToken("");
     setShowOtpVerification(false);
-    localStorage.removeItem("tenantSignupToken");
+    localStorage.removeItem(TENANT_SIGNUP_TOKEN_STORAGE_KEY);
     setActiveStep(1);
   };
 
@@ -991,23 +1008,20 @@ export function BusinessOnboarding() {
       }
 
       localStorage.removeItem("selectedPackagePlanId");
-      localStorage.setItem("tenantSignupToken", token);
+      localStorage.setItem(TENANT_SIGNUP_TOKEN_STORAGE_KEY, token);
 
       if (shouldShowPackagePayment) {
-        sessionStorage.setItem(
-          "deliverywayPackageSubscription",
-          JSON.stringify(
-            buildPackageSubscriptionSession({
-              accessToken: token,
-              formData,
-              refreshToken,
-              registration: registrationData,
-              subscription,
-            })
-          )
+        persistPackageSubscriptionSession(
+          buildPackageSubscriptionSession({
+            accessToken: token,
+            formData,
+            refreshToken,
+            registration: registrationData,
+            subscription,
+          })
         );
       } else {
-        sessionStorage.removeItem("deliverywayPackageSubscription");
+        clearPackageSubscriptionSession();
       }
 
       startOtpVerification({
@@ -1041,7 +1055,7 @@ export function BusinessOnboarding() {
       return;
     }
 
-    const token = accessToken || localStorage.getItem("tenantSignupToken");
+    const token = accessToken || localStorage.getItem(TENANT_SIGNUP_TOKEN_STORAGE_KEY);
 
     setOtpLoading(true);
 
@@ -1079,18 +1093,15 @@ export function BusinessOnboarding() {
       const packageSubscription = parsePackageSubscriptionSession();
 
       if (Object.keys(packageSubscription).length > 0) {
-        sessionStorage.setItem(
-          "deliverywayPackageSubscription",
-          JSON.stringify({
-            ...packageSubscription,
-            emailVerified: true,
-          })
-        );
+        persistPackageSubscriptionSession({
+          ...packageSubscription,
+          emailVerified: true,
+        });
         window.location.assign("/package-payment");
         return;
       }
 
-      localStorage.removeItem("tenantSignupToken");
+      localStorage.removeItem(TENANT_SIGNUP_TOKEN_STORAGE_KEY);
 
       setShowOtpVerification(false);
       setOtp("");

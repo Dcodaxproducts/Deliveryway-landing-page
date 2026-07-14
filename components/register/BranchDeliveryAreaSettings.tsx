@@ -1255,7 +1255,7 @@ export function BranchDeliveryAreaSettings({
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-[26px] border border-gray-100 bg-gradient-to-br from-white via-[#fff8f8] to-white shadow-[0_22px_55px_rgba(15,23,42,0.07)]">
+      <section className="overflow-hidden rounded-[26px] border border-gray-100 bg-gradient-to-br from-white via-[#fff8f0] to-white shadow-[0_22px_55px_rgba(15,23,42,0.07)]">
         <div className="border-b border-white/80 p-5 lg:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>

@@ -228,10 +228,6 @@ export function StorePublished({
     tRegister("published.fallbacks.businessAccount")
   );
 
-  const openDashboard = () => {
-    window.open(loginUrl, "_blank", "noopener,noreferrer");
-  };
-
   const copyDashboardLink = async () => {
     try {
       setCopying(true);
@@ -273,11 +269,11 @@ export function StorePublished({
     <div className="min-h-[80vh] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         {/* SUCCESS HEADER */}
-        <div className="relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#8f0010_0%,#c1000a_36%,#ef304f_72%,#ff7aa2_128%)] px-6 py-8 text-white shadow-[0_26px_70px_rgba(193,0,10,0.26)] sm:px-10 sm:py-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(255,255,255,0.24),transparent_32%),radial-gradient(circle_at_88%_8%,rgba(255,190,212,0.55),transparent_34%),linear-gradient(90deg,rgba(55,0,8,0.28),rgba(55,0,8,0)_58%)]" />
+        <div className="relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#7a000d_0%,#c1000a_48%,#f97316_128%)] px-6 py-8 text-white shadow-[0_26px_70px_rgba(193,0,10,0.26)] sm:px-10 sm:py-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(255,255,255,0.24),transparent_32%),radial-gradient(circle_at_88%_8%,rgba(249,115,22,0.42),transparent_34%),linear-gradient(90deg,rgba(55,0,8,0.28),rgba(55,0,8,0)_58%)]" />
           <div className="absolute -right-12 -top-16 h-44 w-44 rounded-full border border-white/20 bg-white/10" />
           <div className="absolute bottom-5 right-8 hidden h-20 w-20 rounded-full bg-white/10 blur-sm sm:block" />
-          <div className="absolute -bottom-14 left-1/2 h-32 w-32 rounded-full bg-[#ffbfd1]/25 blur-2xl" />
+          <div className="absolute -bottom-14 left-1/2 h-32 w-32 rounded-full bg-orange-400/20 blur-2xl" />
 
           <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -303,11 +299,13 @@ export function StorePublished({
 
             <div className="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
               <Button
-                onClick={openDashboard}
-                className="h-12 rounded-xl bg-white px-6 text-[#9f0010] shadow-lg shadow-black/10 hover:bg-[#fff4f7]"
+                asChild
+                className="h-12 rounded-xl bg-white px-6 text-[#9f0010] shadow-lg shadow-black/10 hover:bg-orange-50"
               >
-                {tRegister("published.actions.openDashboard")}
-                <ArrowRight size={18} className="ml-2" />
+                <a href={loginUrl} target="_blank" rel="noopener noreferrer">
+                  {tRegister("published.actions.openDashboard")}
+                  <ArrowRight size={18} className="ml-2" />
+                </a>
               </Button>
 
               <Button
@@ -460,13 +458,11 @@ export function StorePublished({
                       Copy
                     </Button> */}
 
-                    <Button
-                      type="button"
-                      onClick={openDashboard}
-                      className="rounded-xl p-2"
-                    >
-                      {tRegister("published.actions.open")}
-                      <ExternalLink size={16}  />
+                    <Button asChild className="rounded-xl p-2">
+                      <a href={loginUrl} target="_blank" rel="noopener noreferrer">
+                        {tRegister("published.actions.open")}
+                        <ExternalLink size={16} />
+                      </a>
                     </Button>
                   </div>
                 </div>
@@ -549,13 +545,11 @@ export function StorePublished({
               </div>
 
               <div className="mt-6 grid grid-cols-1 gap-3">
-                <Button
-                  type="button"
-                  onClick={openDashboard}
-                  className="h-12 rounded-xl"
-                >
-                  {tRegister("published.actions.visitDashboard")}
-                  <ExternalLink size={17} className="ml-2" />
+                <Button asChild className="h-12 rounded-xl">
+                  <a href={loginUrl} target="_blank" rel="noopener noreferrer">
+                    {tRegister("published.actions.visitDashboard")}
+                    <ExternalLink size={17} className="ml-2" />
+                  </a>
                 </Button>
 
                 <Button

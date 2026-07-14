@@ -17,6 +17,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { API_BASE_URL } from "@/lib/constants";
 
+const PACKAGE_SUBSCRIPTION_STORAGE_KEY = "deliverywayPackageSubscription";
+const TENANT_SIGNUP_TOKEN_STORAGE_KEY = "tenantSignupToken";
+
 type StoredSubscription = {
   auth?: {
     accessToken?: unknown;
@@ -104,6 +107,25 @@ const parseStoredSubscription = (value: string | null): StoredSubscription => {
   }
 };
 
+const getStoredSubscription = () => {
+  return parseStoredSubscription(
+    sessionStorage.getItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY) ||
+      localStorage.getItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY),
+  );
+};
+
+const persistStoredSubscription = (value: StoredSubscription) => {
+  const serialized = JSON.stringify(value);
+
+  sessionStorage.setItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY, serialized);
+  localStorage.setItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY, serialized);
+};
+
+const clearStoredSubscription = () => {
+  sessionStorage.removeItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY);
+  localStorage.removeItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY);
+};
+
 const normalizeResponse = (value: unknown) => {
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
@@ -168,12 +190,10 @@ export default function PackagePaymentPage() {
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      const nextStoredData = parseStoredSubscription(
-        sessionStorage.getItem("deliverywayPackageSubscription"),
-      );
+      const nextStoredData = getStoredSubscription();
       setStoredData(nextStoredData);
       setToken(
-        localStorage.getItem("tenantSignupToken") ||
+        localStorage.getItem(TENANT_SIGNUP_TOKEN_STORAGE_KEY) ||
           getString(nextStoredData.auth?.accessToken),
       );
       setVerified(nextStoredData.emailVerified === true);
@@ -184,7 +204,8 @@ export default function PackagePaymentPage() {
 
   useEffect(() => {
     if (!verified || !paymentConfirmed) return;
-    localStorage.removeItem("tenantSignupToken");
+    localStorage.removeItem(TENANT_SIGNUP_TOKEN_STORAGE_KEY);
+    clearStoredSubscription();
     setToken("");
   }, [paymentConfirmed, verified]);
 
@@ -310,10 +331,7 @@ export default function PackagePaymentPage() {
         ...storedData,
         emailVerified: true,
       };
-      sessionStorage.setItem(
-        "deliverywayPackageSubscription",
-        JSON.stringify(nextStoredData),
-      );
+      persistStoredSubscription(nextStoredData);
       setStoredData(nextStoredData);
       setVerified(true);
       setOtp("");

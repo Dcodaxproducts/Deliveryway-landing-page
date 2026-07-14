@@ -964,7 +964,7 @@ const handleRestaurantLogoSelect = async (file: File) => {
       </div>
 
       {/* Branding */}
-      <section className="mb-8 overflow-hidden rounded-[28px] border border-gray-100 bg-gradient-to-br from-white via-[#fff7f7] to-white shadow-[0_24px_70px_rgba(193,0,10,0.08)]">
+      <section className="mb-8 overflow-hidden rounded-[28px] border border-gray-100 bg-gradient-to-br from-white via-[#fff8f0] to-white shadow-[0_24px_70px_rgba(193,0,10,0.08)]">
         <div className="grid gap-6 border-b border-white/70 p-5 lg:grid-cols-[1.1fr_0.9fr] lg:p-6">
           <div>
             <div className="mb-4 flex items-center gap-3">
