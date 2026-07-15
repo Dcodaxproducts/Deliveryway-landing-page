@@ -43,8 +43,8 @@ const reportMissingKeys = (label, keys) => {
   keys.forEach((key) => console.error(`- ${key}`));
 };
 
-const en = await readJson("messages/en.json");
-const de = await readJson("messages/de.json");
+const en = await readJson("src/messages/en.json");
+const de = await readJson("src/messages/de.json");
 
 const enMissingNamespaces = findMissingNamespaces(en);
 const deMissingNamespaces = findMissingNamespaces(de);
