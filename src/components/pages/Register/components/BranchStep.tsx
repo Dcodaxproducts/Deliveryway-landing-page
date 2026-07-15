@@ -307,6 +307,24 @@ export function BranchStep({
     clearError("branch.address.lng");
   };
 
+  const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  const getFirstAddressLine = (place: GooglePlaceResult) =>
+    (place.formatted_address || place.name || "").split(",")[0]?.trim() || "";
+
+  const stripHouseNumberFromStreet = (street: string, houseNumber: string) => {
+    const trimmedStreet = street.trim();
+
+    if (!houseNumber) return trimmedStreet;
+
+    const escapedHouseNumber = escapeRegExp(houseNumber.trim());
+
+    return trimmedStreet
+      .replace(new RegExp(`^${escapedHouseNumber}\\s+`, "i"), "")
+      .replace(new RegExp(`\\s+${escapedHouseNumber}$`, "i"), "")
+      .trim();
+  };
+
   const applyPlaceToForm = (place: GooglePlaceResult) => {
     if (!place) return false;
 
@@ -327,7 +345,11 @@ export function BranchStep({
 
     const houseNumber = getAddressComponent(components, ["street_number"]);
     const route = getAddressComponent(components, ["route"]);
-    const street = route || place.name || "";
+    const fallbackStreet = stripHouseNumberFromStreet(
+      getFirstAddressLine(place),
+      houseNumber
+    );
+    const street = route || fallbackStreet;
     const postalCode = getAddressComponent(components, ["postal_code"]);
 
     const city =
