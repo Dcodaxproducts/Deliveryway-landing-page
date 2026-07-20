@@ -1,34 +1,27 @@
-"use client";
-
 import type { Metadata } from "next";
 import "./globals.css";
 import { onest } from "@/lib/fonts";
-import { Navbar } from "@/components/layout/navbar/navbar";
-import { usePathname } from "next/navigation";
-import { Footer } from "@/components/layout/footer/Footer";
-import { Toaster } from "sonner";
-import { I18nProvider } from "@/components/providers/I18nProvider";
+import { AppChrome } from "@/components/layout/AppChrome";
+
+export const metadata: Metadata = {
+  title: {
+    default: "DeliveryWay | Restaurant delivery platform",
+    template: "%s | DeliveryWay",
+  },
+  applicationName: "DeliveryWay",
+  description:
+    "DeliveryWay gives restaurants the tools to manage ordering, delivery, customers, and operations from one platform.",
+};
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-
-  // routes where layout should be hidden
-  const hideLayout = ["/register"].includes(pathname);
-
   return (
     <html lang="en">
       <body className={`${onest.className}`}>
-        <I18nProvider>
-          {!hideLayout && <Navbar />}
-          <Toaster position="top-right" richColors />
-
-          <div>{children}</div>
-          {!hideLayout &&  <Footer />}
-        </I18nProvider>
+        <AppChrome>{children}</AppChrome>
       </body>
     </html>
   );

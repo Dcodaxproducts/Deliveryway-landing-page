@@ -40,14 +40,12 @@ export function Footer() {
           <div className="max-w-[400px]">
             <div className="flex items-center gap-2">
               <Image
-                src="/assets/logo.png"
-                alt="Food Logo"
-                width={40}
-                height={40}
+                src="/assets/deliveryway-logo.jpg"
+                alt="DeliveryWay"
+                width={686}
+                height={541}
+                className="h-[72px] w-[190px] rounded-xl bg-white object-contain"
               />
-              <span className="text-xl font-bold text-gray-900">
-                food
-              </span>
             </div>
 
             <h4 className="mt-6 font-heading font-semibold text-gray-900">

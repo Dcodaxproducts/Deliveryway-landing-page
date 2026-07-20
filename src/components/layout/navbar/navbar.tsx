@@ -38,14 +38,13 @@ export function Navbar() {
             {/* LEFT: LOGO */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={()=>router.push('/')}>
               <Image
-                src="/assets/logo_nav.png"
-                alt="Food logo"
-                width={36}
-                height={36}
+                src="/assets/deliveryway-logo.jpg"
+                alt="DeliveryWay"
+                width={686}
+                height={541}
+                className="h-[52px] w-[148px] rounded-xl bg-white object-contain"
+                priority
               />
-              <span className="text-[20px] font-[700] text-white">
-                food
-              </span>
             </div>
 
             {/* CENTER: LINKS (DESKTOP) */}
