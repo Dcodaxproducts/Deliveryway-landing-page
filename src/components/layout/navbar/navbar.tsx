@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { LanguageSelector } from "@/components/layout/navbar/LanguageSelector";
 import { useTranslations } from "next-intl";
+import { useLandingSettings } from "@/components/providers/LandingSettingsProvider";
 
 const NAVIGATION_LINKS = [
   { href: "/about", labelKey: "about" },
@@ -27,6 +28,7 @@ export function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
   const t = useTranslations("navigation");
+  const landingSettings = useLandingSettings();
 
   return (
     <>
@@ -38,8 +40,8 @@ export function Navbar() {
             {/* LEFT: LOGO */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={()=>router.push('/')}>
               <Image
-                src="/assets/deliveryway-logo.jpg"
-                alt="DeliveryWay"
+                src={landingSettings.logoUrl || "/assets/deliveryway-logo.jpg"}
+                alt={landingSettings.businessName}
                 width={686}
                 height={541}
                 className="h-[52px] w-[148px] rounded-xl bg-white object-contain"

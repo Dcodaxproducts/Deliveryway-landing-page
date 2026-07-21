@@ -490,6 +490,7 @@ const handleProfileFileSelect = async (file: File) => {
             ref={inputRefs.password}
             label={tRegister("fields.password.requiredLabel")}
             placeholder="StrongPassword123!"
+            showPasswordToggle
             value={user.password || ""}
             onChange={(val: string) => {
               updateFormData("user", { password: val });

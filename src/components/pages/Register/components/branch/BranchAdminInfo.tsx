@@ -107,9 +107,9 @@ export function BranchAdminInfo({
           <FormInput
             label={tRegister("branch.admin.fields.password.label")}
             placeholder={tRegister("branch.admin.fields.password.placeholder")}
+            showPasswordToggle
             value={branchAdmin.password || ""}
             onChange={(val) => onFieldChange("password", val)}
-            showPasswordToggle
           />
           {error("branchAdmin.password") && (
             <p className="mt-1 text-xs text-red-500">

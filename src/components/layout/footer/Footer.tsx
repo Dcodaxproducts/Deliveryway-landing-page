@@ -8,6 +8,7 @@ import {
   FaYoutube,
 } from "react-icons/fa";
 import { useTranslations } from "next-intl";
+import { useLandingSettings } from "@/components/providers/LandingSettingsProvider";
 
 const QUICK_LINKS = ["home", "about", "services", "contact"] as const;
 
@@ -28,6 +29,7 @@ const COMPANY_LINKS = [
 
 export function Footer() {
   const t = useTranslations("footer");
+  const landingSettings = useLandingSettings();
 
   return (
     <footer className="relative bg-gray-100 pt-20">
@@ -40,12 +42,28 @@ export function Footer() {
           <div className="max-w-[400px]">
             <div className="flex items-center gap-2">
               <Image
-                src="/assets/deliveryway-logo.jpg"
-                alt="DeliveryWay"
+                src={landingSettings.logoUrl || "/assets/deliveryway-logo.jpg"}
+                alt={landingSettings.businessName}
                 width={686}
                 height={541}
                 className="h-[72px] w-[190px] rounded-xl bg-white object-contain"
               />
+            </div>
+
+            {landingSettings.footerDescription ? (
+              <p className="mt-4 text-[15px] text-gray-600">
+                {landingSettings.footerDescription}
+              </p>
+            ) : null}
+
+            <div className="mt-3 space-y-1 text-sm text-gray-600">
+              {landingSettings.supportEmail ? (
+                <p>{landingSettings.supportEmail}</p>
+              ) : null}
+              {landingSettings.supportPhone ? (
+                <p>{landingSettings.supportPhone}</p>
+              ) : null}
+              {landingSettings.address ? <p>{landingSettings.address}</p> : null}
             </div>
 
             <h4 className="mt-6 font-heading font-semibold text-gray-900">
@@ -115,17 +133,49 @@ export function Footer() {
         {/* BOTTOM ROW */}
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-sm text-gray-600">
-            {t("copyright")}
+            {landingSettings.copyrightText || t("copyright")}
           </p>
 
           <div className="flex items-center gap-4">
-            <FaFacebookF className="h-4 w-4 cursor-pointer text-gray-600 hover:text-black" />
-            <FaTwitter className="h-4 w-4 cursor-pointer text-gray-600 hover:text-black" />
-            <FaInstagram className="h-4 w-4 cursor-pointer text-gray-600 hover:text-black" />
-            <FaYoutube className="h-4 w-4 cursor-pointer text-gray-600 hover:text-black" />
+            <SocialLink href={landingSettings.socialLinks.facebook} label="Facebook">
+              <FaFacebookF className="h-4 w-4" />
+            </SocialLink>
+            <SocialLink href={landingSettings.socialLinks.twitter} label="Twitter">
+              <FaTwitter className="h-4 w-4" />
+            </SocialLink>
+            <SocialLink href={landingSettings.socialLinks.instagram} label="Instagram">
+              <FaInstagram className="h-4 w-4" />
+            </SocialLink>
+            <SocialLink href={landingSettings.socialLinks.youtube} label="YouTube">
+              <FaYoutube className="h-4 w-4" />
+            </SocialLink>
           </div>
         </div>
       </div>
     </footer>
+  );
+}
+
+function SocialLink({
+  href,
+  label,
+  children,
+}: {
+  href: string | null;
+  label: string;
+  children: React.ReactNode;
+}) {
+  if (!href) return null;
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={label}
+      className="text-gray-600 hover:text-black"
+    >
+      {children}
+    </a>
   );
 }
