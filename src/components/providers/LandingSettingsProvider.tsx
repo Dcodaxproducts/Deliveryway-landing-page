@@ -47,7 +47,7 @@ export function LandingSettingsProvider({
 
   useEffect(() => {
     const controller = new AbortController();
-    const endpoint = `${API_BASE_URL.replace(/\/$/, "")}/admin/global-settings/public/landing-page`;
+    const endpoint = `${API_BASE_URL.replace(/\/$/, "")}/v1/admin/global-settings/public/landing-page`;
 
     void fetch(endpoint, { signal: controller.signal })
       .then((response) => (response.ok ? response.json() : null))
