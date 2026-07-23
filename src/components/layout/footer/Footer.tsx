@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   FaFacebookF,
   FaTwitter,
@@ -8,6 +7,7 @@ import {
   FaYoutube,
 } from "react-icons/fa";
 import { useTranslations } from "next-intl";
+import { LandingLogo } from "@/components/common/LandingLogo";
 import { useLandingSettings } from "@/components/providers/LandingSettingsProvider";
 
 const QUICK_LINKS = ["home", "about", "services", "contact"] as const;
@@ -41,13 +41,7 @@ export function Footer() {
           {/* LOGO + SUBSCRIBE (LEFT) */}
           <div className="max-w-[400px]">
             <div className="flex items-center gap-2">
-              <Image
-                src={landingSettings.logoUrl || "/assets/deliveryway-logo.jpg"}
-                alt={landingSettings.businessName}
-                width={686}
-                height={541}
-                className="h-[72px] w-[190px] rounded-xl bg-white object-contain"
-              />
+              <LandingLogo className="h-[72px] w-[190px] rounded-xl bg-white object-contain" />
             </div>
 
             {landingSettings.footerDescription ? (
