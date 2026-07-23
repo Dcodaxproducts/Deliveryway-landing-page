@@ -18,6 +18,17 @@ export type LandingSettings = {
     instagram: string | null;
     youtube: string | null;
   };
+  faqs: LandingPageFaq[];
+};
+
+export type LandingPageFaq = {
+  id: string;
+  questionEn: string;
+  answerEn: string;
+  questionDe: string;
+  answerDe: string;
+  isActive: boolean;
+  sortOrder: number;
 };
 
 const DEFAULT_SETTINGS: LandingSettings = {
@@ -34,6 +45,7 @@ const DEFAULT_SETTINGS: LandingSettings = {
     instagram: null,
     youtube: null,
   },
+  faqs: [],
 };
 
 const LandingSettingsContext = createContext(DEFAULT_SETTINGS);
@@ -62,6 +74,7 @@ export function LandingSettingsProvider({
             ...DEFAULT_SETTINGS.socialLinks,
             ...(data.socialLinks || {}),
           },
+          faqs: Array.isArray(data.faqs) ? data.faqs : [],
         });
       })
       .catch((error: unknown) => {

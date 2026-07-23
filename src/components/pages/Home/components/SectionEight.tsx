@@ -2,11 +2,33 @@
 
 import { Accordion } from "@/components/ui/accordion";
 import { FaqItem } from "@/components/common/cards/FaqItem";
-import { faqs } from "@/constants/faq";
-import { useTranslations } from "next-intl";
+import { faqs as fallbackFaqs } from "@/constants/faq";
+import { useLandingSettings } from "@/components/providers/LandingSettingsProvider";
+import { useLocale, useTranslations } from "next-intl";
 
 export function SectionEight() {
   const t = useTranslations();
+  const locale = useLocale();
+  const landingSettings = useLandingSettings();
+  const hasManagedFaqs = landingSettings.faqs.length > 0;
+  const managedFaqs = landingSettings.faqs
+    .filter((faq) => faq.isActive)
+    .sort(
+      (left, right) =>
+        left.sortOrder - right.sortOrder || left.id.localeCompare(right.id),
+    )
+    .map((faq) => ({
+      id: faq.id,
+      question: locale.startsWith("de") ? faq.questionDe : faq.questionEn,
+      answer: locale.startsWith("de") ? faq.answerDe : faq.answerEn,
+    }));
+  const displayFaqs = hasManagedFaqs
+    ? managedFaqs
+    : fallbackFaqs.map((faq) => ({
+        id: faq.id,
+        question: t(faq.questionKey),
+        answer: t(faq.answerKey),
+      }));
 
   return (
     <section className="w-full bg-white pt-12 md:pt-15 pb-30 md:pb-30">
@@ -39,15 +61,15 @@ export function SectionEight() {
             <Accordion
               type="single"
               collapsible
-              defaultValue={faqs[0]?.id}
+              defaultValue={displayFaqs[0]?.id}
               className="w-full"
             >
-              {faqs.map((faq) => (
+              {displayFaqs.map((faq) => (
                 <FaqItem
                   key={faq.id}
                   id={faq.id}
-                  question={t(faq.questionKey)}
-                  answer={t(faq.answerKey)}
+                  question={faq.question}
+                  answer={faq.answer}
                 />
               ))}
             </Accordion>
