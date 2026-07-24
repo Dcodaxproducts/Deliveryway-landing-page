@@ -1,16 +1,11 @@
-import { Contact } from '@/components/pages/Contact/components/Contact'
-import { ContactHero } from '@/components/pages/Contact/components/ContactHero'
-import { Infrastructure } from '@/components/pages/Contact/components/Infrastructure'
+import { Contact } from "@/components/pages/Contact/components/Contact";
+import { ContactHero } from "@/components/pages/Contact/components/ContactHero";
 
-const page = () => {
+export default function ContactPage() {
   return (
     <div>
       <ContactHero />
-<Contact />
-<Infrastructure />
-
+      <Contact />
     </div>
-  )
+  );
 }
-
-export default page

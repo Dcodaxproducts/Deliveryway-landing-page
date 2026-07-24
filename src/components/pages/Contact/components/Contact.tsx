@@ -1,70 +1,99 @@
 "use client";
 
-import { MapPin } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { ContactForm } from "@/components/forms/ContactForm";
-import { contactInfo, contactSectionLabels, officeLocations } from "@/constants/contact";
 
+import { ContactForm } from "@/components/forms/ContactForm";
+import { useLandingSettings } from "@/components/providers/LandingSettingsProvider";
 
 export const Contact = () => {
-  const t = useTranslations();
+  const t = useTranslations("contact");
+  const settings = useLandingSettings();
+  const contactDetails = [
+    settings.supportEmail
+      ? {
+          id: "email",
+          label: t("info.salesEmail.title"),
+          value: settings.supportEmail,
+          href: `mailto:${settings.supportEmail}`,
+          icon: Mail,
+        }
+      : null,
+    settings.supportPhone
+      ? {
+          id: "phone",
+          label: t("info.supportPhone.title"),
+          value: settings.supportPhone,
+          href: `tel:${settings.supportPhone}`,
+          icon: Phone,
+        }
+      : null,
+    settings.address
+      ? {
+          id: "address",
+          label: t("sections.officeLocations"),
+          value: settings.address,
+          href: null,
+          icon: MapPin,
+        }
+      : null,
+  ].filter((item): item is NonNullable<typeof item> => item !== null);
 
   return (
-    <section className="w-full py-20 px-6 lg:px-25 bg-slate-50 flex flex-col lg:flex-row gap-15">
-
-      {/* Form */}
-      <div className="flex-1 flex justify-center items-center">
-        <div className="w-full  bg-white p-10 rounded-2xl shadow-lg">
+    <section className="w-full bg-slate-50 px-6 py-16 lg:px-24 lg:py-20">
+      <div
+        className={`mx-auto grid max-w-7xl gap-10 ${
+          contactDetails.length ? "lg:grid-cols-[1.2fr_0.8fr]" : ""
+        }`}
+      >
+        <div className="rounded-3xl bg-white p-6 shadow-lg sm:p-10">
           <ContactForm />
         </div>
-      </div>
 
-      {/* Contact Info */}
-      <div className="flex-1 flex flex-col justify-center gap-12">
+        {contactDetails.length ? (
+          <aside className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h2 className="text-2xl font-bold text-slate-950">
+              {t("sections.contactInformation")}
+            </h2>
+            <div className="mt-7 space-y-5">
+              {contactDetails.map((detail) => {
+                const Icon = detail.icon;
+                const content = (
+                  <>
+                    <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-red-50 text-red-600">
+                      <Icon className="size-5" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold text-slate-950">
+                        {detail.label}
+                      </span>
+                      <span className="mt-1 block break-words text-sm leading-6 text-slate-600">
+                        {detail.value}
+                      </span>
+                    </span>
+                  </>
+                );
 
-        {/* Contact Methods */}
-        <div className="flex flex-col gap-8">
-          <h2 className="flex items-center gap-3 text-2xl font-bold text-slate-900">
-            <div className="w-8 h-1 bg-red-600 rounded-full" />
-            {t(contactSectionLabels.contactInformationKey)}
-          </h2>
-
-          <div className="flex flex-col gap-6">
-            {contactInfo.map((info) => (
-              <div key={info.titleKey} className="flex gap-4 items-start">
-                <div className="w-12 h-12 flex justify-center items-center bg-red-600/10 rounded-xl">
-                  {info.icon}
-                </div>
-                <div className="flex flex-col gap-1">
-                  <div className="text-slate-900 font-bold">{t(info.titleKey)}</div>
-                  <div className="text-slate-600">{info.value}</div>
-                  <div className="text-slate-400 text-xs">{t(info.noteKey)}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Office Locations */}
-        <div className="flex flex-col gap-8">
-          <h2 className="flex items-center gap-3 text-2xl font-bold text-slate-900">
-            <div className="w-8 h-1 bg-red-600 rounded-full" />
-            {t(contactSectionLabels.officeLocationsKey)}
-          </h2>
-
-          <div className="flex flex-col sm:flex-row gap-8">
-            {officeLocations.map((office) => (
-              <div key={office.cityKey} className="flex-1 flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-red-600" />
-                  <div className="text-slate-900 font-bold">{t(office.cityKey)}</div>
-                </div>
-                <div className="text-slate-600 text-sm">{office.address}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
+                return detail.href ? (
+                  <a
+                    key={detail.id}
+                    href={detail.href}
+                    className="flex gap-4 rounded-2xl border border-slate-100 p-4 transition hover:border-red-200 hover:bg-red-50/40"
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  <div
+                    key={detail.id}
+                    className="flex gap-4 rounded-2xl border border-slate-100 p-4"
+                  >
+                    {content}
+                  </div>
+                );
+              })}
+            </div>
+          </aside>
+        ) : null}
       </div>
     </section>
   );

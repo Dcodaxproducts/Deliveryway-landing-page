@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { API_BASE_URL } from "@/lib/constants";
+import { useLandingSettings } from "@/components/providers/LandingSettingsProvider";
+import Link from "next/link";
 
 const getMessageValue = (value: unknown) => {
   return typeof value === "string" ? value : "";
@@ -34,6 +36,7 @@ const isPublicRestaurant = (value: unknown): value is PublicRestaurant => {
 
 export const ContactForm = () => {
   const t = useTranslations();
+  const landingSettings = useLandingSettings();
   const [loading, setLoading] = useState(false);
   const [restaurants, setRestaurants] = useState<PublicRestaurant[]>([]);
   const [restaurantsLoading, setRestaurantsLoading] = useState(true);
@@ -57,7 +60,7 @@ export const ContactForm = () => {
             sortOrder: "ASC",
           });
           const response = await fetch(
-            `${API_BASE_URL}/v1/restaurants/public?${params.toString()}`
+            `${API_BASE_URL}/v1/restaurants/public?${params.toString()}`,
           );
           const payload: unknown = await response.json();
           const responseData = normalizeResponse(payload);
@@ -66,7 +69,7 @@ export const ContactForm = () => {
           if (!response.ok) {
             throw new Error(
               getMessageValue(responseData.message) ||
-                t("forms.status.restaurantsLoadError")
+                t("forms.status.restaurantsLoadError"),
             );
           }
 
@@ -89,7 +92,7 @@ export const ContactForm = () => {
           const pageParams = new URLSearchParams(window.location.search);
           const restaurantIdFromUrl = pageParams.get("restaurantId") || "";
           const hasRestaurantFromUrl = loadedRestaurants.some(
-            (restaurant) => restaurant.id === restaurantIdFromUrl
+            (restaurant) => restaurant.id === restaurantIdFromUrl,
           );
 
           if (hasRestaurantFromUrl) return restaurantIdFromUrl;
@@ -103,7 +106,7 @@ export const ContactForm = () => {
         setRestaurantsError(
           error instanceof Error
             ? error.message
-            : t("forms.status.restaurantsLoadError")
+            : t("forms.status.restaurantsLoadError"),
         );
       } finally {
         if (isMounted) {
@@ -149,7 +152,7 @@ export const ContactForm = () => {
             subject: String(formData.get("subject") || "").trim(),
             message: String(formData.get("message") || "").trim(),
           }),
-        }
+        },
       );
       const payload: unknown = await response.json();
       const responseData = normalizeResponse(payload);
@@ -157,7 +160,8 @@ export const ContactForm = () => {
 
       if (!response.ok || submittedData.submitted !== true) {
         throw new Error(
-          getMessageValue(responseData.message) || t("forms.status.submitError")
+          getMessageValue(responseData.message) ||
+            t("forms.status.submitError"),
         );
       }
 
@@ -165,7 +169,7 @@ export const ContactForm = () => {
       toast.success(t("forms.status.submitSuccess"));
     } catch (error: unknown) {
       toast.error(
-        error instanceof Error ? error.message : t("forms.status.submitError")
+        error instanceof Error ? error.message : t("forms.status.submitError"),
       );
     } finally {
       setLoading(false);
@@ -174,7 +178,6 @@ export const ContactForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6 w-full">
-
       {/* Name Fields */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 flex flex-col gap-1">
@@ -264,14 +267,19 @@ export const ContactForm = () => {
         disabled={loading}
         className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-3"
       >
-        {loading ? t("forms.actions.submitting") : t("forms.actions.sendMessage")}
+        {loading
+          ? t("forms.actions.submitting")
+          : t("forms.actions.sendMessage")}
       </Button>
 
-      {/* FAQ Link */}
-      <div className="text-center mt-2 text-sm text-slate-500">
-        {t("forms.contact.needInstantAnswers")}{" "}
-        <span className="text-red-600 font-bold cursor-pointer">{t("forms.contact.checkFaq")}</span>
-      </div>
+      {landingSettings.faqs.some((faq) => faq.isActive) ? (
+        <div className="mt-2 text-center text-sm text-slate-500">
+          {t("forms.contact.needInstantAnswers")}{" "}
+          <Link href="/#faqs" className="font-bold text-red-600 hover:underline">
+            {t("forms.contact.checkFaq")}
+          </Link>
+        </div>
+      ) : null}
     </form>
   );
 };

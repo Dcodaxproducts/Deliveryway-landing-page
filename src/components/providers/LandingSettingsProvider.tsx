@@ -18,7 +18,33 @@ export type LandingSettings = {
     instagram: string | null;
     youtube: string | null;
   };
+  pages: LandingPagePages;
   faqs: LandingPageFaq[];
+};
+
+export type LandingPageHero = {
+  eyebrowEn: string | null;
+  eyebrowDe: string | null;
+  headingEn: string | null;
+  headingDe: string | null;
+  subheadingEn: string | null;
+  subheadingDe: string | null;
+};
+
+export type LandingPageContent = {
+  hero: LandingPageHero;
+  contentEn: string | null;
+  contentDe: string | null;
+};
+
+export type LandingPagePages = {
+  services: LandingPageContent;
+  pricing: LandingPageContent;
+  about: LandingPageContent;
+  privacyPolicy: LandingPageContent;
+  support: LandingPageContent;
+  termsOfService: LandingPageContent;
+  contact: LandingPageContent;
 };
 
 export type LandingPageFaq = {
@@ -30,6 +56,19 @@ export type LandingPageFaq = {
   isActive: boolean;
   sortOrder: number;
 };
+
+const createEmptyPage = (): LandingPageContent => ({
+  hero: {
+    eyebrowEn: null,
+    eyebrowDe: null,
+    headingEn: null,
+    headingDe: null,
+    subheadingEn: null,
+    subheadingDe: null,
+  },
+  contentEn: null,
+  contentDe: null,
+});
 
 const DEFAULT_SETTINGS: LandingSettings = {
   businessName: "DeliveryWay",
@@ -44,6 +83,15 @@ const DEFAULT_SETTINGS: LandingSettings = {
     twitter: null,
     instagram: null,
     youtube: null,
+  },
+  pages: {
+    services: createEmptyPage(),
+    pricing: createEmptyPage(),
+    about: createEmptyPage(),
+    privacyPolicy: createEmptyPage(),
+    support: createEmptyPage(),
+    termsOfService: createEmptyPage(),
+    contact: createEmptyPage(),
   },
   faqs: [],
 };
@@ -74,6 +122,15 @@ export function LandingSettingsProvider({
             ...DEFAULT_SETTINGS.socialLinks,
             ...(data.socialLinks || {}),
           },
+          pages: {
+            services: normalizePage(data.pages?.services),
+            pricing: normalizePage(data.pages?.pricing),
+            about: normalizePage(data.pages?.about),
+            privacyPolicy: normalizePage(data.pages?.privacyPolicy),
+            support: normalizePage(data.pages?.support),
+            termsOfService: normalizePage(data.pages?.termsOfService),
+            contact: normalizePage(data.pages?.contact),
+          },
           faqs: Array.isArray(data.faqs) ? data.faqs : [],
         });
       })
@@ -97,3 +154,17 @@ export function LandingSettingsProvider({
 }
 
 export const useLandingSettings = () => useContext(LandingSettingsContext);
+
+const normalizePage = (
+  page: Partial<LandingPageContent> | null | undefined,
+): LandingPageContent => {
+  const empty = createEmptyPage();
+  return {
+    ...empty,
+    ...page,
+    hero: {
+      ...empty.hero,
+      ...(page?.hero || {}),
+    },
+  };
+};
