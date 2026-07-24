@@ -1,6 +1,27 @@
 {
   "common": {
     "getStarted": "Get Started",
+    "close": "Close",
+    "exportReports": "Export reports",
+    "pagination": {
+      "label": "Pagination",
+      "previous": "Previous",
+      "previousAria": "Go to previous page",
+      "next": "Next",
+      "nextAria": "Go to next page"
+    },
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Search by restaurant name or domain",
+      "status": "Status",
+      "selectStatus": "Select status",
+      "active": "Active",
+      "disabled": "Disabled",
+      "businessModel": "Business model",
+      "selectModel": "Select model",
+      "commission": "Commission",
+      "subscription": "Subscription"
+    },
     "actions": {
       "edit": "Edit",
       "view": "View",

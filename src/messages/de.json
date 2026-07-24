@@ -1,6 +1,27 @@
 {
   "common": {
     "getStarted": "Loslegen",
+    "close": "Schließen",
+    "exportReports": "Berichte exportieren",
+    "pagination": {
+      "label": "Seitennavigation",
+      "previous": "Zurück",
+      "previousAria": "Zur vorherigen Seite",
+      "next": "Weiter",
+      "nextAria": "Zur nächsten Seite"
+    },
+    "filters": {
+      "search": "Suchen",
+      "searchPlaceholder": "Nach Restaurantname oder Domain suchen",
+      "status": "Status",
+      "selectStatus": "Status auswählen",
+      "active": "Aktiv",
+      "disabled": "Deaktiviert",
+      "businessModel": "Geschäftsmodell",
+      "selectModel": "Modell auswählen",
+      "commission": "Provision",
+      "subscription": "Abonnement"
+    },
     "actions": {
       "edit": "Bearbeiten",
       "view": "Ansehen",

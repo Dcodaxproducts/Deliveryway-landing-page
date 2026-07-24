@@ -5,12 +5,12 @@ import { AppChrome } from "@/components/layout/AppChrome";
 
 export const metadata: Metadata = {
   title: {
-    default: "DeliveryWay | Restaurant delivery platform",
+    default: "DeliveryWay | Lieferplattform für Restaurants",
     template: "%s | DeliveryWay",
   },
   applicationName: "DeliveryWay",
   description:
-    "DeliveryWay gives restaurants the tools to manage ordering, delivery, customers, and operations from one platform.",
+    "DeliveryWay bietet Restaurants alle Werkzeuge, um Bestellungen, Lieferungen, Kunden und Abläufe auf einer Plattform zu verwalten.",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="de">
       <body className={`${onest.className}`}>
         <AppChrome>{children}</AppChrome>
       </body>
