@@ -115,18 +115,6 @@ const normalizeEnumValue = (value: unknown) => {
   return toStringValue(value).trim().toUpperCase();
 };
 
-const createSlug = (value: string, fallback = "restaurant") => {
-  const slug = value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-  return slug || fallback;
-};
-
 const normalizeArray = (value: unknown) => {
   return Array.isArray(value) ? value : [];
 };
@@ -567,7 +555,6 @@ export function BusinessOnboarding() {
 
     tenant: {
       name: "",
-      slug: "",
       bio: "",
       logoUrl: "",
       logoPreviewUrl: "",
@@ -899,11 +886,6 @@ export function BusinessOnboarding() {
     const branchSettingsPayload = buildBranchSettingsPayload(
       formData.branch.settings
     );
-    const tenantSlug = createSlug(
-      formData.tenant.slug || formData.tenant.name || formData.restaurant.name,
-      "tenant"
-    );
-
     const payload = {
       packagePlanId: selectedPackagePlan.id,
       user: {
@@ -923,7 +905,6 @@ export function BusinessOnboarding() {
       },
       tenant: {
         name: formData.tenant.name,
-        slug: tenantSlug,
         logoUrl: formData.tenant.logoUrl,
         bio: formData.tenant.bio,
         socialLinks: normalizePlainObject(formData.tenant.socialLinks),
