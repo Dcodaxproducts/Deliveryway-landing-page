@@ -49,14 +49,24 @@ export function ContentWithChecklistSection({
                 : "lg:justify-start lg:order-1"
             }`}
           >
-            <Image
-              src={imageSrc}
-              alt={imageAlt}
-              width={imageWidth}
-              height={imageHeight}
-              priority
-              className="object-contain w-[280px] sm:w-[340px] md:w-[420px] lg:w-auto"
-            />
+            {imageSrc.startsWith("http") ? (
+              <img
+                src={imageSrc}
+                alt={imageAlt}
+                width={imageWidth}
+                height={imageHeight}
+                className="object-contain w-[280px] sm:w-[340px] md:w-[420px] lg:w-auto"
+              />
+            ) : (
+              <Image
+                src={imageSrc}
+                alt={imageAlt}
+                width={imageWidth}
+                height={imageHeight}
+                priority
+                className="object-contain w-[280px] sm:w-[340px] md:w-[420px] lg:w-auto"
+              />
+            )}
           </div>
 
           {/* CONTENT */}

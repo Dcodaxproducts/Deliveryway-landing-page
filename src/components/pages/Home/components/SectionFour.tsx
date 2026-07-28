@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { useLandingSettings } from "@/components/providers/LandingSettingsProvider";
 
 const topLogos = [
   { name: "Brand One", src: "/assets/sectionFour/brand1.png" },
@@ -18,13 +19,57 @@ const bottomLogos = [
 
 export function SectionFour() {
   const t = useTranslations("home.sectionFour");
+  const locale = useLocale();
+  const { home } = useLandingSettings();
+  const settings = home.featuredRestaurants;
+  const heading =
+    (locale.startsWith("de") ? settings.headingDe : settings.headingEn) || null;
+
+  if (!settings.isVisible) return null;
+
+  if (settings.restaurantIds.length > 0 && settings.items.length > 0) {
+    return (
+      <section className="w-full bg-white py-12 md:py-15">
+        <div className="mx-auto max-w-7xl px-4 text-center">
+          <h2 className="text-xl font-medium text-gray-900 font-heading">
+            {heading || `${t("trustedBy")} ${t("industryLeaders")}`}
+          </h2>
+          <div className="mt-10 grid grid-cols-2 items-center gap-8 md:grid-cols-4">
+            {settings.items.map((restaurant) => (
+              <div
+                key={restaurant.id}
+                className="flex min-h-20 flex-col items-center justify-center gap-3 rounded-2xl p-4"
+              >
+                {restaurant.logoUrl ? (
+                  <img
+                    src={restaurant.logoUrl}
+                    alt={restaurant.name}
+                    className="h-14 w-full max-w-40 object-contain"
+                  />
+                ) : (
+                  <span className="text-lg font-semibold text-gray-900">
+                    {restaurant.name}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="w-full bg-white py-12 md:py-15">
       <div className="mx-auto max-w-7xl px-4 text-center">
         {/* Heading */}
         <h2 className="text-xl font-medium text-gray-900 font-heading">
-          {t("trustedBy")} <span className="font-bold">5,500+</span> {t("industryLeaders")}
+          {heading || (
+            <>
+              {t("trustedBy")} <span className="font-bold">5,500+</span>{" "}
+              {t("industryLeaders")}
+            </>
+          )}
         </h2>
 
         {/* ================= MOBILE GRID (2 logos per row) ================= */}
@@ -72,8 +117,6 @@ export function SectionFour() {
             ))}
           </div>
         </div>
-
-     
       </div>
     </section>
   );
