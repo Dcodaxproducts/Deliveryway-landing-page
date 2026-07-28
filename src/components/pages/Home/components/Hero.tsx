@@ -3,10 +3,28 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { useLandingSettings } from "@/components/providers/LandingSettingsProvider";
 
 export function Hero() {
   const t = useTranslations("home.hero");
+  const locale = useLocale();
+  const { home } = useLandingSettings();
+  const settings = home.hero;
+  const localized = (english: string | null, german: string | null) =>
+    (locale === "de" ? german : english) || null;
+  const badge = localized(settings.badgeEn, settings.badgeDe) || t("badge");
+  const heading =
+    localized(settings.headingEn, settings.headingDe) ||
+    `${t("titleLineOne")} ${t("titleLineTwo")}`;
+  const subheading =
+    localized(settings.subheadingEn, settings.subheadingDe) ||
+    `${t("descriptionLineOne")} ${t("descriptionLineTwo")}`;
+  const primaryCta =
+    localized(settings.primaryCtaEn, settings.primaryCtaDe) || t("primaryCta");
+  const secondaryCta =
+    localized(settings.secondaryCtaEn, settings.secondaryCtaDe) ||
+    t("secondaryCta");
 
   return (
     <section className="relative w-full overflow-hidden bg-[#CE181B] pt-20 text-white">
@@ -17,31 +35,29 @@ export function Hero() {
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
             <ShieldCheck />
           </span>
-          {t("badge")}
+          {badge}
         </div>
 
         {/* TITLE */}
       <h1 className="mx-auto max-w-6xl text-2xl sm:text-3xl md:text-6xl font-[500] leading-tight font-sans px-4 sm:px-0">
-  {t("titleLineOne")}{" "}
-  {t("titleLineTwo")}
+  {heading}
 </h1>
 
 
         {/* DESCRIPTION */}
        <p className="mx-auto mt-6 max-w-3xl text-sm sm:text-base md:text-lg leading-relaxed text-white/90 px-4 sm:px-0">
-  {t("descriptionLineOne")}{" "}
-  {t("descriptionLineTwo")}
+  {subheading}
 </p>
 
 
         {/* ACTION BUTTONS */}
        <div className="mt-8 flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 px-4 sm:px-0">
-  <Button className="w-full sm:w-auto rounded-full bg-white px-9 py-3 sm:py-4 text-sm font-medium text-[#CE181B] hover:bg-white/90">
-    {t("primaryCta")}
+  <Button asChild className="w-full sm:w-auto rounded-full bg-white px-9 py-3 sm:py-4 text-sm font-medium text-[#CE181B] hover:bg-white/90">
+    <a href={settings.primaryCtaUrl || "#"}>{primaryCta}</a>
   </Button>
 
-  <Button className="w-full sm:w-auto rounded-full bg-black px-9 py-3 sm:py-4 text-sm font-medium text-white hover:bg-black/90">
-    {t("secondaryCta")}
+  <Button asChild className="w-full sm:w-auto rounded-full bg-black px-9 py-3 sm:py-4 text-sm font-medium text-white hover:bg-black/90">
+    <a href={settings.secondaryCtaUrl || "#"}>{secondaryCta}</a>
   </Button>
 </div>
 
@@ -60,14 +76,22 @@ export function Hero() {
 
         {/* IPHONE (ALWAYS VISIBLE) */}
         <div className="relative z-10">
-          <Image
-            src="/assets/hero/iphone.png"
-            alt="Mobile App"
-            width={378}
-            height={760}
-            priority
-            className="object-contain"
-          />
+          {settings.imageUrl ? (
+            <img
+              src={settings.imageUrl}
+              alt={heading}
+              className="h-auto max-h-[760px] w-[378px] max-w-full object-contain"
+            />
+          ) : (
+            <Image
+              src="/assets/hero/iphone.png"
+              alt="Mobile App"
+              width={378}
+              height={760}
+              priority
+              className="object-contain"
+            />
+          )}
 
           {/* USERS BADGE (DESKTOP ONLY) */}
           <div className="absolute -right-20 bottom-20 hidden md:flex items-center gap-2 rounded-full bg-white px-3 py-2 text-gray-900 shadow-lg">
