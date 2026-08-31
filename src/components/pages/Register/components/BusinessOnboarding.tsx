@@ -67,7 +67,9 @@ const PACKAGE_SUBSCRIPTION_STORAGE_KEY = "deliverywayPackageSubscription";
 const TENANT_SIGNUP_TOKEN_STORAGE_KEY = "tenantSignupToken";
 
 const normalizeEmail = (email?: string) => {
-  return String(email || "").trim().toLowerCase();
+  return String(email || "")
+    .trim()
+    .toLowerCase();
 };
 
 const isPlainObject = (value: unknown): value is PlainObject => {
@@ -85,14 +87,8 @@ const extractAccessToken = (data: unknown) => {
     responseData.accessToken ||
       responseData.token ||
       response.accessToken ||
-      response.token
+      response.token,
   );
-};
-
-const extractRefreshToken = (data: unknown) => {
-  const response = normalizePlainObject(data);
-  const responseData = normalizePlainObject(response.data);
-  return toStringValue(responseData.refreshToken || response.refreshToken);
 };
 
 const extractOwnerId = (data: unknown) => {
@@ -111,10 +107,6 @@ const toStringValue = (value: unknown, fallback = "") => {
   return String(value);
 };
 
-const normalizeEnumValue = (value: unknown) => {
-  return toStringValue(value).trim().toUpperCase();
-};
-
 const normalizeArray = (value: unknown) => {
   return Array.isArray(value) ? value : [];
 };
@@ -131,116 +123,9 @@ const omitAuthTokens = (value: PlainObject): PublishedResponseData => {
   return rest;
 };
 
-const buildPublishedFormSummary = (formData: {
-  branch: { name?: string };
-  restaurant: { name?: string };
-  tenant: { name?: string };
-  user: { email?: string };
-}) => {
-  return {
-    branch: {
-      name: formData.branch.name,
-    },
-    restaurant: {
-      name: formData.restaurant.name,
-    },
-    tenant: {
-      name: formData.tenant.name,
-    },
-    user: {
-      email: normalizeEmail(formData.user.email),
-    },
-  };
-};
-
-const buildPackageSubscriptionSession = ({
-  accessToken,
-  formData,
-  refreshToken,
-  registration,
-  subscription,
-}: {
-  accessToken: string;
-  formData: Parameters<typeof buildPublishedFormSummary>[0];
-  refreshToken: string;
-  registration: PlainObject;
-  subscription: PlainObject;
-}) => {
-  const ownerId = toStringValue(registration.ownerId);
-
-  return {
-    auth: {
-      accessToken,
-      refreshToken,
-      ownerId,
-    },
-    emailVerified: false,
-    formData: buildPublishedFormSummary(formData),
-    registration: omitAuthTokens(registration),
-    subscription: {
-      ...subscription,
-      id: subscription.id,
-      paymentRequiredNow: subscription.paymentRequiredNow,
-      paymentStatus: subscription.paymentStatus,
-    },
-  };
-};
-
-const persistPackageSubscriptionSession = (value: PlainObject) => {
-  const serialized = JSON.stringify(value);
-
-  sessionStorage.setItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY, serialized);
-  localStorage.setItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY, serialized);
-};
-
 const clearPackageSubscriptionSession = () => {
   sessionStorage.removeItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY);
   localStorage.removeItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY);
-};
-
-const parsePackageSubscriptionSession = () => {
-  const storedValue =
-    sessionStorage.getItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY) ||
-    localStorage.getItem(PACKAGE_SUBSCRIPTION_STORAGE_KEY);
-
-  try {
-    return normalizePlainObject(JSON.parse(storedValue || "{}"));
-  } catch {
-    return {};
-  }
-};
-
-const shouldCollectPackagePayment = ({
-  selectedPackagePlan,
-  subscription,
-}: {
-  selectedPackagePlan: PackagePlan;
-  subscription: PlainObject;
-}) => {
-  const paymentRequiredNow = subscription.paymentRequiredNow === true;
-  const paymentStatus = normalizeEnumValue(subscription.paymentStatus);
-  const subscriptionPlan = normalizePlainObject(subscription.plan);
-  const billingModel =
-    normalizeEnumValue(subscriptionPlan.billingModel) ||
-    normalizeEnumValue(selectedPackagePlan.billingModel);
-  const trialDays = toNumber(
-    subscriptionPlan.trialDays,
-    selectedPackagePlan.trialDays
-  );
-  const planPrice = toNumber(
-    subscriptionPlan.planPrice,
-    toNumber(selectedPackagePlan.planPrice)
-  );
-  const selectedPaidPlanRequiresPayment =
-    trialDays <= 0 &&
-    planPrice > 0 &&
-    (billingModel === "PLAN" || billingModel === "HYBRID");
-
-  return (
-    paymentRequiredNow ||
-    paymentStatus === "PENDING" ||
-    selectedPaidPlanRequiresPayment
-  );
 };
 
 const normalizeDeliveryMode = (mode: unknown) => {
@@ -262,18 +147,17 @@ const normalizeDeliveryZones = (zones: unknown) => {
         minOrderAmount: toNumber(zone.minOrderAmount, 0),
         freeDeliveryThreshold: toNumber(zone.freeDeliveryThreshold, 0),
         polygon: normalizeArray(zone.polygon)
-        .map((pointValue) => {
-          const point = normalizePlainObject(pointValue);
+          .map((pointValue) => {
+            const point = normalizePlainObject(pointValue);
 
-          return {
-          lat: toNumber(point?.lat, NaN),
-          lng: toNumber(point?.lng, NaN),
-          };
-        })
-        .filter(
-          (point) =>
-            Number.isFinite(point.lat) && Number.isFinite(point.lng)
-        ),
+            return {
+              lat: toNumber(point?.lat, NaN),
+              lng: toNumber(point?.lng, NaN),
+            };
+          })
+          .filter(
+            (point) => Number.isFinite(point.lat) && Number.isFinite(point.lng),
+          ),
       };
     })
     .filter(
@@ -282,7 +166,7 @@ const normalizeDeliveryZones = (zones: unknown) => {
         zone.deliveryFee > 0 ||
         zone.minOrderAmount > 0 ||
         zone.freeDeliveryThreshold > 0 ||
-        zone.polygon.length > 0
+        zone.polygon.length > 0,
     );
 };
 
@@ -305,7 +189,7 @@ const normalizeZoneBands = (bands: unknown) => {
         band.toKm > 0 ||
         band.deliveryFee > 0 ||
         band.minOrderAmount > 0 ||
-        band.freeDeliveryThreshold > 0
+        band.freeDeliveryThreshold > 0,
     );
 };
 
@@ -326,7 +210,7 @@ const normalizePostalCodeRules = (rules: unknown) => {
         rule.postalCode ||
         rule.deliveryFee > 0 ||
         rule.minOrderAmount > 0 ||
-        rule.freeDeliveryThreshold > 0
+        rule.freeDeliveryThreshold > 0,
     );
 };
 
@@ -347,34 +231,34 @@ const createRestaurantBrandingPayload = (brandingValue: unknown) => {
   const textColor = toStringValue(branding.textColor, "#030401");
   const fontFamily = toStringValue(
     branding.fontFamily,
-    "var(--font-onest), 'Onest', 'Onest Fallback', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    "var(--font-onest), 'Onest', 'Onest Fallback', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   );
   const headingFontFamily = toStringValue(
     branding.headingFontFamily,
-    fontFamily
+    fontFamily,
   );
   const borderRadius = toStringValue(branding.borderRadius, "12px");
   const buttonStyle = toStringValue(branding.buttonStyle, "rounded");
   const dark = {
     primaryColor: toStringValue(
       darkInput.primaryColor ?? themeDarkInput.primaryColor,
-      "#FF4D57"
+      "#FF4D57",
     ),
     secondaryColor: toStringValue(
       darkInput.secondaryColor ?? themeDarkInput.secondaryColor,
-      "#F5F5F5"
+      "#F5F5F5",
     ),
     accentColor: toStringValue(
       darkInput.accentColor ?? themeDarkInput.accentColor,
-      "#FBBF24"
+      "#FBBF24",
     ),
     backgroundColor: toStringValue(
       darkInput.backgroundColor ?? themeDarkInput.backgroundColor,
-      "#030401"
+      "#030401",
     ),
     textColor: toStringValue(
       darkInput.textColor ?? themeDarkInput.textColor,
-      "#F5F5F5"
+      "#F5F5F5",
     ),
   };
 
@@ -394,11 +278,17 @@ const createRestaurantBrandingPayload = (brandingValue: unknown) => {
       primaryColor: toStringValue(themeInput.primaryColor, primaryColor),
       secondaryColor: toStringValue(themeInput.secondaryColor, secondaryColor),
       accentColor: toStringValue(themeInput.accentColor, accentColor),
-      backgroundColor: toStringValue(themeInput.backgroundColor, backgroundColor),
+      backgroundColor: toStringValue(
+        themeInput.backgroundColor,
+        backgroundColor,
+      ),
       textColor: toStringValue(themeInput.textColor, textColor),
       dark,
       fontFamily: toStringValue(themeInput.fontFamily, fontFamily),
-      headingFontFamily: toStringValue(themeInput.headingFontFamily, headingFontFamily),
+      headingFontFamily: toStringValue(
+        themeInput.headingFontFamily,
+        headingFontFamily,
+      ),
       borderRadius: toStringValue(themeInput.borderRadius, borderRadius),
       buttonStyle: toStringValue(themeInput.buttonStyle, buttonStyle),
       homeLayout: toStringValue(themeInput.homeLayout, "hero"),
@@ -420,7 +310,7 @@ const createRestaurantBrandingPayload = (brandingValue: unknown) => {
       showSupportContact: Boolean(checkoutInput.showSupportContact ?? true),
       successMessage: toStringValue(
         checkoutInput.successMessage,
-        "Thank you for ordering with us."
+        "Thank you for ordering with us.",
       ),
       highlightColor: toStringValue(checkoutInput.highlightColor, primaryColor),
       successColor: toStringValue(checkoutInput.successColor, "#00A63E"),
@@ -460,9 +350,11 @@ const buildBranchSettingsPayload = (settingsValue: unknown) => {
 
   return {
     deliveryTime: toNumber(settings?.deliveryTime, 45),
-    tableReservationsEnabled: Boolean(settings?.tableReservationsEnabled ?? false),
+    tableReservationsEnabled: Boolean(
+      settings?.tableReservationsEnabled ?? false,
+    ),
     tableReservationAutoAccept: Boolean(
-      settings?.tableReservationAutoAccept ?? false
+      settings?.tableReservationAutoAccept ?? false,
     ),
     tableCount: toNumber(settings?.tableCount, 0),
     allowedOrderTypes,
@@ -472,31 +364,40 @@ const buildBranchSettingsPayload = (settingsValue: unknown) => {
       radiusKm: toNumber(deliveryConfig?.radiusKm ?? settings?.radiusKm, 0),
       minOrderAmount: toNumber(
         deliveryConfig?.minOrderAmount ?? settings?.minOrderAmount,
-        0
+        0,
       ),
-      deliveryFee: toNumber(deliveryConfig?.deliveryFee ?? settings?.deliveryFee, 0),
+      deliveryFee: toNumber(
+        deliveryConfig?.deliveryFee ?? settings?.deliveryFee,
+        0,
+      ),
       isFreeDelivery: Boolean(
-        deliveryConfig?.isFreeDelivery ?? settings?.isFreeDelivery ?? false
+        deliveryConfig?.isFreeDelivery ?? settings?.isFreeDelivery ?? false,
       ),
       freeDeliveryThreshold: toNumber(
-        deliveryConfig?.freeDeliveryThreshold ?? settings?.freeDeliveryThreshold,
-        0
+        deliveryConfig?.freeDeliveryThreshold ??
+          settings?.freeDeliveryThreshold,
+        0,
       ),
       zones: normalizeDeliveryZones(deliveryConfig?.zones),
       zoneBands: normalizeZoneBands(deliveryConfig?.zoneBands),
-      postalCodeRules: normalizePostalCodeRules(deliveryConfig?.postalCodeRules),
+      postalCodeRules: normalizePostalCodeRules(
+        deliveryConfig?.postalCodeRules,
+      ),
     },
     automation: {
       autoAcceptOrders: Boolean(
-        automation?.autoAcceptOrders ?? settings?.autoAcceptOrders ?? false
+        automation?.autoAcceptOrders ?? settings?.autoAcceptOrders ?? false,
       ),
       estimatedPrepTime: toNumber(
         automation?.estimatedPrepTime ?? settings?.estimatedPrepTime,
-        0
+        0,
       ),
     },
     taxation: {
-      taxPercentage: toNumber(taxation?.taxPercentage ?? settings?.taxPercentage, 0),
+      taxPercentage: toNumber(
+        taxation?.taxPercentage ?? settings?.taxPercentage,
+        0,
+      ),
     },
     serviceCharge: {
       isEnabled: Boolean(serviceCharge?.isEnabled ?? false),
@@ -516,7 +417,8 @@ const buildBranchSettingsPayload = (settingsValue: unknown) => {
 export function BusinessOnboarding() {
   const tRegister = useTranslations("register");
   const [activeStep, setActiveStep] = useState<number>(1);
-  const [publishedData, setPublishedData] = useState<PublishedResponseData | null>(null);
+  const [publishedData, setPublishedData] =
+    useState<PublishedResponseData | null>(null);
   const [selectedPackagePlanId, setSelectedPackagePlanId] = useState("");
   const [packagePlans, setPackagePlans] = useState<PackagePlan[]>([]);
   const [packagePlansLoading, setPackagePlansLoading] = useState(true);
@@ -734,7 +636,7 @@ export function BusinessOnboarding() {
 
   useEffect(() => {
     const packagePlanId = new URLSearchParams(window.location.search).get(
-      "packagePlanId"
+      "packagePlanId",
     );
     const storedPackagePlanId = localStorage.getItem("selectedPackagePlanId");
     const nextPackagePlanId = packagePlanId || storedPackagePlanId || "";
@@ -754,12 +656,12 @@ export function BusinessOnboarding() {
 
       try {
         const response = await fetch(
-          `${API_BASE_URL}/v1/package-plans?page=1&limit=100&includeInactive=false`
+          `${API_BASE_URL}/v1/package-plans?page=1&limit=100&includeInactive=false`,
         );
         const payload: unknown = await response.json();
         const responseData = normalizePlainObject(payload);
-        const plans = normalizeArray(responseData.data)
-          .filter((plan): plan is PackagePlan => {
+        const plans = normalizeArray(responseData.data).filter(
+          (plan): plan is PackagePlan => {
             const packagePlan = normalizePlainObject(plan);
 
             return (
@@ -771,12 +673,13 @@ export function BusinessOnboarding() {
               typeof packagePlan.currency === "string" &&
               packagePlan.isActive !== false
             );
-          });
+          },
+        );
 
         if (!response.ok) {
           throw new Error(
             getMessageValue(responseData.message) ||
-              "Unable to load package plans"
+              "Unable to load package plans",
           );
         }
 
@@ -794,7 +697,9 @@ export function BusinessOnboarding() {
         if (!isMounted) return;
 
         setPackagePlansError(
-          error instanceof Error ? error.message : "Unable to load package plans"
+          error instanceof Error
+            ? error.message
+            : "Unable to load package plans",
         );
       } finally {
         if (isMounted) {
@@ -814,7 +719,9 @@ export function BusinessOnboarding() {
 
   const activeIndex = ONBOARDING_STEPS.findIndex((s) => s.id === activeStep);
   const selectedPackagePlan = useMemo(() => {
-    return packagePlans.find((plan) => plan.id === selectedPackagePlanId) || null;
+    return (
+      packagePlans.find((plan) => plan.id === selectedPackagePlanId) || null
+    );
   }, [packagePlans, selectedPackagePlanId]);
   const canSubmitRegistration = Boolean(selectedPackagePlan);
 
@@ -884,7 +791,7 @@ export function BusinessOnboarding() {
     setLoading(true);
 
     const branchSettingsPayload = buildBranchSettingsPayload(
-      formData.branch.settings
+      formData.branch.settings,
     );
     const payload = {
       packagePlanId: selectedPackagePlan.id,
@@ -918,7 +825,9 @@ export function BusinessOnboarding() {
         customDomain: formData.restaurant.customDomain || "",
         bio: formData.restaurant.bio || "",
         tagline: formData.restaurant.tagline,
-        supportContact: normalizePlainObject(formData.restaurant.supportContact),
+        supportContact: normalizePlainObject(
+          formData.restaurant.supportContact,
+        ),
         branding: createRestaurantBrandingPayload(formData.restaurant.branding),
         socialMedia: normalizePlainObject(formData.restaurant.socialMedia),
       },
@@ -963,24 +872,17 @@ export function BusinessOnboarding() {
       if (!response.ok) {
         toast.error(
           getMessageValue(responseData.message) ||
-            tRegister("toasts.registrationFailed")
+            tRegister("toasts.registrationFailed"),
         );
         return;
       }
 
       const token = extractAccessToken(data);
-      const refreshToken = extractRefreshToken(data);
       const ownerId = extractOwnerId(data);
       const registrationData: PlainObject = {
         ...nestedResponseData,
         ...(ownerId ? { ownerId } : {}),
       };
-      const subscription = normalizePlainObject(registrationData.subscription);
-      const shouldShowPackagePayment = shouldCollectPackagePayment({
-        selectedPackagePlan,
-        subscription,
-      });
-
       setPublishedData(omitAuthTokens(registrationData));
 
       if (!token) {
@@ -990,20 +892,7 @@ export function BusinessOnboarding() {
 
       localStorage.removeItem("selectedPackagePlanId");
       localStorage.setItem(TENANT_SIGNUP_TOKEN_STORAGE_KEY, token);
-
-      if (shouldShowPackagePayment) {
-        persistPackageSubscriptionSession(
-          buildPackageSubscriptionSession({
-            accessToken: token,
-            formData,
-            refreshToken,
-            registration: registrationData,
-            subscription,
-          })
-        );
-      } else {
-        clearPackageSubscriptionSession();
-      }
+      clearPackageSubscriptionSession();
 
       startOtpVerification({
         email: formData.user.email,
@@ -1016,7 +905,7 @@ export function BusinessOnboarding() {
       toast.error(
         error instanceof Error
           ? error.message
-          : tRegister("toasts.genericError")
+          : tRegister("toasts.genericError"),
       );
     } finally {
       setLoading(false);
@@ -1036,7 +925,8 @@ export function BusinessOnboarding() {
       return;
     }
 
-    const token = accessToken || localStorage.getItem(TENANT_SIGNUP_TOKEN_STORAGE_KEY);
+    const token =
+      accessToken || localStorage.getItem(TENANT_SIGNUP_TOKEN_STORAGE_KEY);
 
     setOtpLoading(true);
 
@@ -1063,24 +953,13 @@ export function BusinessOnboarding() {
 
       if (!res.ok) {
         throw new Error(
-            getMessageValue(responseData.message) ||
+          getMessageValue(responseData.message) ||
             getMessageValue(responseError.message) ||
-            tRegister("otp.verificationFailed")
+            tRegister("otp.verificationFailed"),
         );
       }
 
       toast.success(tRegister("otp.emailVerified"));
-
-      const packageSubscription = parsePackageSubscriptionSession();
-
-      if (Object.keys(packageSubscription).length > 0) {
-        persistPackageSubscriptionSession({
-          ...packageSubscription,
-          emailVerified: true,
-        });
-        window.location.assign("/package-payment");
-        return;
-      }
 
       localStorage.removeItem(TENANT_SIGNUP_TOKEN_STORAGE_KEY);
 
@@ -1094,7 +973,7 @@ export function BusinessOnboarding() {
       toast.error(
         error instanceof Error
           ? error.message
-          : tRegister("otp.verificationFailed")
+          : tRegister("otp.verificationFailed"),
       );
     } finally {
       setOtpLoading(false);
@@ -1135,16 +1014,16 @@ export function BusinessOnboarding() {
         throw new Error(
           getMessageValue(responseData.message) ||
             getMessageValue(responseError.message) ||
-            tRegister("otp.resendFailed")
+            tRegister("otp.resendFailed"),
         );
       }
 
       toast.success(
-        getMessageValue(responseData.message) || tRegister("otp.resendSent")
+        getMessageValue(responseData.message) || tRegister("otp.resendSent"),
       );
     } catch (error: unknown) {
       toast.error(
-        error instanceof Error ? error.message : tRegister("otp.resendFailed")
+        error instanceof Error ? error.message : tRegister("otp.resendFailed"),
       );
     } finally {
       setResendOtpLoading(false);
@@ -1170,9 +1049,7 @@ export function BusinessOnboarding() {
           </p>
 
           <div className="mt-4 rounded-xl bg-gray-50 border border-gray-100 px-4 py-3">
-            <p className="text-xs text-gray-500">
-              {tRegister("otp.sentTo")}
-            </p>
+            <p className="text-xs text-gray-500">{tRegister("otp.sentTo")}</p>
             <p className="text-sm font-semibold text-gray-900 break-all mt-1">
               {verificationEmail || tRegister("otp.fallbackEmail")}
             </p>
@@ -1190,7 +1067,9 @@ export function BusinessOnboarding() {
               autoComplete="one-time-code"
               placeholder={tRegister("otp.placeholder")}
               value={cleanedOtp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              onChange={(e) =>
+                setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+              }
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !otpLoading && isOtpValid) {
                   handleVerifyOtp();
