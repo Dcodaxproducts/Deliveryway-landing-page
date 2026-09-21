@@ -1,28 +1,28 @@
 "use client";
 
+import { useLocale } from "next-intl";
+
 import { ContentWithChecklistSection } from "@/components/common/shared/ContentWithChecklistSection";
-import { homeChecklistSections } from "@/constants/home";
-import { useTranslations } from "next-intl";
+import { useLandingSettings } from "@/components/providers/LandingSettingsProvider";
 
 export function SectionSix() {
-  const t = useTranslations();
-  const section = homeChecklistSections.growth;
+  const locale = useLocale();
+  const section = useLandingSettings().home.growth;
+  const isGerman = locale.startsWith("de");
+
+  if (!section.isVisible || !section.imageUrl) return null;
 
   return (
     <ContentWithChecklistSection
       reverseOnMobile
       imagePosition="left"
-      title={
-        <>
-          {t("home.sectionSix.titleLineOne")} <br className="hidden sm:block" />
-          {t("home.sectionSix.titleLineTwo")} <br className="hidden sm:block" />
-          {t("home.sectionSix.titleLineThree")}
-        </>
+      title={isGerman ? section.headingDe : section.headingEn}
+      description={
+        (isGerman ? section.descriptionDe : section.descriptionEn) || ""
       }
-      description={t(section.descriptionKey)}
-      checklist={section.checklistKeys.map((key) => t(key))}
-      imageSrc="/assets/sectionSix/dining.png"
-      imageAlt="Restaurant dining experience"
+      checklist={isGerman ? section.checklistDe : section.checklistEn}
+      imageSrc={section.imageUrl}
+      imageAlt=""
       imageWidth={520}
       imageHeight={620}
     />

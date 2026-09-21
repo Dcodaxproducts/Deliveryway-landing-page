@@ -1,28 +1,28 @@
 "use client";
 
+import { useLocale } from "next-intl";
+
 import { ContentWithChecklistSection } from "@/components/common/shared/ContentWithChecklistSection";
-import { homeChecklistSections } from "@/constants/home";
-import { useTranslations } from "next-intl";
+import { useLandingSettings } from "@/components/providers/LandingSettingsProvider";
 
 export function SectionSeven() {
-  const t = useTranslations();
-  const section = homeChecklistSections.orderManagement;
+  const locale = useLocale();
+  const section = useLandingSettings().home.orderManagement;
+  const isGerman = locale.startsWith("de");
+
+  if (!section.isVisible || !section.imageUrl) return null;
 
   return (
     <ContentWithChecklistSection
-      imagePosition="right" 
-       reverseOnMobile
-      title={
-        <>
-          {t("home.sectionSeven.titleLineOne")} <br className="hidden sm:block" />
-          {t("home.sectionSeven.titleLineTwo")} <br className="hidden sm:block" />
-          {t("home.sectionSeven.titleLineThree")}
-        </>
+      imagePosition="right"
+      reverseOnMobile
+      title={isGerman ? section.headingDe : section.headingEn}
+      description={
+        (isGerman ? section.descriptionDe : section.descriptionEn) || ""
       }
-      description={t(section.descriptionKey)}
-      checklist={section.checklistKeys.map((key) => t(key))}
-      imageSrc="/assets/sectionSeven/map.png"
-      imageAlt="Global restaurant order management map"
+      checklist={isGerman ? section.checklistDe : section.checklistEn}
+      imageSrc={section.imageUrl}
+      imageAlt=""
       imageWidth={560}
       imageHeight={420}
     />

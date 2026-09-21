@@ -1,79 +1,50 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
 
-const topLogos = [
-  { name: "Brand One", src: "/assets/sectionFour/brand1.png" },
-  { name: "Bone’s", src: "/assets/sectionFour/brand2.png" },
-  { name: "Red Lobster", src: "/assets/sectionFour/brand3.png" },
-];
-
-const bottomLogos = [
-  { name: "Alexandre", src: "/assets/sectionFour/brand4.png" },
-  { name: "The Grill", src: "/assets/sectionFour/brand5.png" },
-  { name: "Chefscraft", src: "/assets/sectionFour/brand6.png" },
-  { name: "The Backside", src: "/assets/sectionFour/brand7.png" },
-];
+import { useLandingSettings } from "@/components/providers/LandingSettingsProvider";
 
 export function SectionFour() {
-  const t = useTranslations("home.sectionFour");
+  const locale = useLocale();
+  const section = useLandingSettings().home.featuredRestaurants;
+  const heading = locale.startsWith("de")
+    ? section.headingDe
+    : section.headingEn;
+
+  if (!section.isVisible || section.items.length === 0) return null;
 
   return (
-    <section className="w-full bg-white py-12 md:py-15">
+    <section className="w-full bg-white py-14 md:py-20">
       <div className="mx-auto max-w-7xl px-4 text-center">
-        {/* Heading */}
-        <h2 className="text-xl font-medium text-gray-900 font-heading">
-          {t("trustedBy")} <span className="font-bold">5,500+</span> {t("industryLeaders")}
-        </h2>
-
-        {/* ================= MOBILE GRID (2 logos per row) ================= */}
-        <div className="mt-10 grid grid-cols-2 gap-6 md:hidden">
-          {[...topLogos, ...bottomLogos].map((logo, index) => (
-            <div key={index} className="flex justify-center items-center">
-              <Image
-                src={logo.src}
-                alt={logo.name}
-                width={150}
-                height={50}
-                className="object-contain"
-              />
+        {heading ? (
+          <h2 className="text-2xl font-bold text-gray-900 md:text-4xl">
+            {heading}
+          </h2>
+        ) : null}
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {section.items.map((restaurant) => (
+            <div
+              key={restaurant.id}
+              className="flex min-h-32 items-center justify-center rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+            >
+              {restaurant.logoUrl ? (
+                <Image
+                  src={restaurant.logoUrl}
+                  alt={restaurant.name}
+                  width={240}
+                  height={64}
+                  unoptimized
+                  className="max-h-16 max-w-full object-contain"
+                />
+              ) : (
+                <span className="font-semibold text-gray-900">
+                  {restaurant.name}
+                </span>
+              )}
             </div>
           ))}
         </div>
-
-        {/* ================= DESKTOP (ORIGINAL LAYOUT) ================= */}
-        <div className="hidden md:block">
-          {/* Top Logos */}
-          <div className="mt-10 flex items-center justify-center gap-16">
-            {topLogos.map((logo, index) => (
-              <Image
-                key={index}
-                src={logo.src}
-                alt={logo.name}
-                width={180}
-                height={60}
-                className="object-contain"
-              />
-            ))}
-          </div>
-
-          {/* Bottom Logos */}
-          <div className="mt-8 flex items-center justify-center gap-14">
-            {bottomLogos.map((logo, index) => (
-              <Image
-                key={index}
-                src={logo.src}
-                alt={logo.name}
-                width={150}
-                height={45}
-                className="object-contain"
-              />
-            ))}
-          </div>
-        </div>
-
-     
       </div>
     </section>
   );
