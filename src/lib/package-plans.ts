@@ -23,10 +23,10 @@ const isPackagePlan = (value: unknown): value is PackagePlan => {
 export const getPackagePlans = async () => {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/v1/package-plans?page=1&limit=100&includeInactive=false`,
+      `${API_BASE_URL}/v1/package-plans?page=1&limit=100&includeInactive=false&landingOnly=true`,
       {
         cache: "no-store",
-      }
+      },
     );
 
     if (!response.ok) return [];
@@ -34,7 +34,9 @@ export const getPackagePlans = async () => {
     const payload = (await response.json()) as PackagePlansResponse;
     const plans = Array.isArray(payload.data) ? payload.data : [];
 
-    return plans.filter(isPackagePlan).filter((plan) => plan.isActive !== false);
+    return plans
+      .filter(isPackagePlan)
+      .filter((plan) => plan.isActive !== false);
   } catch {
     return [];
   }

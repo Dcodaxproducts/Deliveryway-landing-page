@@ -1,5 +1,4 @@
 import { PlanCard } from "@/components/common/cards/PlanCard";
-import { plans } from "@/constants/pricing";
 import type { PackagePlan } from "@/types/package-plans";
 
 interface PlansProps {
@@ -7,15 +6,16 @@ interface PlansProps {
 }
 
 export const Plans = ({ packagePlans }: PlansProps) => {
-  const visiblePlans = packagePlans.length ? packagePlans : plans;
-  const mostPopularIndex = Math.floor(visiblePlans.length / 2);
+  const mostPopularIndex = Math.floor(packagePlans.length / 2);
+
+  if (packagePlans.length === 0) return null;
 
   return (
     <section className="w-full bg-slate-50 pb-20 pt-20 lg:pt-36 px-6">
       <div className="mx-auto flex flex-col md:flex-row justify-center items-stretch gap-8">
-        {visiblePlans.map((plan, index) => (
+        {packagePlans.map((plan, index) => (
           <PlanCard
-            key={"id" in plan ? plan.id : plan.nameKey}
+            key={plan.id}
             plan={plan}
             isHighlighted={index === mostPopularIndex}
           />
