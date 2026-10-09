@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { API_BASE_URL } from "@/lib/constants";
-import { prepareUploadFile } from "@/lib/prepare-upload-file";
 import { useTranslations } from "next-intl";
 
 interface UploadResult {
@@ -44,55 +43,19 @@ export const useFileUpload = () => {
         throw new Error(tValidation("fileMaxSize", { size: MAX_UPLOAD_FILE_SIZE_MB }));
       }
 
-      const prepared = await prepareUploadFile(file);
-
       const token =
         typeof window !== "undefined"
           ? localStorage.getItem("token")
           : null;
 
-      /* 🔥 STEP 1: PRESIGNED URL */
-      const presignedRes = await fetch(
-        `${API_BASE_URL}/v1/storage/presigned-upload`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({
-            fileName: prepared.file.name,
-            contentType: prepared.file.type,
-            fileSize: prepared.file.size,
-          }),
-        }
-      );
-
-      if (!presignedRes.ok) {
-        throw new Error(tErrors("uploadUrlFailed"));
-      }
-
-      const presigned = (await presignedRes.json()) as PresignedUploadResponse;
-      const uploadData = presigned?.data;
-
-      if (!uploadData?.uploadUrl) {
-        throw new Error(tErrors("invalidPresignedResponse"));
-      }
-
-      const uploadUrl = uploadData.uploadUrl;
-
-      /* 🔥 STEP 2: UPLOAD WITH XHR (PROGRESS) */
-      await new Promise<void>((resolve, reject) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("assetType", "logo");
+      const uploadData = await new Promise<PresignedUploadData>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
 
-        xhr.open(uploadData.method || "PUT", uploadUrl);
-
-        /* headers */
-        if (uploadData.headers) {
-          Object.entries(uploadData.headers).forEach(([key, value]) => {
-            xhr.setRequestHeader(key, value);
-          });
-        }
+        xhr.open("POST", `${API_BASE_URL}/v1/storage/upload-image`);
+        if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
 
         /* 🔥 PROGRESS TRACK */
         xhr.upload.onprogress = (event) => {
@@ -104,7 +67,12 @@ export const useFileUpload = () => {
 
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
+            const response = JSON.parse(xhr.responseText) as PresignedUploadResponse;
+            if (!response.data?.fileUrl || !response.data.key) {
+              reject(new Error(tErrors("invalidPresignedResponse")));
+              return;
+            }
+            resolve(response.data);
           } else {
             reject(new Error(tErrors("uploadFailed")));
           }
@@ -112,7 +80,7 @@ export const useFileUpload = () => {
 
         xhr.onerror = () => reject(new Error(tErrors("uploadFailed")));
 
-        xhr.send(prepared.file);
+        xhr.send(formData);
       });
 
       toast.success(tCommon("fileUploaded"));
