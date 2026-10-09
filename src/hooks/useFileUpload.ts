@@ -40,48 +40,56 @@ export const useFileUpload = () => {
       setProgress(0);
 
       if (file.size > MAX_UPLOAD_FILE_SIZE_BYTES) {
-        throw new Error(tValidation("fileMaxSize", { size: MAX_UPLOAD_FILE_SIZE_MB }));
+        throw new Error(
+          tValidation("fileMaxSize", { size: MAX_UPLOAD_FILE_SIZE_MB }),
+        );
       }
 
       const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem("token")
-          : null;
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
       const formData = new FormData();
       formData.append("file", file);
       formData.append("assetType", "logo");
-      const uploadData = await new Promise<PresignedUploadData>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
+      const uploadData = await new Promise<PresignedUploadData>(
+        (resolve, reject) => {
+          const xhr = new XMLHttpRequest();
 
-        xhr.open("POST", `${API_BASE_URL}/v1/storage/upload-image`);
-        if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+          xhr.open("POST", `${API_BASE_URL}/v1/storage/upload-image`);
+          if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
 
-        /* 🔥 PROGRESS TRACK */
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 100);
-            setProgress(percent);
-          }
-        };
-
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            const response = JSON.parse(xhr.responseText) as PresignedUploadResponse;
-            if (!response.data?.fileUrl || !response.data.key) {
-              reject(new Error(tErrors("invalidPresignedResponse")));
-              return;
+          /* 🔥 PROGRESS TRACK */
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percent = Math.round((event.loaded / event.total) * 100);
+              setProgress(percent);
             }
-            resolve(response.data);
-          } else {
-            reject(new Error(tErrors("uploadFailed")));
-          }
-        };
+          };
 
-        xhr.onerror = () => reject(new Error(tErrors("uploadFailed")));
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                const response = JSON.parse(
+                  xhr.responseText,
+                ) as PresignedUploadResponse;
+                if (!response.data?.fileUrl || !response.data.key) {
+                  reject(new Error(tErrors("invalidPresignedResponse")));
+                  return;
+                }
+                resolve(response.data);
+              } catch {
+                reject(new Error(tErrors("invalidPresignedResponse")));
+              }
+            } else {
+              reject(new Error(tErrors("uploadFailed")));
+            }
+          };
 
-        xhr.send(formData);
-      });
+          xhr.onerror = () => reject(new Error(tErrors("uploadFailed")));
+
+          xhr.send(formData);
+        },
+      );
 
       toast.success(tCommon("fileUploaded"));
 
@@ -94,7 +102,7 @@ export const useFileUpload = () => {
       toast.error(
         err instanceof Error && err.message
           ? err.message
-          : tErrors("uploadFailed")
+          : tErrors("uploadFailed"),
       );
       return null;
     } finally {
